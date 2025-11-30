@@ -1,6 +1,6 @@
-function fetchUtil(url, action){
-    fetch(url)
-        .then(data => data.json())
+function fetchUtil(url, action, method="GET"){
+    fetch(url, {method: method})
+    .then(data => data.json())
     .then(action)
     .catch(err => console.error(err));
 }

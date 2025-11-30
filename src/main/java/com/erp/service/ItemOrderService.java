@@ -1,9 +1,11 @@
 package com.erp.service;
 
+import com.erp.controller.exception.ItemOrderNotFoundException;
 import com.erp.dto.ItemOrderDetailDTO;
 import com.erp.repository.*;
 import com.erp.dto.ItemOrderDTO;
 import com.erp.repository.entity.ItemOrder;
+import com.erp.repository.entity.ItemOrderDetail;
 import com.erp.repository.entity.Store;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,5 +58,22 @@ public class ItemOrderService {
 
     public List<ItemOrderDetailDTO> getItemOrderDetailByOrderNo(Long itemOrderNo) {
         return orderDetailRepo.findAllItemOrderDetail(ItemOrder.builder().itemOrderNo(itemOrderNo).build());
+    }
+
+    public void cancelItemOrder(Long orderNo) {
+        // 대기 중 발주 선택
+        boolean result = false;
+        ItemOrder itemOrder = repoOrder.findByItemOrderStatusAndStoreNo(
+                "대기",
+                Store.builder().storeNo(orderNo).build() // 직영점 번호 지정
+        ).get(0);
+
+        if(itemOrder == null){
+            throw new ItemOrderNotFoundException(orderNo);
+        }
+
+        // 선택한 발주 요청 번호 데이터 상태 취소 변경
+        itemOrder.setItemOrderStatus("취소"); // 상태 변경
+        itemOrder.setProcessDatetime(new Timestamp(System.currentTimeMillis())); // 처리 시간
     }
 }
