@@ -24,13 +24,13 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         if(role.equals("ROLE_ADMIN")) {
             response.sendRedirect("/admin/home");
-            return;
+
         } else if(role.equals("ROLE_MANAGER")) {
             response.sendRedirect("/manager/salesMain");
-            return;
+
         } else if(role.equals("ROLE_STORE")) {
             response.sendRedirect("/store/storeSalesMain");
-            return;
+
         }
 
     }

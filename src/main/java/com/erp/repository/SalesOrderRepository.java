@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 @Repository
-public interface SalesOrderRepository extends JpaRepository<SalesOrder, Long>, Specification<SalesOrder> {
+public interface SalesOrderRepository extends JpaRepository<SalesOrder, Long>{
 
 
     @Query("""

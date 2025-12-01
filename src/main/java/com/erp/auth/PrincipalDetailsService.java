@@ -19,7 +19,9 @@ public class PrincipalDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String managerId) throws UsernameNotFoundException {
 
+
         ManagerDTO manager = managerDAO.getManagerForLogin(managerId);
+
         if (manager == null) {
             throw new UsernameNotFoundException("해당 아이디가 존재하지 않습니다: " + managerId);
         }

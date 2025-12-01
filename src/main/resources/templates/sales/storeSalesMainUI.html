@@ -187,7 +187,42 @@
 
 <script>
 
-  /* === 화면 전환 === */
+
+  $(document).on("change", "#startInput", function () {
+    const start = $(this).val();
+    $("#endInput").attr("min", start);
+
+    if ($("#endInput").val() && $("#endInput").val() < start) {
+      $("#endInput").val(start);
+    }
+  });
+
+  $(document).on("change", "#endInput", function () {
+    const end = $(this).val();
+    $("#startInput").attr("max", end);
+
+    if ($("#startInput").val() && $("#startInput").val() > end) {
+      $("#startInput").val(end);
+    }
+  });
+
+  $("#getSalesBtn").on("click", function () {
+
+    const type = $("input[name='period']:checked").attr("id");
+
+    const start = $("#startInput").val();
+    const end   = $("#endInput").val();
+
+    if (!start || !end) {
+      alert("조회기간을 입력하세요.");
+      return;
+    }
+
+    loadTrend(type, start, end);
+    loadKPI(type, start, end);
+  });
+
+
   $("#chartBtn").on("click", ()=>showChart());
   $("#listBtn").on("click", ()=>showList());
 
@@ -227,7 +262,7 @@
   });
 
 
-  /* ================= 메인 차트 ================= */
+
   let mainChart;
 
   function createMainChart(labels, values){
@@ -448,25 +483,34 @@
 
 
 
-  /* ================= 초기 로딩 ================= */
-
   $(document).ready(function(){
 
     showChart();
-
     $("#day").prop("checked", true);
     updatePeriodInputs("day");
 
     const today = new Date();
-    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
+
+    let startObj, endObj;
+
+    if (today.getDate() === 1) {
+      const prevLast = new Date(today.getFullYear(), today.getMonth(), 0);
+      const prevStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+      startObj = prevStart;
+      endObj = prevLast;
+    } else {
+      const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      startObj = monthStart;
+      endObj = yesterday;
+    }
 
     const toDate = d =>
             `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 
-    const s = toDate(monthStart);
-    const e = toDate(yesterday);
+    const s = toDate(startObj);
+    const e = toDate(endObj);
 
     $("#startInput").val(s);
     $("#endInput").val(e);
