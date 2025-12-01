@@ -21,9 +21,11 @@ function fetchUtil(url, action, method="GET", json=null){
     .catch(err => console.error(err));
 }
 
+let currentPage = 1;
 $(document).on("click", "#pagination .page-link", function () {
 
     const page = $(this).data("page");
+    currentPage = page;
     const current = $("#pagination .active a").data("page");
 
     // 이전

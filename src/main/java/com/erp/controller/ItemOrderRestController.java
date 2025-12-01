@@ -34,10 +34,11 @@ public class ItemOrderRestController {
     }
     @GetMapping("/itemOrder/itemOrderListFilter")
     public Map<String, Object> itemOrderListFilter(@RequestParam int pageNo,
+                                                 @RequestParam Long storeNo,
                                                  @RequestParam String startDate,
                                                  @RequestParam String endDate,
                                                  @RequestParam String orderStatus) {
-        Page<ItemOrderDTO> page = itemOrderService.getItemOrderList(pageNo, orderStatus, startDate, endDate);
+        Page<ItemOrderDTO> page = itemOrderService.getItemOrderList(pageNo, storeNo, orderStatus, startDate, endDate);
         return Map.of(
                 "list", page.getContent(),
                 "totalPages", page.getTotalPages(),
@@ -102,8 +103,37 @@ public class ItemOrderRestController {
 
     @PostMapping("/itemOrder/itemOrder")
     public ResponseEntity<Map<String, String>> requestItemOrder(@RequestBody ItemOrderRequestDTO request) {
-        itemOrderService.requestItemOrder(request);
-
+        try {
+            itemOrderService.requestItemOrder(request);
+        }
+        catch (Exception e) {
+            System.err.println(e.getMessage());
+            return ResponseEntity.status(400).build();
+        }
         return ResponseEntity.ok().body(Map.of("message", "Request ItemOrder Success"));
+    }
+
+    @PutMapping("/itemOrder/approveItemOrder/{itemOrderNo}")
+    public ResponseEntity<Map<String, String>> approveItemOrder(@PathVariable Long itemOrderNo) {
+        try {
+            itemOrderService.approveItemOrder(itemOrderNo, "galaxy0712");
+        }
+        catch (ItemOrderNotFoundException e) {
+            System.err.println(e.getMessage());
+            return ResponseEntity.status(400).build();
+        }
+        return ResponseEntity.ok().body(Map.of("message", "Approve ItemOrder Success"));
+    }
+
+    @PutMapping("/itemOrder/declineItemOrder/{itemOrderNo}")
+    public ResponseEntity<Map<String, String>> declineItemOrder(@PathVariable Long itemOrderNo) {
+        try {
+            itemOrderService.declineItemOrder(itemOrderNo, "galaxy0712");
+        }
+        catch (ItemOrderNotFoundException e) {
+            System.err.println(e.getMessage());
+            return ResponseEntity.status(400).build();
+        }
+        return ResponseEntity.ok().body(Map.of("message", "Decline ItemOrder Success"));
     }
 }

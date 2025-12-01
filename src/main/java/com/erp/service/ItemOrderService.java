@@ -40,16 +40,14 @@ public class ItemOrderService {
     }
 
     public Page<ItemOrderDTO> getItemOrderList(Integer pageNo) {
-        return repoOrder.findAllItemOrderList(PageRequest.of(pageNo, 10, Sort.by("itemOrderNo").descending()), null, null, null);
+        return repoOrder.findAllItemOrderList(PageRequest.of(pageNo, 10, Sort.by("itemOrderNo").descending()), null, null, null, null);
     }
-    public Page<ItemOrderDTO> getItemOrderList(Integer pageNo, String orderStatus, String startDate, String endDate) {
+    public Page<ItemOrderDTO> getItemOrderList(Integer pageNo, Long storeNo, String orderStatus, String startDate, String endDate) {
         LocalDateTime startDateTime = startDate.isEmpty() ? null : LocalDate.parse(startDate).atStartOfDay();
-        LocalDateTime endDateTime = endDate.isEmpty() ? null : LocalDate.parse(endDate).atStartOfDay();
-
-        if(startDate.equals(endDate)) {endDateTime = endDateTime.plusDays(1);}
-        String status = orderStatus.equals("전체") ? "" : orderStatus;
-
-        return repoOrder.findAllItemOrderList(PageRequest.of(pageNo, 10, Sort.by("itemOrderNo").descending()), status, startDateTime, endDateTime);
+        LocalDateTime endDateTime = endDate.isEmpty() ? null : (endDate.equals(startDate) ? LocalDate.parse(endDate).plusDays(1).atStartOfDay() : LocalDate.parse(endDate).atStartOfDay());
+        String status = orderStatus.equals("전체") ? null : orderStatus;
+        storeNo = storeNo == 0 ? null : storeNo;
+        return repoOrder.findAllItemOrderList(PageRequest.of(pageNo, 10, Sort.by("itemOrderNo").descending()), storeNo, status, startDateTime, endDateTime);
     }
 
     public Page<ItemOrderDTO> getItemOrderListByDate(Integer pageNo, LocalDate startDate, LocalDate endDate) {
@@ -191,5 +189,31 @@ public class ItemOrderService {
 
             orderDetailRepo.save(orderDetail);
         });
+    }
+
+    public void approveItemOrder(Long itemOrderNo, String managerId) {
+        // 대기 중 발주 선택
+        ItemOrder itemOrder = repoOrder.findById(itemOrderNo).orElseThrow(() -> new ItemOrderNotFoundException(itemOrderNo) );
+
+        // 선택한 발주 요청 번호 데이터 상태 승인 변경
+        if(itemOrder != null){
+            itemOrder.setManagerId(Manager.builder().managerId(managerId).build());
+            itemOrder.setItemOrderStatus("승인"); // 상태 변경
+            itemOrder.setProcessDatetime(new Timestamp(System.currentTimeMillis())); // 처리 시간
+            repoOrder.save(itemOrder);
+        }
+    }
+    
+    public void declineItemOrder(Long itemOrderNo, String managerId){
+        // 대기 중 발주 선택
+        ItemOrder itemOrder = repoOrder.findById(itemOrderNo).orElseThrow(() -> new ItemOrderNotFoundException(itemOrderNo) );
+
+        // 선택한 발주 요청 번호 데이터 상태 승인 변경
+        if(itemOrder != null){
+            itemOrder.setManagerId(Manager.builder().managerId(managerId).build());
+            itemOrder.setItemOrderStatus("반려"); // 상태 변경
+            itemOrder.setProcessDatetime(new Timestamp(System.currentTimeMillis())); // 처리 시간
+            repoOrder.save(itemOrder);
+        }
     }
 }

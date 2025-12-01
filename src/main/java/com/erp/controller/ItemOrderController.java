@@ -29,6 +29,6 @@ public class ItemOrderController {
     }
     @GetMapping("/itemOrder/itemOrderListManager")
     public String itemOrderHistoryManager() {
-        return "/itemOrder/itemOrderListManager";
+        return "/itemOrder/itemOrderHistoryManager";
     }
 }

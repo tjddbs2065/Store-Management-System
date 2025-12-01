@@ -33,14 +33,15 @@ public interface ItemOrderRepository extends JpaRepository<ItemOrder, Long> {
     from ItemOrder io
     left join io.storeNo st
     left join ItemOrderDetail od on od.itemOrderNo.itemOrderNo = io.itemOrderNo
-    where (
-        ((:start is null or io.requestDatetime >= :start) and (:end is null or io.requestDatetime <= :end))
-        or io.itemOrderStatus = :status)
+    where (:start is null or io.requestDatetime >= :start)
+              and (:end is null or io.requestDatetime <= :end)
+              and (:status is null or io.itemOrderStatus = :status)
+              and (:storeNo is null or io.storeNo.storeNo = :storeNo)
     group by io.itemOrderNo, st.storeNo, st.storeName,
                 io.requestDatetime, io.totalItem,
                 io.totalAmount, io.itemOrderStatus
 """)
-    Page<ItemOrderDTO> findAllItemOrderList(Pageable pageable, String status, LocalDateTime start, LocalDateTime end);
+    Page<ItemOrderDTO> findAllItemOrderList(Pageable pageable, Long storeNo, String status, LocalDateTime start, LocalDateTime end);
 
     @Query("""
     select new com.erp.dto.ItemOrderDTO(
