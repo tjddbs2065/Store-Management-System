@@ -24,18 +24,14 @@ public class ManagerDAOTest {
     @Test
     void addManager() {
         ManagerDTO manager = ManagerDTO.builder()
-                .managerId("test123")
-                .pw("1234")
+                .managerId("testStore")
+                .pw(encoder.encode("1234"))
                 .email("test@test.com")
-                .managerName("테스트매니저")
+                .managerName("테스트직영점")
                 .phoneNumber("010-1111-2222")
-                .role("ROLE_MANAGER")
+                .role("ROLE_STORE")
                 .build();
 
-        if ("test123".equals(manager.getManagerId())){
-            System.out.println("아이디 중복");
-            return;
-        }
         managerDAO.addManager(manager);
     }
 

@@ -38,131 +38,43 @@
         }
     </style>
 </head>
-<body>
-
+<body th:attr="data-role=${role}, data-item-no=${itemNo}">
 <header th:replace="fragments/toolBarManager :: toolBarManager"></header>
 
-<main class="py-3">
-    <div class="wrapper-box">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-
-                <!-- 제목 + 버튼 -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="fw-bold mb-0">재고 품목 상세 보기</h2>
-                    <div class="d-flex gap-2">
-                        <button class="btn custom-btn"
-                                th:onclick="|location.href='@{/item/set}'|">
-                            수정
-                        </button>
-                        <button class="btn btn-outline-danger">품목 삭제</button>
-                        <button class="btn btn-outline-secondary"
-                                th:onclick="|location.href='@{/item/get}'|">
-                            전체 품목 목록으로
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 기본 정보 -->
-                <section class="mb-3">
-                    <h5 class="fw-bold mb-3">기본 정보</h5>
-                    <div class="border rounded-3 p-3">
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">카테고리</label>
-                                <div class="view-box">치즈</div>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">품목 코드</label>
-                                <div class="view-box">MOZZ-2.5KG</div>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">품목 명</label>
-                                <div class="view-box">모짜렐라 2.5kg 블럭</div>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">재료 명</label>
-                                <div class="view-box">피자 치즈</div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 규격·공급 정보 -->
-                <section class="mb-3">
-                    <h5 class="fw-bold mb-3">규격·공급 정보</h5>
-                    <div class="border rounded-3 p-3">
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">기준 단위</label>
-                                <div class="view-box">g</div>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">공급 단위</label>
-                                <div class="view-box">ea</div>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">환산 (1 공급단위)</label>
-                                <div class="view-box">2,500 g</div>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">공급 가격</label>
-                                <div class="view-box">45,000 원</div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">공급사</label>
-                                <div class="view-box">신선신선 치즈</div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 보관 정보 -->
-                <section class="mb-3">
-                    <h5 class="fw-bold mb-3">보관 정보</h5>
-                    <div class="border rounded-3 p-3">
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">보관 방식</label>
-                                <div class="view-box">냉장</div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">보관기한 타입</label>
-                                <div class="view-box">입고 후 n일</div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">보관기한</label>
-                                <div class="view-box">7 일</div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 기타 정보 -->
-                <section>
-                    <h5 class="fw-bold mb-3">기타 정보</h5>
-                    <div class="border rounded-3 p-3">
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">품목 이미지</label><br>
-                                <img src="https://via.placeholder.com/220x160"
-                                     alt="품목 이미지" class="detail-img">
-                            </div>
-                            <div class="col-md-8">
-                                <label class="form-label fw-semibold">비고</label>
-                                <div class="view-box" style="height:140px;">
-                                    냉장 0~4℃ 보관. 사용 후 즉시 밀봉.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-            </div>
-        </div>
+<!-- 제목 + 버튼 -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">재고 품목 상세 보기</h2>
+    <div class="d-flex gap-2">
+        <button id="btnEdit" class="btn custom-btn">수정</button>
+        <button id="btnDelete" class="btn btn-outline-danger">품목 삭제</button>
+        <button id="btnAddNew" class="btn btn-outline-secondary" th:onclick="|location.href='@{/item/get}'|">
+            전체 품목 목록으로
+        </button>
     </div>
-</main>
+</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- 기본 정보 -->
+<div class="view-box" id="d-category"></div>
+<div class="view-box" id="d-itemCode"></div>
+<div class="view-box" id="d-itemName"></div>
+<div class="view-box" id="d-ingredientName"></div>
+
+<!-- 규격/공급 -->
+<div class="view-box" id="d-stockUnit"></div>
+<div class="view-box" id="d-supplyUnit"></div>
+<div class="view-box" id="d-convert"></div>
+<div class="view-box" id="d-itemPrice"></div>
+<div class="view-box" id="d-supplier"></div>
+
+<!-- 보관 -->
+<div class="view-box" id="d-storageType"></div>
+<div class="view-box" id="d-expType"></div>
+<div class="view-box" id="d-expiration"></div>
+
+<!-- 기타 -->
+<img id="d-itemImage" class="detail-img" src="https://via.placeholder.com/220x160" alt="">
+<div class="view-box" id="d-note" style="height:140px;"></div>
+
+<script src="/js/item.js"></script>
 </body>
 </html>

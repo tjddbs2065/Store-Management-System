@@ -374,6 +374,8 @@
         modal.data('convertStock', conv || 0);
         modal.data('supplyUnit', supplyUnit);
         modal.data('stockUnit', stockUnit);
+        modal.data('storeItemNo', $row.data('storeitemno'));
+
 
         if (!disposeModalInstance) {
             const el = document.getElementById('disposeModal');
@@ -400,6 +402,8 @@
         const sc = parseInt($(this).val() || '0', 10);
         if (conv > 0 && sc >= 0) $('#disposeQtyInput').val(sc * conv);
     });
+
+
 
     /*** 본문 테이블 렌더 (두 한도 data-* 포함) ***/
     function buildRowHtml(item) {

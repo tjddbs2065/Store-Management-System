@@ -4,6 +4,7 @@ import com.erp.controller.request.StoreItemSearchRequestDTO;
 import com.erp.dto.PageResponseDTO;
 import com.erp.dto.StoreItemDTO;
 import com.erp.service.StoreItemService;
+import com.erp.service.StoreStockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,9 @@ import org.springframework.web.bind.annotation.*;
 public class StoreItemRestController {
 
     private final StoreItemService storeItemService;
+    private final StoreStockService storeStockService;
+
+
 
     /**
      * 재고 조회 : 본사용 목록 API
@@ -50,4 +54,13 @@ public class StoreItemRestController {
                             @RequestParam(defaultValue = "false") boolean isManagerRole) {
         storeItemService.setStoreItemLimit(storeItemNo, newLimit, isManagerRole);
     }
+
+    @PostMapping("/{storeItemNo}/dispose")
+    public java.util.Map<String, Object> dispose(@PathVariable Long storeItemNo,
+                                                 @RequestParam int quantity,
+                                                 @RequestParam(required = false) String reason) {
+        int current = storeStockService.dispose(storeItemNo, quantity, reason);
+        return java.util.Map.of("currentQuantity", current);
+    }
+
 }
