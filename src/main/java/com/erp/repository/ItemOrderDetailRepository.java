@@ -14,17 +14,21 @@ public interface ItemOrderDetailRepository extends JpaRepository<ItemOrderDetail
 
     @Query("""
         select new com.erp.dto.ItemOrderDetailDTO(
-                id.itemOrderNo.itemOrderNo,
+                id.itemOrderDetailNo,
                 i.itemCode,
                 i.itemName,
                 i.itemCategory,
                 id.orderDetailQuantity,
+                i.supplyUnit,
                 i.itemPrice,
-                id.orderDetailPrice
+                id.orderDetailPrice,
+                id.receiveDatetime
             )
             from ItemOrderDetail id
             left join id.itemNo i
             where id.itemOrderNo=:itemOrder
     """)
     List<ItemOrderDetailDTO> findAllItemOrderDetail(ItemOrder itemOrder);
+
+    ItemOrderDetail findByItemOrderDetailNo(Long itemOrderDetailNo);
 }

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,11 +33,14 @@ public interface ItemOrderRepository extends JpaRepository<ItemOrder, Long> {
     from ItemOrder io
     left join io.storeNo st
     left join ItemOrderDetail od on od.itemOrderNo.itemOrderNo = io.itemOrderNo
+    where (
+        ((:start is null or io.requestDatetime >= :start) and (:end is null or io.requestDatetime <= :end))
+        or io.itemOrderStatus = :status)
     group by io.itemOrderNo, st.storeNo, st.storeName,
                 io.requestDatetime, io.totalItem,
                 io.totalAmount, io.itemOrderStatus
 """)
-    Page<ItemOrderDTO> findAllItemOrderList(Pageable pageable);
+    Page<ItemOrderDTO> findAllItemOrderList(Pageable pageable, String status, LocalDateTime start, LocalDateTime end);
 
     @Query("""
     select new com.erp.dto.ItemOrderDTO(

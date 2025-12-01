@@ -6,6 +6,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
+<script src="/js/util.js"></script>
 
 <style>
     /* 전체 화면 설정 */
@@ -75,10 +76,10 @@
         border-collapse: separate;
         border-spacing: 0;
         border-radius: 10px;
-        overflow:hidden;
         background:white;
         width:100%;
         table-layout: fixed;
+        text-align: center;
     }
 
     .table-rounded thead {
@@ -89,8 +90,8 @@
     .table-rounded thead th{
         position: sticky;
         top: 0;
+        background: white;
         z-index: 10;
-        background: #f1f3f5;
     }
 
     .table-rounded th, .table-rounded td {
@@ -117,7 +118,7 @@
     <div class="panel">
         <div>
             <h5 class="fw-semibold mb-3">발주 추천 목록</h5>
-            <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#proposalModal">
+            <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#proposalModal" id="item_proposal_history">
                 제안 내역
             </button>
         </div>
@@ -133,8 +134,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>2025.09.19</td><td>페페로니 1kg</td><td>2</td><td>-</td><td class="text-center"><button class="btn btn-warning btn-sm approve_btn">확인</button> <button class="btn btn-outline-secondary btn-sm cancel_btn">취소</button></td></tr>
-                    <tr><td>2025.09.19</td><td>도우 M 230g</td><td>5</td><td>-</td><td class="text-center"><button class="btn btn-warning btn-sm approve_btn">확인</button> <button class="btn btn-outline-secondary btn-sm cancel_btn">취소</button></td></tr>
                 </tbody>
             </table>
         </div>
@@ -156,7 +155,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>도우 M 230g</td><td>box</td><td><input type="number" class="form-control form-control-sm quantity_box" value="1"></td><td data-price="75000">75,000원</td><td class="text-center"><button class="btn btn-outline-secondary btn-sm remove_btn">삭제</button></td></tr>
                 </tbody>
             </table>
         </div>
@@ -204,8 +202,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>DOUGH-M-230G</td><td>도우 M 230g</td><td>도우</td><td>40</td><td class="text-danger fw-semibold">26</td><td>1 box(20 ea)</td><td data-price="75000">75,000원</td><td class="text-center"><button class="btn btn-warning btn-sm add_btn">담기</button></td></tr>
-                    <tr><td>PEPPERONI-1KG</td><td>페페로니 1kg</td><td>토핑</td><td>2500</td><td class="text-danger fw-semibold">1600</td><td>1 ea(1000 g)</td><td data-price="14900">14,900원</td><td class="text-center"><button class="btn btn-warning btn-sm add_btn">담기</button></td></tr>
                 </tbody>
             </table>
         </div>
@@ -228,7 +224,7 @@
 
             <div class="modal-body">
 
-                <table class="table table-bordered table-hover align-middle">
+                <table class="table table-bordered table-hover align-middle" id="proposal_history_table">
                     <thead>
                     <tr>
                         <th>제안 일자</th>
@@ -241,60 +237,6 @@
                     </thead>
 
                     <tbody>
-                    <tr>
-                        <td>2025.09.19</td>
-                        <td class="fw-bold">페퍼로니 1kg</td>
-                        <td>2 ea</td>
-                        <td>-</td>
-                        <td>홍길동</td>
-                        <td class="text-danger fw-bold">미응답</td>
-                    </tr>
-
-                    <tr>
-                        <td>2025.09.18</td>
-                        <td class="fw-bold">페퍼로니 1kg</td>
-                        <td>1 ea</td>
-                        <td>신제품 출시 일정 테스트 필요</td>
-                        <td>홍길동</td>
-                        <td class="text-danger fw-bold">미응답</td>
-                    </tr>
-
-                    <tr>
-                        <td>2025.09.03</td>
-                        <td class="fw-bold">고구마 10kg 박스</td>
-                        <td>1 ea</td>
-                        <td>-</td>
-                        <td>홍길동</td>
-                        <td class="text-danger fw-bold">미응답</td>
-                    </tr>
-
-                    <tr>
-                        <td>2025.09.03</td>
-                        <td class="fw-bold">계란 30구</td>
-                        <td>3 tray</td>
-                        <td>-</td>
-                        <td>홍길동</td>
-                        <td class="text-danger fw-bold">미응답</td>
-                    </tr>
-
-                    <tr>
-                        <td>2025.08.29</td>
-                        <td class="fw-bold">양파 10kg 자루</td>
-                        <td>1 bag</td>
-                        <td>-</td>
-                        <td>이순신</td>
-                        <td class="text-success fw-bold">응답완료</td>
-                    </tr>
-
-                    <tr>
-                        <td>2025.08.27</td>
-                        <td class="fw-bold">계란 30구</td>
-                        <td>2 tray</td>
-                        <td>-</td>
-                        <td>이순신</td>
-                        <td class="text-success fw-bold">응답완료</td>
-                    </tr>
-
                     </tbody>
                 </table>
 
@@ -317,6 +259,7 @@
        $(this).closest("tr").remove();
     });
 
+
     // 제안 확인 이벤트
     itemProposal.on("click", ".approve_btn", function (){
         const oldRow = $(this).closest("tr");
@@ -328,6 +271,10 @@
             return;
         }
 
+        const proposalNo = $(this).closest("tr").data("proposal_no");
+        fetchUtil(`/itemOrder/respondItemProposal/${proposalNo}`, (data)=>{
+            console.log("test");
+        }, "PUT");
         const itemRow = $("#item_toOrder tbody tr").filter(function(){
             return $(this).find("td").eq(1).text().trim() === itemName;
         });
@@ -360,6 +307,8 @@
 
         $("#item_selected tbody").append(newRow);
         oldRow.remove();
+
+
 
     });
 
@@ -409,7 +358,7 @@
             return;
         }
 
-        const newRow = $("<tr>");
+        const newRow = $("<tr>").data("itemno", itemRow.data("itemno"));
 
         $("<td>").text(itemName).appendTo(newRow); // 품목 명
 
@@ -451,7 +400,7 @@
             .text(total.toLocaleString())
             .data("price", total);
 
-        totalCnt.text($(target).children().length); // 총 품목 수
+        totalCnt.text($(target).children().length).data("cnt", $(target).children().length); // 총 품목 수
     }
     // 선택한 품목 최종 결산
     const target = itemSelected.find("tbody");
@@ -491,10 +440,6 @@
         })
     });
 
-    $("#order_request").on("click", function(){
-        $(location).attr("href", "itemOrderHistory.html");
-    });
-
     // 중복 검사
     function hasDuplicate(name) {
         return $("#item_selected tbody tr").filter(function () {
@@ -507,7 +452,107 @@
 
 
 <script>
+    function load_proposal(data){
+        const tbody = $("#item_proposal tbody");
+        tbody.empty();
 
+        data.forEach((item) => {
+            const date = new Date(item.proposalDate);
+            let row = `<tr data-proposal_no="${item.proposalNo}">
+                   <td>${date.getFullYear()+"-"+String(date.getMonth()).padStart(2, "0")+"-"+String(date.getDate()).padStart(2, "0")}</td>
+                   <td>${item.itemName}</td>
+                   <td>${item.quantity}</td>
+                   <td>${item.reason == null ? "-" : item.reason}</td>
+                   <td class="text-center">
+                       <button class="btn btn-warning btn-sm approve_btn">확인</button>
+                       <button class="btn btn-outline-secondary btn-sm cancel_btn">취소</button>
+                   </td>
+                   </tr>`;
+
+            tbody.append(row);
+        });
+    }
+
+    function load_proposal_history(data){
+        const tbody = $("#proposal_history_table tbody");
+        tbody.empty();
+
+        data.forEach((item) => {
+            const date = new Date(item.proposalDate);
+            let row = `<tr>
+                        <td>${date.getFullYear()+"-"+String(date.getMonth()).padStart(2, "0")+"-"+String(date.getDate()).padStart(2, "0")}</td>
+                        <td class="fw-bold">${item.itemName}</td>
+                        <td>${item.quantity +" "+ item.supplyUnit}</td>
+                        <td>${item.reason == null ? "-" : item.reason}</td>
+                        <td>${item.managerName}</td>`;
+
+            if(item.responseDate == null)
+                row += `<td class="text-danger fw-bold">대기</td>`;
+            else
+                row += `<td class="text-success fw-bold">확인</td>`;
+
+            tbody.append(row+`<tr>`);
+        });
+    }
+    $(document).on("click", "#item_proposal_history", function(){
+        fetchUtil(`/itemOrder/itemProposalHistory/1`, (data)=>{
+            load_proposal_history(data);
+        });
+    });
+
+    function load_itemList(data){
+        const tbody = $("#item_toOrder tbody");
+        tbody.empty();
+
+        data.forEach(item => {
+            let row = `<tr data-itemno="${item.itemNo}">
+                           <td>${item.itemCode}</td>
+                           <td>${item.itemName}</td>
+                           <td>${item.itemCategory}</td>
+                           <td>${item.limit == null ? "-" : item.limit}</td>
+                           <td class="text-danger fw-semibold">${item.itemQuantity == null ? "0" : item.itemQuantity}</td>
+                           <td>${item.supplyUnit}</td>
+                           <td data-price="${item.itemPrice}">${(item.itemPrice).toLocaleString()}</td>
+                           <td class="text-center">
+                           <button class="btn btn-warning btn-sm add_btn">담기</button>
+                           </td>
+                       </tr>`;
+            tbody.append(row);
+        });
+    }
+
+    $("#order_request").on("click", function(){
+        let list = {
+            storeNo : 1,
+            totalItem: $("#total-cnt").data("cnt"),
+            totalAmount: $("#total-price").data("price"),
+            orderList : []
+        };
+        itemSelected.find("tbody tr").each(function(){
+            const itemNo = $(this).data("itemno");
+            const itemQuantity = $(this).find("td").eq(2).find("input").val();
+            const itemOrderPrice = $(this).find("td").eq(3).data("price");
+            list.orderList.push({
+                itemNo : itemNo,
+                itemQuantity : itemQuantity,
+                itemOrderPrice : itemOrderPrice
+            });
+        });
+
+        fetchUtil(`/itemOrder/itemOrder`, (data)=>{
+            $(location).attr("href", "/itemOrder/itemOrderList");
+        }, "POST", JSON.stringify(list));
+
+    });
+
+    $(window).on("load", function(){
+        fetchUtil(`/itemOrder/itemProposal/1`, (data)=>{
+            load_proposal(data);
+        });
+        fetchUtil(`/itemOrder/itemList/1`, (data)=>{
+            load_itemList(data);
+        });
+    });
 </script>
 
 </body>

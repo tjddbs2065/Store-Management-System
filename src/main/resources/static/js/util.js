@@ -1,10 +1,24 @@
-function fetchUtil(url, action){
-    fetch(url)
-        .then(data => data.json())
+function fetchUtil(url, action, method="GET", json=null){
+    const options = {
+        method: method
+    };
+
+    if(method !== "GET" && json !== null){
+        options.headers = {
+            "Content-Type" : "application/json"
+        };
+
+        if(typeof json === "object"){
+            options.body = JSON.stringify(json);
+        }else{
+            options.body = json;
+        }
+    }
+
+    fetch(url, options)
+    .then(data => data.json())
     .then(action)
-    .catch(err => console.error(
-        "에러"
-    ));
+    .catch(err => console.error(err));
 }
 
 $(document).on("click", "#pagination .page-link", function () {

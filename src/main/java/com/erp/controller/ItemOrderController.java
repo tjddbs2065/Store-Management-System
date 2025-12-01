@@ -15,8 +15,20 @@ import java.util.List;
 public class ItemOrderController {
     private ItemOrderService itemOrderService;
 
-    @GetMapping("/itemOrder/itemList")
-    public String test() {
+    @GetMapping("/itemOrder/itemOrderList")
+    public String itemOrderHistory() {
         return "/itemOrder/itemOrderHistory";
+    }
+    @GetMapping("/itemOrder/itemOrder")
+    public String itemOrder() {
+        return "/itemOrder/itemOrder";
+    }
+    @GetMapping("/itemOrder/itemProposal")
+    public String itemProposal() {
+        return "/itemOrder/itemProposal";
+    }
+    @GetMapping("/itemOrder/itemOrderListManager")
+    public String itemOrderHistoryManager() {
+        return "/itemOrder/itemOrderListManager";
     }
 }

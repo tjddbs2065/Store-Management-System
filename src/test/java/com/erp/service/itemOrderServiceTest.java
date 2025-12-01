@@ -39,4 +39,9 @@ public class itemOrderServiceTest {
     public void getItemOrderDetailListTestByItemOrderNoTest() {
         System.out.println(orderService.getItemOrderDetailByOrderNo(1L));
     }
+
+    @Test
+    public void itemList(){
+        System.out.println(orderService.itemList(1L));
+    }
 }

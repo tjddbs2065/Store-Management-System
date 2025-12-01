@@ -7,18 +7,21 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 @Builder
-public class ItemOrderDetailDTO {
-    private Long itemOrderDetailNo;
+public class ItemStoreQuantityDTO {
+    private Long itemNo;
     private String itemCode;
+    private String itemCategory;
     private String itemName;
-    private String itemCategoryName;
-    private Integer itemOrderQuantity;
+
+    private String stockUnit;
     private String supplyUnit;
+    private String supplier;
     private Integer itemPrice;
-    private Integer itemOrderPrice; // quantity * price
-    private Timestamp receiveDatetime;
+
+    private Integer itemQuantity;
+    private Integer limit;
 }
