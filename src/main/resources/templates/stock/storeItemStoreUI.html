@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>재고 조회 : 직영점</title>
-
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -29,7 +30,7 @@
         .limit-gear{cursor:pointer}
     </style>
 </head>
-<body>
+<body data-role="STORE" th:attr="data-store-no=${storeNo}">
 <header th:replace="fragments/toolBarStore :: toolBarStore"></header>
 
 <div class="layout-container py-4 px-3">
@@ -43,13 +44,15 @@
             <div class="col-6 col-md-2">
                 <select id="categorySelect" class="form-select form-select-sm">
                     <option value="">전체</option><option>도우</option><option>소스</option><option>치즈</option>
-                    <option>육류</option><option>야채</option><option>사이드</option><option>음료</option>
+                    <option>토핑</option><option>향신료</option><option>야채</option><option>사이드</option><option>음료</option><option>면</option>
                 </select>
             </div>
 
             <div class="col-6 col-md-2">
+                <!-- ★ NAME / CODE 로 맞춤 -->
                 <select id="searchTypeSelect" class="form-select form-select-sm">
-                    <option value="ITEM_NAME">품목명</option><option value="ITEM_CODE">품목코드</option>
+                    <option value="NAME">품목명</option>
+                    <option value="CODE">품목코드</option>
                 </select>
             </div>
 
@@ -79,169 +82,7 @@
                     </tr>
                     </thead>
                     <tbody id="stockTableBody">
-                    <!-- 샘플 20행: 본사 데이터에서 점포 컬럼만 제외하여 동일 값 유지 -->
-                    <tr data-itemno="1" data-itemname="도우 M 230g(레귤러)" data-category="도우" data-currentqty="26" data-unit="ea" data-limit="40" data-itemcode="DOUGH-M-230G">
-                        <td class="text-code">DOUGH-M-230G</td><td>도우 M 230g(레귤러)</td><td>도우</td>
-                        <td class="text-qty">40 ea <button class="icon-btn" onclick="openLimitModal(this)" title="하한선 설정"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">26 ea
-                            <!-- 폐기 아이콘을 현재 재고 옆에 -->
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-                    <tr data-itemno="2" data-itemname="토마토 소스 3kg 캔" data-category="소스" data-currentqty="8000" data-unit="g" data-limit="6000" data-itemcode="SAUCE-3KG-CAN">
-                        <td class="text-code">SAUCE-3KG-CAN</td><td>토마토 소스 3kg 캔</td><td>소스</td>
-                        <td class="text-qty">6,000 g <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">8,000 g
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-                    <tr data-itemno="3" data-itemname="모짜렐라 2.5kg 블록" data-category="치즈" data-currentqty="1800" data-unit="g" data-limit="5000" data-itemcode="MOZZ-2.5KG">
-                        <td class="text-code">MOZZ-2.5KG</td><td>모짜렐라 2.5kg 블록</td><td>치즈</td>
-                        <td class="text-qty">5,000 g <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">1,800 g
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-                    <tr data-itemno="4" data-itemname="계란 30구" data-category="계란" data-currentqty="28" data-unit="ea" data-limit="90" data-itemcode="EGG-30EA">
-                        <td class="text-code">EGG-30EA</td><td>계란 30구</td><td>계란</td>
-                        <td class="text-qty">90 ea <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">28 ea
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-                    <tr data-itemno="5" data-itemname="피클 3kg 캔" data-category="사이드" data-currentqty="9" data-unit="ea" data-limit="5" data-itemcode="PICKLE-3KG">
-                        <td class="text-code">PICKLE-3KG</td><td>피클 3kg 캔</td><td>사이드</td>
-                        <td class="text-qty">5 ea <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">9 ea
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-                    <tr data-itemno="6" data-itemname="양파 슬라이스 2kg" data-category="야채" data-currentqty="2500" data-unit="g" data-limit="2000" data-itemcode="ONION-2KG">
-                        <td class="text-code">ONION-2KG</td><td>양파 슬라이스 2kg</td><td>야채</td>
-                        <td class="text-qty">2,000 g <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">2,500 g
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-                    <tr data-itemno="7" data-itemname="페퍼로니 슬라이스 1kg" data-category="육류" data-currentqty="700" data-unit="g" data-limit="1500" data-itemcode="PEPP-1KG">
-                        <td class="text-code">PEPP-1KG</td><td>페퍼로니 슬라이스 1kg</td><td>육류</td>
-                        <td class="text-qty">1,500 g <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">700 g
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-                    <tr data-itemno="8" data-itemname="올리브 슬라이스 1kg" data-category="야채" data-currentqty="900" data-unit="g" data-limit="800" data-itemcode="OLIVE-1KG">
-                        <td class="text-code">OLIVE-1KG</td><td>올리브 슬라이스 1kg</td><td>야채</td>
-                        <td class="text-qty">800 g <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">900 g
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-                    <tr data-itemno="9" data-itemname="콜라 1.25L" data-category="음료" data-currentqty="30" data-unit="ea" data-limit="20" data-itemcode="COKE-1.25L">
-                        <td class="text-code">COKE-1.25L</td><td>콜라 1.25L</td><td>음료</td>
-                        <td class="text-qty">20 ea <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">30 ea
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-                    <tr data-itemno="10" data-itemname="사이다 500ml" data-category="음료" data-currentqty="45" data-unit="ea" data-limit="30" data-itemcode="SODA-500ML">
-                        <td class="text-code">SODA-500ML</td><td>사이다 500ml</td><td>음료</td>
-                        <td class="text-qty">30 ea <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">45 ea
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-
-                    <tr data-itemno="11" data-itemname="도우 M 230g(레귤러)" data-category="도우" data-currentqty="55" data-unit="ea" data-limit="40" data-itemcode="DOUGH-M-230G">
-                        <td class="text-code">DOUGH-M-230G</td><td>도우 M 230g(레귤러)</td><td>도우</td>
-                        <td class="text-qty">40 ea <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">55 ea
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-                    <tr data-itemno="12" data-itemname="토마토 소스 3kg 캔" data-category="소스" data-currentqty="4500" data-unit="g" data-limit="6000" data-itemcode="SAUCE-3KG-CAN">
-                        <td class="text-code">SAUCE-3KG-CAN</td><td>토마토 소스 3kg 캔</td><td>소스</td>
-                        <td class="text-qty">6,000 g <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">4,500 g
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-                    <tr data-itemno="13" data-itemname="모짜렐라 2.5kg 블록" data-category="치즈" data-currentqty="3000" data-unit="g" data-limit="5000" data-itemcode="MOZZ-2.5KG">
-                        <td class="text-code">MOZZ-2.5KG</td><td>모짜렐라 2.5kg 블록</td><td>치즈</td>
-                        <td class="text-qty">5,000 g <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">3,000 g
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-                    <tr data-itemno="14" data-itemname="계란 30구" data-category="계란" data-currentqty="110" data-unit="ea" data-limit="90" data-itemcode="EGG-30EA">
-                        <td class="text-code">EGG-30EA</td><td>계란 30구</td><td>계란</td>
-                        <td class="text-qty">90 ea <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">110 ea
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-                    <tr data-itemno="15" data-itemname="피클 3kg 캔" data-category="사이드" data-currentqty="3" data-unit="ea" data-limit="5" data-itemcode="PICKLE-3KG">
-                        <td class="text-code">PICKLE-3KG</td><td>피클 3kg 캔</td><td>사이드</td>
-                        <td class="text-qty">5 ea <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">3 ea
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-                    <tr data-itemno="16" data-itemname="양파 슬라이스 2kg" data-category="야채" data-currentqty="1500" data-unit="g" data-limit="2000" data-itemcode="ONION-2KG">
-                        <td class="text-code">ONION-2KG</td><td>양파 슬라이스 2kg</td><td>야채</td>
-                        <td class="text-qty">2,000 g <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">1,500 g
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-                    <tr data-itemno="17" data-itemname="페퍼로니 슬라이스 1kg" data-category="육류" data-currentqty="2000" data-unit="g" data-limit="1500" data-itemcode="PEPP-1KG">
-                        <td class="text-code">PEPP-1KG</td><td>페퍼로니 슬라이스 1kg</td><td>육류</td>
-                        <td class="text-qty">1,500 g <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">2,000 g
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-                    <tr data-itemno="18" data-itemname="올리브 슬라이스 1kg" data-category="야채" data-currentqty="500" data-unit="g" data-limit="800" data-itemcode="OLIVE-1KG">
-                        <td class="text-code">OLIVE-1KG</td><td>올리브 슬라이스 1kg</td><td>야채</td>
-                        <td class="text-qty">800 g <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">500 g
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-                    <tr data-itemno="19" data-itemname="콜라 1.25L" data-category="음료" data-currentqty="12" data-unit="ea" data-limit="20" data-itemcode="COKE-1.25L">
-                        <td class="text-code">COKE-1.25L</td><td>콜라 1.25L</td><td>음료</td>
-                        <td class="text-qty">20 ea <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">12 ea
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
-                    <tr data-itemno="20" data-itemname="사이다 500ml" data-category="음료" data-currentqty="18" data-unit="ea" data-limit="30" data-itemcode="SODA-500ML">
-                        <td class="text-code">SODA-500ML</td><td>사이다 500ml</td><td>음료</td>
-                        <td class="text-qty">30 ea <button class="icon-btn" onclick="openLimitModal(this)"><i class="bi bi-gear limit-gear"></i></button></td>
-                        <td class="text-qty">18 ea
-                            <button type="button" class="icon-btn" title="폐기 등록" onclick="openDisposeModal(this)"><i class="bi bi-trash3"></i></button>
-                        </td>
-                        <td class="text-center"><button type="button" class="icon-btn detail-btn" title="상세보기"><i class="bi bi-file-earmark-text"></i></button></td>
-                    </tr>
+                    <!-- JS로 렌더링 -->
                     </tbody>
                 </table>
             </div>
@@ -259,279 +100,7 @@
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    let limitModalInstance = null;
-    const TABLE_ROWS_PER_PAGE = 10;
-    let $mainAllRows = $();
-    let $mainFilteredRows = $();
-    let mainTotalPages = 1;
-    let mainCurrentPage = 1;
-
-    const CONVERT_STOCK = 10;
-
-    function markLowRows(){
-        $('#stockTableBody tr').each(function(){
-            const cur = Number($(this).data('currentqty')) || 0;
-            const lim = Number($(this).data('limit')) || 0;
-            const $cell = $(this).children().eq(4); // 현재 재고 셀(직영점 컬럼 구성)
-            if(cur < lim){ $cell.addClass('text-danger fw-bold'); }
-            else{ $cell.removeClass('text-danger fw-bold'); }
-        });
-    }
-
-    function validateLimitInput(){
-        const locked = $('#limitModal').data('lockedByManager');
-        const $err = $('#limitErrorText');
-        const $btn = $('#btnSaveLimit');
-
-        // 본사 설정이면 항상 잠금
-        if (locked) {
-            $err.addClass('d-none');
-            $btn.prop('disabled', true);
-            return;
-        }
-
-        const val = $('#limitNew').val();
-
-        // 빈값(null) 허용 → 삭제 의미
-        if (!val) {
-            $err.addClass('d-none');
-            $btn.prop('disabled', false);
-            return;
-        }
-
-        const num = Number(val);
-        if (isNaN(num) || num <= 0) {
-            $err.removeClass('d-none');
-            $btn.prop('disabled', true);
-        } else {
-            $err.addClass('d-none');
-            $btn.prop('disabled', false);
-        }
-    }
-
-    $(document).on('input', '#limitNew', validateLimitInput);
-
-
-    function openLimitModal(el){
-        const $row = $(el).closest('tr');
-        const itemName  = $row.data('itemname') || '';
-        const rawLimit  = $row.data('limit');
-        const unit      = $row.data('unit')      || 'ea';
-
-        let limit = null;
-        if (rawLimit !== undefined && rawLimit !== null && rawLimit !== '') {
-            const parsed = Number(rawLimit);
-            limit = isNaN(parsed) ? null : parsed;
-        }
-
-        // data-owner 없으면 기본값을 'STORE'로 보고, 나중에 서버에서 정확히 내려주면 됨
-        let owner = $row.data('owner');
-        if (!owner) {
-            owner = 'STORE';
-        }
-
-        $('#limitStoreName').text(''); // 직영점 화면: 점포명 표기는 세션/헤더 등에 따로 노출 가능
-        $('#limitItemName').text(itemName);
-
-        if (limit === null) {
-            $('#limitCurrentText').text('설정 없음');
-        } else {
-            $('#limitCurrentText').text(limit.toLocaleString() + ' ' + unit);
-        }
-
-        if (owner === 'MANAGER') {
-            $('#limitOwnerText').text('본사에서 설정한 하한선입니다. (직영점에서 수정할 수 없습니다.)');
-        } else if (owner === 'STORE') {
-            $('#limitOwnerText').text('직영점에서 설정한 하한선입니다.');
-        } else {
-            $('#limitOwnerText').text('현재 설정된 하한선이 없습니다.');
-        }
-
-        $('#limitUnit2').text(unit);
-        $('#limitUseSupply').prop('checked', false);
-        $('#limitSupplyCount').val('');
-        $('#limitSupplyUnit').text('box');
-        $('#limitConvertInfo').text('※ 1 box = ' + CONVERT_STOCK + ' ' + unit);
-        $('#limitErrorText').addClass('d-none');
-
-        const locked = (owner === 'MANAGER');
-        $('#limitModal').data('lockedByManager', locked);
-
-        if (locked) {
-            // 본사 설정 → 직영점에서는 입력/저장 비활성화
-            $('#limitNew').val('').prop('disabled', true);
-            $('#limitUseSupply').prop('disabled', true);
-            $('#limitSupplyCount').prop('disabled', true);
-            $('#btnSaveLimit').prop('disabled', true);
-        } else {
-            $('#limitNew').val('').prop('disabled', false);
-            $('#limitUseSupply').prop('disabled', false);
-            $('#limitSupplyCount').prop('disabled', true);
-            $('#btnSaveLimit').prop('disabled', false);
-        }
-
-        if(!limitModalInstance){
-            limitModalInstance = new bootstrap.Modal(document.getElementById('limitModal'));
-        }
-        limitModalInstance.show();
-    }
-
-
-    // 공급단위 계산(하한선)
-    $(document).on('change', '#limitUseSupply', function(){
-        const locked = $('#limitModal').data('lockedByManager');
-        if (locked) {
-            // 본사 잠금 상태에서는 체크 못 하게
-            $('#limitUseSupply').prop('checked', false);
-            return;
-        }
-
-        const on = this.checked;
-        $('#limitSupplyCount').prop('disabled', !on);
-        if(on){
-            $('#limitSupplyCount').trigger('input');
-        } else {
-            $('#limitSupplyCount').val('');
-            $('#limitNew').val('').trigger('input');
-        }
-    });
-
-    $(document).on('input', '#limitSupplyCount', function(){
-        const locked = $('#limitModal').data('lockedByManager');
-        if (locked) return;
-
-        const boxes = parseFloat(this.value) || 0;
-        $('#limitNew').val(boxes * CONVERT_STOCK).trigger('input');
-    });
-
-
-    // 폐기 모달
-    function openDisposeModal(el){
-        const $row = $(el).closest('tr');
-        const name = $row.data('itemname') || '';
-        const cur  = Number($row.data('currentqty')) || 0;
-        const unit = $row.data('unit') || 'ea';
-
-        $('#disposeItemName').text(name);
-        $('#disposeCurrentQty').text(cur);
-        $('#disposeUnit, #disposeUnit2').text(unit);
-        $('#disposeQtyInput').val('');
-        $('#checkSupplyDispose').prop('checked', false);
-        $('#disposeSupplyCount').prop('disabled', true).val('');
-        $('#disposeSupplyUnit').text('box');
-        $('#disposeConvertInfo').text('※ 1 box = ' + CONVERT_STOCK + ' ' + unit);
-
-        if(!window._disposeModalInstance){
-            window._disposeModalInstance = new bootstrap.Modal(document.getElementById('disposeModal'));
-        }
-        window._disposeModalInstance.show();
-    }
-    // 공급단위 계산(폐기)
-    $(document).on('change', '#checkSupplyDispose', function(){
-        const on = this.checked;
-        $('#disposeSupplyCount').prop('disabled', !on);
-        if(on){ $('#disposeSupplyCount').trigger('input'); }
-        else { $('#disposeSupplyCount').val(''); $('#disposeQtyInput').val(''); }
-    });
-    $(document).on('input', '#disposeSupplyCount', function(){
-        const boxes = parseFloat(this.value) || 0;
-        $('#disposeQtyInput').val(boxes * CONVERT_STOCK);
-    });
-
-    // 상세보기
-    $(document).on('click', '.detail-btn', function(){
-        window.location.href = '/item/detail';
-    });
-
-    // 메인 테이블 필터/페이지네이션(10개)
-    function snapshotMainRows(){ $mainAllRows = $('#stockTableBody tr'); }
-    function applyMainFilter(){
-        const cat  = $('#categorySelect').val();
-        const type = $('#searchTypeSelect').val();
-        const kw   = ($('#searchKeyword').val()||'').trim();
-
-        $mainFilteredRows = $mainAllRows.filter(function(){
-            const $tr = $(this);
-            const rowCat = ($tr.data('category') || '').toString();
-            if(cat && rowCat !== cat) return false;
-
-            if(!kw) return true;
-            if(type === 'ITEM_NAME'){
-                const name = ($tr.data('itemname') || '').toString();
-                return name.indexOf(kw) !== -1;
-            }else{
-                const code = ($tr.data('itemcode') || '').toString();
-                return code.indexOf(kw) !== -1;
-            }
-        });
-    }
-    function buildMainPager(){
-        const total = $mainFilteredRows.length;
-        mainTotalPages = Math.max(1, Math.ceil(total / TABLE_ROWS_PER_PAGE));
-        const $pager = $('#mainPager').empty();
-        $pager.append(li('first','&laquo;'));
-        $pager.append(li('prev','&lt;'));
-        for(let i=1;i<=mainTotalPages;i++){ $pager.append(li(String(i), String(i))); }
-        $pager.append(li('next','&gt;'));
-        $pager.append(li('last','&raquo;'));
-        function li(data,text){
-            return $('<li class="page-item"><a class="page-link" href="#"></a></li>')
-                .find('a').attr('data-page', data).html(text).end();
-        }
-    }
-    function showMainPage(page){
-        mainCurrentPage = page;
-        $mainAllRows.hide();
-        const s = (page - 1) * TABLE_ROWS_PER_PAGE;
-        const e = s + TABLE_ROWS_PER_PAGE;
-        $mainFilteredRows.slice(s, e).show();
-    }
-    function paintMainPager(){
-        const $pager = $('#mainPager');
-        $pager.find('.page-item').removeClass('active disabled');
-        $pager.find(`a[data-page="${mainCurrentPage}"]`).parent().addClass('active');
-        if(mainCurrentPage === 1){ disable('first'); disable('prev'); }
-        if(mainCurrentPage === mainTotalPages){ disable('last'); disable('next'); }
-        function disable(key){ $pager.find(`a[data-page="${key}"]`).parent().addClass('disabled'); }
-    }
-    function refreshMainTable(){
-        snapshotMainRows();
-        applyMainFilter();
-        buildMainPager();
-        showMainPage(1);
-        paintMainPager();
-        markLowRows();
-    }
-
-    $(function(){
-        refreshMainTable();
-
-        $('#btnSearchExec').on('click', refreshMainTable);
-        $('#btnResetFilter').on('click', function(){
-            $('#categorySelect').val('');
-            $('#searchTypeSelect').val('ITEM_NAME');
-            $('#searchKeyword').val('');
-            refreshMainTable();
-        });
-
-        $(document).on('click', '#mainPager a.page-link', function(e){
-            e.preventDefault();
-            const act = $(this).data('page');
-            const $li = $(this).parent();
-            if($li.hasClass('disabled') || $li.hasClass('active')) return;
-
-            if(act === 'first') showMainPage(1);
-            else if(act === 'prev') showMainPage(Math.max(1, mainCurrentPage - 1));
-            else if(act === 'next') showMainPage(Math.min(mainTotalPages, mainCurrentPage + 1));
-            else if(act === 'last') showMainPage(mainTotalPages);
-            else {
-                const n = parseInt(act, 10);
-                if(!isNaN(n)) showMainPage(n);
-            }
-            paintMainPager();
-        });
-    });
-</script>
+<script src="/js/modalStoreSearch.js"></script>
+<script src="/js/storeItem.js"></script>
 </body>
 </html>

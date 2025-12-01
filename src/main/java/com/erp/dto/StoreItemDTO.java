@@ -9,34 +9,19 @@ import lombok.*;
 @ToString
 @Builder
 public class StoreItemDTO {
-
-    private Long storeItemNo;
-
-    private Long storeNo;
+    private Long   storeItemNo;
+    private Long   storeNo;
     private String storeName;
-
-    private Long itemNo;
+    private Long   itemNo;
     private String itemCode;
     private String itemName;
     private String itemCategory;
-
-    /**
-     * 최종 하한선 값
-     * - managerLimit / storeLimit 중 하나 (COALESCE)
-     */
     private Integer finalLimit;
+    private String  limitOwner;      // "MANAGER" / "STORE" / "NONE"
+    private Integer currentQuantity;      // COALESCE(...,0)
+    private String  stockUnit;
+    private Integer convertStock;
+    private Integer managerLimit;
+    private Integer storeLimit;
 
-    /**
-     * 하한선을 누가 설정했는지
-     * - "MANAGER" : 본사(ROLE_ADMIN, ROLE_MANAGER 계열)
-     * - "STORE"   : 직영점(ROLE_STORE)
-     * - "NONE"    : 미설정
-     */
-    private String limitOwner;
-
-    /** 현재 재고 수량 (STORE_STOCK 최신 로그의 currentQuantity) */
-    private Integer currentQuantity;
-
-    /** 재고 단위 (ea, g 등) */
-    private String stockUnit;
 }

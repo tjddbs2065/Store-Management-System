@@ -1,129 +1,47 @@
 <div th:fragment="modalStoreSearch">
     <div class="modal fade" id="storeSearchModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
-
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold">직영점 검색</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body">
-
-                    <!-- 🔍 검색창 -->
-                    <div class="d-flex align-items-center mb-3">
-
-                        <input type="text"
-                               id="storeSearchInput"
-                               class="form-control form-control-sm"
-                               style="width: 250px;"
-                               placeholder="직영점명을 입력하세요 (예: 가산점)">
-
-                        <button type="button"
-                                class="btn btn-main btn-sm ms-2"
-                                id="btnSearchStoreExec">
-                            검색
-                        </button>
-
-                        <button class="btn btn-sm btn-outline-secondary ms-3"
-                                id="btnSearchStoreReset">
-                            검색 초기화
-                        </button>
+                    <div class="row g-2 align-items-center mb-3">
+                        <div class="col">
+                            <input type="text" id="storeSearchInput" class="form-control form-control-sm"
+                                   placeholder="직영점명 입력 후 Enter 또는 [검색]">
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" id="btnSearchStoreExec"  class="btn btn-sm btn-main">검색</button>
+                            <button type="button" id="btnSearchStoreReset" class="btn btn-sm btn-outline-secondary">초기화</button>
+                        </div>
                     </div>
 
-                    <!-- 🔽 직영점 목록 테이블 -->
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle text-center" id="storeSearchTable">
+                        <table class="table table-hover align-middle mb-0">
                             <thead class="table-light">
                             <tr>
-                                <th>직영점</th>
-                                <th>주소</th>
-                                <th>점장명</th>
-                                <th>선택</th>
+                                <th style="width:32%;">직영점명</th>
+                                <th style="width:48%;">주소</th>
+                                <th class="text-center" style="width:20%;">선택</th>
                             </tr>
                             </thead>
-                            <tbody id="storeSearchTableBody">
-
-                            <!-- 샘플 직영점 정적 데이터 (20개 고정) -->
-                            <tr><td>가산점</td><td>서울 금천구 1로 22</td><td>홍길동</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="가산점">선택</button></td></tr>
-
-                            <tr><td>구로점</td><td>서울 구로구 12길 9</td><td>이매니저</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="구로점">선택</button></td></tr>
-
-                            <tr><td>대전둔산점</td><td>대전 서구 둔산대로 89</td><td>정점장</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="대전둔산점">선택</button></td></tr>
-
-                            <tr><td>수원영통점</td><td>경기 수원 영통구 100</td><td>이수원</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="수원영통점">선택</button></td></tr>
-
-                            <tr><td>안양범계점</td><td>경기 안양 동안구 55</td><td>김범계</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="안양범계점">선택</button></td></tr>
-
-                            <tr><td>인천송도점</td><td>인천 연수구 77</td><td>송도</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="인천송도점">선택</button></td></tr>
-
-                            <tr><td>김포장기점</td><td>경기 김포 장기동 12</td><td>장기</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="김포장기점">선택</button></td></tr>
-
-                            <tr><td>부산해운대점</td><td>부산 해운대구 90</td><td>해운</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="부산해운대점">선택</button></td></tr>
-
-                            <tr><td>광주수완점</td><td>광주 광산구 91</td><td>수완</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="광주수완점">선택</button></td></tr>
-
-                            <tr><td>제주연동점</td><td>제주 제주시 5길 3</td><td>연동</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="제주연동점">선택</button></td></tr>
-
-                            <tr><td>강릉포남점</td><td>강원 강릉시 포남2동 11</td><td>포남</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="강릉포남점">선택</button></td></tr>
-
-                            <tr><td>천안불당점</td><td>충남 천안 불당대로 88</td><td>불당</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="천안불당점">선택</button></td></tr>
-
-                            <tr><td>청주흥덕점</td><td>충북 청주 흥덕구 55</td><td>흥덕</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="청주흥덕점">선택</button></td></tr>
-
-                            <tr><td>전주효자동점</td><td>전북 전주 완산구 효자동</td><td>효자</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="전주효자동점">선택</button></td></tr>
-
-                            <tr><td>세종도담점</td><td>세종 도담동 5</td><td>도담</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="세종도담점">선택</button></td></tr>
-
-                            <tr><td>울산삼산점</td><td>울산 남구 삼산동 22</td><td>삼산</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="울산삼산점">선택</button></td></tr>
-
-                            <tr><td>창원중앙점</td><td>경남 창원 중앙대로 14</td><td>중앙</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="창원중앙점">선택</button></td></tr>
-
-                            <tr><td>포항장성점</td><td>경북 포항 북구 장성동</td><td>장성</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="포항장성점">선택</button></td></tr>
-
-                            <tr><td>부천상동점</td><td>경기 부천 상동로 55</td><td>상동</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="부천상동점">선택</button></td></tr>
-
-                            <tr><td>일산백석점</td><td>경기 고양 일산동구 백석동</td><td>백석</td>
-                                <td><button class="btn btn-main btn-sm btn-select-store" data-store="일산백석점">선택</button></td></tr>
-
+                            <tbody id="storeModalTableBody" style="cursor:pointer;">
+                            <!-- JS로 렌더링 -->
                             </tbody>
                         </table>
                     </div>
 
-                    <!-- 페이지네이션 (UI만, 실제 동작은 각 화면 JS에서 구현) -->
-                    <nav class="mt-2">
-                        <ul class="pagination justify-content-center" id="storePager">
-                            <li class="page-item active">
-                                <a class="page-link" href="#">1</a>
-                            </li>
-                        </ul>
+                    <nav class="mt-3">
+                        <ul class="pagination pagination-sm justify-content-center" id="storeModalPager"></ul>
                     </nav>
-
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
                 </div>
-
             </div>
         </div>
     </div>

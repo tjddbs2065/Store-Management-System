@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StoreItem Modals</title>
+</head>
+<body>
+
+<!-- 직영점 검색 모달 -->
+<div th:fragment="storeSearchModalFragment">
+    <div class="modal fade" id="storeSearchModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">직영점 검색</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <input type="text"
+                               id="storeSearchInput"
+                               class="form-control form-control-sm"
+                               placeholder="직영점명 검색">
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>직영점명</th>
+                                <th>지역</th>
+                            </tr>
+                            </thead>
+                            <tbody id="storeTableBody" style="cursor:pointer;">
+                            <tr data-store-name="전체 직영점">
+                                <td>전체 직영점</td>
+                                <td>-</td>
+                            </tr>
+                            <tr data-store-name="강남직영">
+                                <td>강남직영</td>
+                                <td>서울 강남구</td>
+                            </tr>
+                            <tr data-store-name="홍대직영">
+                                <td>홍대직영</td>
+                                <td>서울 마포구</td>
+                            </tr>
+                            <tr data-store-name="잠실직영">
+                                <td>잠실직영</td>
+                                <td>서울 송파구</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                            data-bs-dismiss="modal">닫기
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 하한선 설정 모달 -->
+<div th:fragment="limitModalFragment">
+    <div class="modal fade" id="limitModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">하한선 설정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-2">
+                        <div class="small text-muted">직영점</div>
+                        <div class="fw-semibold" id="limitStoreName">강남직영</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="small text-muted">품목</div>
+                        <div class="fw-semibold" id="limitItemName">도우 M 230g(레귤러)</div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted">현재 하한선</label>
+                            <div class="border rounded px-2 py-2 bg-light"
+                                 id="limitCurrentText">40 ea
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted">새 하한선</label>
+                            <div class="input-group input-group-sm">
+                                <input type="number" min="0"
+                                       class="form-control"
+                                       id="limitNew">
+                                <span class="input-group-text" id="limitUnit2">ea</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="limitUseSupply">
+                        <label class="form-check-label small" for="limitUseSupply">
+                            공급단위로 계산
+                        </label>
+                    </div>
+
+                    <div class="row g-2 align-items-center mb-2">
+                        <div class="col-8">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">공급 수량</span>
+                                <input type="number" min="0" class="form-control"
+                                       id="limitSupplyCount" disabled>
+                                <span class="input-group-text" id="limitSupplyUnit">ea</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="small text-muted" id="limitConvertInfo">
+                        ※ 1 공급단위 = item.convert_stock (예: 1 box = 2,500 g)
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-main btn-sm" id="btnSaveLimit">저장</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                            data-bs-dismiss="modal">취소
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 폐기 모달 -->
+<div th:fragment="disposeModalFragment">
+    <div class="modal fade" id="disposeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">폐기 등록</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-2">
+                        <div class="small text-muted">직영점</div>
+                        <div class="fw-semibold" id="disposeStoreName">강남직영</div>
+                    </div>
+
+                    <div class="mb-2">
+                        <div class="small text-muted">품목</div>
+                        <div class="fw-semibold" id="disposeItemName">도우 M 230g(레귤러)</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="small text-muted">현재 재고</div>
+                        <div class="border rounded px-2 py-2 bg-light"
+                             id="disposeCurrentQty">26 ea
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small">폐기 수량</label>
+                        <div class="input-group input-group-sm">
+                            <input type="number" min="0"
+                                   class="form-control"
+                                   id="disposeQtyInput">
+                            <span class="input-group-text" id="disposeUnit">ea</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small">폐기 사유</label>
+                        <select id="disposeReasonSelect"
+                                class="form-select form-select-sm mb-2">
+                            <option value="">선택</option>
+                            <option>유통기한 경과</option>
+                            <option>조리 실패</option>
+                            <option>고객 클레임</option>
+                            <option>재고 조사</option>
+                            <option>기타</option>
+                        </select>
+                        <textarea id="disposeReasonEtc"
+                                  class="form-control form-control-sm"
+                                  rows="2"
+                                  placeholder="기타 사유 입력"
+                                  style="display:none;"></textarea>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-main btn-sm"
+                            id="btnSaveDispose">등록
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                            data-bs-dismiss="modal">취소
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
