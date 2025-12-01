@@ -8,8 +8,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-    <!-- 공통 util.js -->
     <script src="/js/util.js"></script>
 
     <style>
@@ -34,7 +32,6 @@
 
 <div class="border border-primary p-2 layout-container">
 
-    <!-- 보기 버튼 -->
     <div class="mt-3 px-2">
         <div class="d-flex align-items-center mb-2">
             <span class="me-2">보기</span>
@@ -45,14 +42,10 @@
         </div>
     </div>
 
-    <!-- ============================
-         CHART PAGE
-    ============================ -->
     <div id="chartPage">
 
         <div class="d-flex align-items-center flex-wrap gap-3 mb-3 px-2">
 
-            <!-- 라디오 -->
             <div>
                 <label class="form-check form-check-inline">
                     <input type="radio" name="period" id="day" class="form-check-input">
@@ -72,21 +65,17 @@
                 </label>
             </div>
 
-            <!-- 조회기간 -->
             <div class="d-flex align-items-center gap-2">
                 <span class="fw-semibold">조회기간</span>
-
                 <div id="periodInputs" class="d-flex align-items-center gap-2">
                     <input id="startInput" type="month" class="form-control form-control-sm w-150">
                     <span>~</span>
                     <input id="endInput" type="month" class="form-control form-control-sm w-150">
                 </div>
-
                 <button id="getSalesBtn" class="btn btn-primary btn-sm">조회</button>
             </div>
         </div>
 
-        <!-- KPI -->
         <div class="row g-3 mb-3 px-2">
             <div class="col-md-3"><div class="kpi-card"><div class="kpi-title">전체 매출</div><div class="kpi-value" id="kpi-totalSales">-</div></div></div>
             <div class="col-md-3"><div class="kpi-card"><div class="kpi-title">총 판매 수량</div><div class="kpi-value" id="kpi-totalMenu">-</div></div></div>
@@ -94,13 +83,11 @@
             <div class="col-md-3"><div class="kpi-card"><div class="kpi-title">전주 대비 매출 증가</div><div class="kpi-value" id="kpi-growth">-</div></div></div>
         </div>
 
-        <!-- 메인 차트 -->
         <div class="section-box mx-2 mb-4">
             <h6 class="fw-bold mb-3">전체 매출 추이</h6>
             <canvas id="mainChart" height="90"></canvas>
         </div>
 
-        <!-- TOP5 & 메뉴비중 -->
         <div class="row g-3 mb-3 px-2">
             <div class="col-md-6">
                 <div class="section-box">
@@ -119,22 +106,15 @@
         </div>
     </div>
 
-    <!-- ============================
-         LIST PAGE
-    ============================ -->
     <div id="listPage">
-
         <div class="section-box mx-2 mt-3">
             <h6 class="fw-bold mb-3">직영점별 매출 리스트</h6>
-
             <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
                 <span class="fw-semibold">조회기간</span>
                 <input type="date" id="list-start" class="form-control form-control-sm w-150">
                 <span>~</span>
                 <input type="date" id="list-end" class="form-control form-control-sm w-150">
-
                 <span class="fw-semibold ms-3">직영점명</span>
-
                 <div class="input-group input-group-sm" style="width: 220px;">
                     <input type="text" id="list-storeName" class="form-control" placeholder="지점명 검색">
                     <button class="btn btn-outline-secondary" id="list-searchBtn">검색</button>
@@ -160,35 +140,26 @@
             <div class="d-flex justify-content-center mb-3">
                 <ul class="pagination pagination-sm" id="pagination"></ul>
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 <script>
     $(document).on("change", "#startInput", function () {
         const start = $(this).val();
         $("#endInput").attr("min", start);
-
-        // 이미 end 값이 min보다 빠르면 자동 보정
         if ($("#endInput").val() && $("#endInput").val() < start) {
             $("#endInput").val(start);
         }
     });
-
-    // 종료일 입력 시 → 시작일의 최대 날짜(max) 지정
     $(document).on("change", "#endInput", function () {
         const end = $(this).val();
         $("#startInput").attr("max", end);
 
-        // 이미 start 값이 max보다 늦으면 자동 보정
         if ($("#startInput").val() && $("#startInput").val() > end) {
             $("#startInput").val(end);
         }
     });
-    /* ================= 공통: 보기 전환 ================= */
     function updateModeButtons(mode){
         $("#chartBtn").toggleClass("btn-warning", mode==="chart")
             .toggleClass("btn-outline-secondary", mode!=="chart");
@@ -202,7 +173,6 @@
     $("#chartBtn").on("click", ()=>updateModeButtons("chart"));
     $("#listBtn").on("click", ()=>updateModeButtons("list"));
 
-    /* ================= 조회기간 input 템플릿 ================= */
     function updatePeriodInputs(type){
         const box = $("#periodInputs");
         const tpl = {
@@ -226,7 +196,6 @@
         updatePeriodInputs($(this).attr("id"));
     });
 
-    /* ================= 메인 차트 ================= */
     let mainChart;
 
     function createMainChart(labels, values){
@@ -249,14 +218,12 @@
         });
     }
 
-    // 본사 버전 Trend API
     function loadTrend(type, start, end){
         fetchUtil(`/salesChart?startDate=${start}&endDate=${end}&type=${type}`, data => {
             createMainChart(data.labels, data.values);
         });
     }
 
-    /* ================= KPI ================= */
     function loadKPI(type, start, end){
         fetchUtil(`/KPI?type=${type}&startDate=${start}&endDate=${end}`, data => {
             $("#kpi-totalSales").text(data.totalSales.toLocaleString());
@@ -266,7 +233,6 @@
         });
     }
 
-    /* 조회 버튼 */
     $("#getSalesBtn").on("click", function () {
         const type = $("input[name='period']:checked").attr("id");
         const start = $("#startInput").val();
@@ -281,7 +247,6 @@
         loadKPI(type, start, end);
     });
 
-    /* ================= TOP5 ================= */
     let top5Chart;
 
     function loadTop5(){
@@ -307,7 +272,6 @@
         });
     }
 
-    /* ================= 메뉴 비중 ================= */
     let menuChart;
 
     function loadMenuRatio(){
@@ -333,7 +297,6 @@
             const baseColors = ["#ff6384","#36a2eb","#ffcd56","#4bc0c0","#9966ff"];
             const colors = labels.map((label, i) => label === "기타" ? "#cccccc" : baseColors[i % baseColors.length]);
 
-            // 범례
             let legendHtml = "";
             labels.forEach((label, i) => {
                 legendHtml += `
@@ -381,7 +344,6 @@
         });
     }
 
-    /* ================= LIST PAGE ================= */
     let listCurrentPage = 1;
 
     function loadList(page){
@@ -391,7 +353,6 @@
         let end   = $("#list-end").val();
         const storeName = $("#list-storeName").val();
 
-        // default: 이번 달 1일 ~ 어제
         if(!start || !end){
             const today = new Date();
             let startObj, endObj;
@@ -489,7 +450,6 @@
         location.href = `/salesDetailUI?storeNo=${storeNo}&salesDate=${date}`;
     });
 
-    /* ================= 초기 로딩 ================= */
     $(document).ready(function(){
 
         updateModeButtons("chart");
@@ -515,10 +475,6 @@
             endObj   = yesterday;
         }
 
-
-
-
-
         const toDate = d =>
             `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 
@@ -538,6 +494,5 @@
     });
 
 </script>
-
 </body>
 </html>

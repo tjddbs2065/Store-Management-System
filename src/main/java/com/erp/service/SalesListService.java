@@ -23,9 +23,7 @@ public class SalesListService {
     private final StoreSalesRepository storeSalesRepository;
     private final StoreOrderDetailRepository storeOrderDetailRepository;
 
-    /* ===============================
-        상세 조회 (본사/직영점 공용)
-    =============================== */
+
     public List<StoreDailyMenuSalesDTO> getSalesDetail(Long storeNo, LocalDate salesDate){
 
         LocalDateTime start = salesDate.atStartOfDay();
@@ -35,9 +33,6 @@ public class SalesListService {
     }
 
 
-    /* ===============================
-        ⭐ (본사) 전체 조회
-    =============================== */
     public Page<SalesListDTO> getSalesList(String startDateStr,
                                            String endDateStr,
                                            String storeName,
