@@ -21,8 +21,6 @@ import java.util.List;
 public class SalesListService {
 
     private final StoreSalesRepository storeSalesRepository;
-
-
     private final StoreOrderDetailRepository storeOrderDetailRepository;
 
 
@@ -40,7 +38,6 @@ public class SalesListService {
                                            String storeName,
                                            Pageable pageable) {
 
-
         LocalDate startDate = null;
         LocalDate endDate = null;
 
@@ -55,6 +52,42 @@ public class SalesListService {
                 storeSalesRepository.findSalesList(startDate, endDate, storeName, pageable);
 
         List<SalesListDTO> content = page.getContent();
+        applyGrowthRate(content);
+
+        return new PageImpl<>(content, pageable, page.getTotalElements());
+    }
+
+
+
+    public Page<SalesListDTO> getSalesListForStore(Long storeNo,
+                                                   String startDateStr,
+                                                   String endDateStr,
+                                                   Pageable pageable) {
+
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+
+        if (startDateStr != null && !startDateStr.isBlank()) {
+            startDate = LocalDate.parse(startDateStr);
+        }
+        if (endDateStr != null && !endDateStr.isBlank()) {
+            endDate = LocalDate.parse(endDateStr);
+        }
+
+        // ⭐ Repository도 storeNo 버전 필요
+        Page<SalesListDTO> page =
+                storeSalesRepository.findSalesListForStore(storeNo, startDate, endDate, pageable);
+
+        List<SalesListDTO> content = page.getContent();
+        applyGrowthRate(content);
+
+        return new PageImpl<>(content, pageable, page.getTotalElements());
+    }
+
+
+
+    private void applyGrowthRate(List<SalesListDTO> content) {
+
         for (SalesListDTO dto : content) {
 
             LocalDate prevDay = dto.getSalesDate().minusDays(1);
@@ -71,12 +104,10 @@ public class SalesListService {
                 int todayAmount = dto.getSalesAmount();
 
                 if (prevAmount > 0) {
-                    double rate = ((double) (todayAmount - prevAmount) / prevAmount) * 100;
-                    dto.setGrowthRate(
-                            String.format("%.1f%% %s",
-                                    Math.abs(rate),
-                                    rate >= 0 ? "상승" : "하락")
-                    );
+                    double rate = ((double)(todayAmount - prevAmount) / prevAmount) * 100;
+                    dto.setGrowthRate(String.format("%.1f%% %s",
+                            Math.abs(rate),
+                            rate >= 0 ? "상승" : "하락"));
                 } else {
                     dto.setGrowthRate("-");
                 }
@@ -84,6 +115,6 @@ public class SalesListService {
                 dto.setGrowthRate("-");
             }
         }
-        return new PageImpl<>(content, pageable, page.getTotalElements());
     }
+
 }

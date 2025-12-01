@@ -22,6 +22,68 @@ public class SalesKPIService {
     private final StoreDAO storeDAO;
 
 
+    public KPIDTO getStoreKPI(Long storeNo, String type, String start, String end) {
+
+        LocalDate startDate = convert(type, start, false);
+        LocalDate endDate   = convert(type, end, true);
+
+        int totalSales = sumStoreSales(storeNo, startDate, endDate);
+
+
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime   = endDate.atTime(23, 59, 59);
+
+        Integer totalMenuCount = salesOrderRepository.getStoreMenuCount(storeNo, startDateTime, endDateTime);
+        if(totalMenuCount == null) totalMenuCount = 0;
+
+
+        int avgPrice = (totalMenuCount == 0) ? 0 : (totalSales / totalMenuCount);
+
+        double growthRate = calcStoreWeeklyGrowth(storeNo);
+
+        return KPIDTO.builder()
+                .totalSales(totalSales)
+                .totalMenuCount(totalMenuCount)
+                .avgOrderAmount(avgPrice)
+                .growthRate(growthRate)
+                .build();
+    }
+
+
+    private int sumStoreSales(Long storeNo, LocalDate start, LocalDate end) {
+        return storeSalesRepository
+                .findByStore_StoreNoAndSalesDateBetween(storeNo, start, end)
+                .stream()
+                .mapToInt(StoreSales::getSalesPrice)
+                .sum();
+    }
+
+
+
+    private double calcStoreWeeklyGrowth(Long storeNo) {
+
+        LocalDate today = LocalDate.now();
+
+        LocalDate thisWeekStart = today.with(java.time.DayOfWeek.MONDAY);
+        LocalDate thisWeekEnd   = today.with(java.time.DayOfWeek.SUNDAY);
+
+        int thisWeekSales = sumStoreSales(storeNo, thisWeekStart, thisWeekEnd);
+
+        LocalDate lastWeekStart = thisWeekStart.minusWeeks(1);
+        LocalDate lastWeekEnd   = thisWeekEnd.minusWeeks(1);
+
+        int lastWeekSales = sumStoreSales(storeNo, lastWeekStart, lastWeekEnd);
+
+        if(lastWeekSales == 0) return 0.0;
+
+        return ((double)(thisWeekSales - lastWeekSales) / lastWeekSales) * 100.0;
+    }
+
+
+
+
+
+
     public KPIDTO getKPIByDate(String type, String start, String end) {
         LocalDate startDate = convert(type, start, false);
         LocalDate endDate   = convert(type, end, true);

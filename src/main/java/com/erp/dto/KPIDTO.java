@@ -11,5 +11,7 @@ public class KPIDTO {
     private Integer totalSales;
     private Integer totalMenuCount;
     private Integer avgStoreSales;
+
+    private Integer avgOrderAmount;
     private Double growthRate;
 }

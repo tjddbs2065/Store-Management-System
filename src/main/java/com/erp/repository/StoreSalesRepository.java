@@ -43,5 +43,34 @@ public interface StoreSalesRepository extends JpaRepository<StoreSales,Long> {
                                      @Param("endDate") LocalDate endDate,
                                      @Param("storeName") String storeName,
                                      Pageable pageable);
+    @Query("""
+    select new com.erp.dto.SalesListDTO(
+        s.store.storeNo,
+        s.store.storeName,
+        s.store.address,
+        (
+            select count(o)
+            from SalesOrder o
+            where o.store.storeNo = s.store.storeNo
+              and function('DATE', o.salesOrderDatetime) = s.salesDate
+        ),
+        s.salesPrice,
+        s.salesDate,
+        null
+    )
+    from StoreSales s
+    where s.store.storeNo = :storeNo         
+      and (:startDate is null or s.salesDate >= :startDate)
+      and (:endDate is null or s.salesDate <= :endDate)
+    order by s.salesDate desc
+    """)
+    Page<SalesListDTO> findSalesListForStore(
+            @Param("storeNo") Long storeNo,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            Pageable pageable
+    );
+
+
 
 }
