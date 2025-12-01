@@ -5,6 +5,7 @@ import com.erp.dto.StoreDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @SpringBootTest
 public class StoreDAOTest {
@@ -12,6 +13,8 @@ public class StoreDAOTest {
     private StoreDAO storeDAO;
     @Autowired
     private ManagerDAO managerDAO;
+    @Autowired
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Test
     void countStoresTest() { System.out.println(storeDAO.countStores()); }
@@ -79,7 +82,7 @@ public class StoreDAOTest {
     void setStoreTest() {
         ManagerDTO manager = new ManagerDTO();
         manager.setManagerId("storeManager3");
-        manager.setPw("1233");
+        manager.setPw(encoder.encode("123"));
         manager.setEmail("storeManager3@test.com");
         manager.setManagerName("박등촌");
         manager.setPhoneNumber("010-1331-2222");

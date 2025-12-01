@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+                xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>메뉴 조회</title>
@@ -96,7 +97,7 @@
             <h2 class="fw-bold">메뉴 조회</h2>
             <div>
                 <!--                직영점 로그인 시에는 메뉴등록버튼 안 보이게 / 직영점별 판매 메뉴 보기 -> 판매 메뉴 보기-->
-                <button class="btn btn-warning me-2 custom-btn" id="menuAddBtn">메뉴 등록</button>
+                <button class="btn btn-warning me-2 custom-btn" id="menuAddBtn" sec:authorize="hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')">메뉴 등록</button>
                 <button class="btn custom-btn" id="storeMenuBtn">직영점별 판매 메뉴 보기</button>
             </div>
         </div>

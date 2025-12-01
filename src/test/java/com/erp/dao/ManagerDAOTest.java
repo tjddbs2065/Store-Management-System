@@ -43,7 +43,7 @@ public class ManagerDAOTest {
     void setManager() {
         ManagerDTO manager = new ManagerDTO();
         manager.setManagerId("test123");
-        manager.setPw("1233");
+        manager.setPw(encoder.encode("1233"));
         manager.setEmail("test12@test.com");
         manager.setManagerName("김삿갓");
         manager.setPhoneNumber("010-1111-2222");
