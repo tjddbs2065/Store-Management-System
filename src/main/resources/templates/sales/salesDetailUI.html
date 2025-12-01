@@ -10,6 +10,15 @@
   <script src="/js/util.js"></script>
 
   <style>
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 2000;
+    }
+    body { background-color: #fdfdfd;      padding-top: 65px !important; }
+
     .page-wrapper {
       max-width:1500px;
       margin:auto;
@@ -19,7 +28,7 @@
 </head>
 
 <body class="bg-light">
-
+<header th:insert="fragments/toolBarManager :: toolBarManager"></header>
 <div class="page-wrapper">
 
   <h4 class="text-center mb-4 mt-3" th:text="${storeName}"></h4>
@@ -63,8 +72,10 @@
 
 
 <script>
+  $(document).on("click", "#logoutBtn", function () {
+    location.href = "/logout";
+  });
 
-  /* URL 파라미터 */
   const params = new URLSearchParams(location.search);
   const storeNo = params.get("storeNo");
   const salesDate = params.get("salesDate");

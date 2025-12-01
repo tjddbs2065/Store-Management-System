@@ -13,7 +13,14 @@
   <script src="/js/util.js"></script>
 
   <style>
-    body { background-color:#fdfdfd; }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 2000;
+    }
+    body { background-color: #fdfdfd;      padding-top: 65px !important; }
     .max-1500 { max-width:1500px; margin:0 auto; }
     .kpi-card { background:#fff; border:1px solid #ccc; border-radius:10px; padding:18px; text-align:center; }
     .kpi-title { font-size:14px; }
@@ -27,7 +34,7 @@
 </head>
 
 <body class="p-2">
-
+<header th:insert="fragments/toolBarManager :: toolBarManager"></header>
 <div class="border border-primary p-2 max-1500">
 
   <!-- 보기 버튼 -->
@@ -186,6 +193,9 @@
 </div>
 
 <script>
+  $(document).on("click", "#logoutBtn", function () {
+    location.href = "/logout";
+  });
 
 
   $(document).on("change", "#startInput", function () {
