@@ -1,7 +1,9 @@
 package com.erp.service;
 
+import com.erp.controller.exception.NoIngredientException;
 import com.erp.dto.SalesOrderDTO;
 import com.erp.dto.SalesOrderDetailDTO;
+import com.erp.dto.SalesOrderRequestDTO;
 import com.erp.dto.StoreMenuDTO;
 import com.erp.repository.*;
 import com.erp.repository.entity.*;
@@ -33,7 +35,12 @@ public class SalesOrderService {
     private final StoreStockRepository storeStockRepository;
 
     @Transactional
-    public SalesOrderDTO addSalesOrder(Long storeNo, List<StoreMenuDTO> menuDTOList, List<SalesOrderDetailDTO> detailDTOList) {
+    public SalesOrderDTO addSalesOrder(SalesOrderRequestDTO request) {
+
+        Long storeNo = request.getStoreNo();
+        List<StoreMenuDTO> menuDTOList = request.getMenuList();
+        List<SalesOrderDetailDTO> detailDTOList = request.getDetailList();
+
         Store store = storeRepository.findById(storeNo).orElse(null);
 
         int totalOrderAmount = 0;
@@ -49,11 +56,16 @@ public class SalesOrderService {
 
         salesOrderRepository.save(salesOrder);
 
+        // 주문 상세 + 재고 차감
         for (int i = 0; i < menuDTOList.size(); i++) {
+
             StoreMenuDTO storeMenuDTO = menuDTOList.get(i);
             SalesOrderDetailDTO salesOrderDetailDTO = detailDTOList.get(i);
 
-            StoreMenu storeMenu = storeMenuRepository.findById(storeMenuDTO.getStoreMenuNo()).orElse(null);
+            StoreMenu storeMenu = storeMenuRepository
+                    .findById(storeMenuDTO.getStoreMenuNo())
+                    .orElse(null);
+
             StoreOrderDetail orderDetail = StoreOrderDetail.builder()
                     .salesOrder(salesOrder)
                     .storeMenu(storeMenu)
@@ -63,10 +75,12 @@ public class SalesOrderService {
 
             salesOrder.addOrderDetail(orderDetail);
 
-
-            List<MenuIngredient> ingredientList = menuIngredientRepository.findByMenu_MenuNo(storeMenu.getMenu().getMenuNo());
+            // 🔥 재고 차감 처리
+            List<MenuIngredient> ingredientList =
+                    menuIngredientRepository.findByMenu_MenuNo(storeMenu.getMenu().getMenuNo());
 
             for (MenuIngredient ingredient : ingredientList) {
+
                 Long itemNo = ingredient.getItem().getItemNo();
                 int needQty = ingredient.getIngredientQuantity();
                 int totalQty = needQty * salesOrderDetailDTO.getCount();
@@ -75,10 +89,16 @@ public class SalesOrderService {
                         .findByStoreNoAndItemNo(storeNo, itemNo)
                         .stream().findFirst().orElse(null);
 
-                StoreStock latestStock = storeStockRepository.findFirstByStoreItemNoOrderByStoreStockNoDesc(storeItem.getStoreItemNo());
+                StoreStock latestStock = storeStockRepository
+                        .findFirstByStoreItemNoOrderByStoreStockNoDesc(storeItem.getStoreItemNo());
 
                 int previousQty = (latestStock == null) ? 0 : latestStock.getCurrentQuantity();
                 int updatedQty = previousQty - totalQty;
+
+                if (updatedQty < 0 ) {
+                    throw new NoIngredientException("재료 재고 부족으로 주문 불가. 부족 재료: "
+                    + ingredient.getItem().getItemNo());
+                }
 
                 StoreStock newStock = StoreStock.builder()
                         .storeItemNo(storeItem.getStoreItemNo())
@@ -90,9 +110,10 @@ public class SalesOrderService {
                 storeStockRepository.save(newStock);
             }
         }
-        return SalesOrderDTO.fromEntity(salesOrder);
 
+        return SalesOrderDTO.fromEntity(salesOrder);
     }
+
 
     @Transactional(readOnly = true)
     public Page<SalesOrderDTO> getSalesOrderList(Integer pageNo, LocalDate date, String storeName) {
