@@ -58,19 +58,21 @@ public class SalesRestController {
     public KPIDTO getKPI(
             @RequestParam String type,
             @RequestParam String startDate,
-            @RequestParam String endDate
+            @RequestParam String endDate,
+            @RequestParam(required = false) Long storeNo
     ) {
-        return salesKPIService.getKPIByDate(type, startDate, endDate);
+        return salesKPIService.getKPIByDate(type, startDate, endDate, storeNo);
     }
 
     @GetMapping("salesChart")
     public SalesChartDTO getSalesChart(
             @RequestParam String startDate,
             @RequestParam String endDate,
-            @RequestParam String type
+            @RequestParam String type,
+            @RequestParam(required = false) Long storeNo
 
     ) {
-        return salesChartService.getSalesChartByDate(startDate,endDate,type);
+        return salesChartService.getSalesChartByDate(startDate,endDate,type, storeNo);
     }
 
     @GetMapping("/totalStoreSales")
