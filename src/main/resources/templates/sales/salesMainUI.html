@@ -8,12 +8,25 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        function loadPage(page){
+            loadList(page);
+        }
+    </script>
     <script src="/js/util.js"></script>
 
     <style>
-        body { background-color:#fdfdfdf; }
-        .layout-container { max-width:1500px; margin:0 auto; }
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 2000;
+        }
+        body { background-color: #fdfdfd;      padding-top: 65px !important; }
 
+
+        .layout-container { max-width:1500px; margin:0 auto; }
         .w-150 { width:150px; }
         .w-120 { width:120px; }
 
@@ -28,9 +41,9 @@
     </style>
 </head>
 
-<body class="p-2">
-
-<div class="border border-primary p-2 layout-container">
+<body>
+<header th:insert="fragments/toolBarManager :: toolBarManager"></header>
+<div class="p-2 layout-container">
 
     <div class="mt-3 px-2">
         <div class="d-flex align-items-center mb-2">
@@ -72,7 +85,9 @@
                     <span>~</span>
                     <input id="endInput" type="month" class="form-control form-control-sm w-150">
                 </div>
-                <button id="getSalesBtn" class="btn btn-primary btn-sm">조회</button>
+                <input id="storeInput" type="text" class="form-control form-control-sm w-150"
+                       placeholder="직영점명">
+                <button id="getSalesBtn" class="btn btn-primary btn-sm ms-1">조회</button>
             </div>
         </div>
 
@@ -145,6 +160,10 @@
 </div>
 
 <script>
+    $(document).on("click", "#logoutBtn", function () {
+            location.href = "/logout";
+    });
+
     $(document).on("change", "#startInput", function () {
         const start = $(this).val();
         $("#endInput").attr("min", start);
@@ -382,7 +401,7 @@
 
         fetchUtil(`/salesList?startDate=${start}&endDate=${end}&storeName=${storeName}&page=${page}`, data => {
             renderList(data.list);
-            renderPagination(data.totalPages, data.currentPage);
+            updatePaginationUI(data.currentPage, data.totalPages);
         });
     }
 
@@ -417,33 +436,9 @@
         });
     }
 
-    function renderPagination(totalPages, currentPage){
-        const $pag = $("#pagination");
-        $pag.empty();
-
-        $pag.append(`
-            <li class="page-item ${currentPage===1?"disabled":""}">
-                <a class="page-link" href="#" onclick="loadList(${currentPage-1}); return false;">&lt;</a>
-            </li>
-        `);
-
-        for(let i=1;i<=totalPages;i++){
-            $pag.append(`
-                <li class="page-item ${currentPage===i?"active":""}">
-                    <a class="page-link" href="#" onclick="loadList(${i}); return false;">${i}</a>
-                </li>
-            `);
-        }
-
-        $pag.append(`
-            <li class="page-item ${currentPage===totalPages?"disabled":""}">
-                <a class="page-link" href="#" onclick="loadList(${currentPage+1}); return false;">&gt;</a>
-            </li>
-        `);
-    }
 
     $("#list-searchBtn").on("click", () => loadList(1));
-
+    $("#list-storeName").on("keyup", e => e.key === "Enter" && loadList(1));
     $(document).on("click", ".detailBtn", function(){
         const storeNo = $(this).data("store-no");
         const date    = $(this).data("sales-date");

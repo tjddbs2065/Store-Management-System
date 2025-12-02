@@ -10,170 +10,129 @@
   <script src="/js/util.js"></script>
 
   <style>
-    .page-wrapper {
+    header {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      z-index: 2000;
+    }
+    body {
+      background-color:#fdfdfd;
+      padding-top:65px !important;
+    }
+    .wrapper {
       max-width:1500px;
       margin:auto;
     }
     .w-240 { width:240px; }
+    .section-box {
+      background:#fff;
+      border:1px solid #ddd;
+      border-radius:10px;
+      padding:20px;
+    }
   </style>
 </head>
 
 <body class="bg-light">
+<header th:insert="fragments/toolBarManager :: toolBarManager"></header>
 
-<div class="page-wrapper">
+<div class="wrapper">
 
-  <h4 class="text-center mb-4 mt-3" th:text="${storeName}"></h4>
+  <h4 class="text-center my-4" th:text="${storeName}"></h4>
 
   <div class="d-flex justify-content-between align-items-center mb-3">
     <button id="btnBack" class="btn btn-warning btn-sm">뒤로가기</button>
 
     <div class="d-flex gap-2">
-      <input id="searchInput" type="text" class="form-control w-240" placeholder="판매상품 검색">
-      <button id="searchBtn" class="btn btn-primary">검색</button>
+      <input id="searchInput" type="text" class="form-control form-control-sm w-240" placeholder="판매상품 검색">
+      <button id="searchBtn" class="btn btn-primary btn-sm">검색</button>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-body p-0">
+  <div class="section-box">
+    <table class="table table-hover text-center align-middle mb-0">
+      <thead class="table-light">
+      <tr>
+        <th>번호</th>
+        <th>카테고리</th>
+        <th>판매상품</th>
+        <th>사이즈</th>
+        <th>판매수량</th>
+        <th>매출액</th>
+      </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
 
-      <table class="table table-hover mb-0 text-center align-middle">
-        <thead class="table-light">
-        <tr>
-          <th>번호</th>
-          <th>카테고리</th>
-          <th>판매상품</th>
-          <th>사이즈</th>
-          <th>판매수량</th>
-          <th>매출액</th>
-        </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-
+    <div class="d-flex justify-content-center mt-3">
+      <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
     </div>
-  </div>
-
-  <div class="d-flex justify-content-center mt-3">
-    <nav>
-      <ul class="pagination mb-0" id="pagination"></ul>
-    </nav>
   </div>
 
 </div>
 
-
 <script>
+  $(document).on("click", "#logoutBtn", () => location.href = "/logout");
 
-  /* URL 파라미터 */
   const params = new URLSearchParams(location.search);
   const storeNo = params.get("storeNo");
   const salesDate = params.get("salesDate");
 
   $("#btnBack").on("click", () => history.back());
 
-  let detailData = [];
-  let filteredData = [];
+  let dataAll = [];
+  let dataFiltered = [];
   let currentPage = 1;
   const rowsPerPage = 10;
 
-  function renderTable() {
-    const startIdx = (currentPage - 1) * rowsPerPage;
-    const endIdx = startIdx + rowsPerPage;
-
-    const tbody = $("#tableBody");
-    tbody.empty();
-
-    filteredData.slice(startIdx, endIdx).forEach((row, idx) => {
-      const rowNo = startIdx + idx + 1;
-
-      tbody.append(`
-        <tr>
-          <td>${rowNo}</td>
-          <td>${row.menuCategory}</td>
-          <td>${row.menuName}</td>
-          <td>${row.size}</td>
-          <td>${row.menuCount}</td>
-          <td>${row.totalPrice.toLocaleString()}</td>
-        </tr>
-      `);
-    });
-
-    renderPagination();
-  }
-
-
-
-  function renderPagination() {
-    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-    const $pagination = $("#pagination");
-    $pagination.empty();
-
-    if (totalPages === 0) return;
-
-
-    $pagination.append(`
-      <li class="page-item ${currentPage === 1 ? "disabled" : ""}">
-        <a class="page-link" href="#" onclick="loadPage(${currentPage - 1}); return false;">&lt;</a>
-      </li>
-    `);
-
-
-    for (let i = 1; i <= totalPages; i++) {
-      $pagination.append(`
-        <li class="page-item ${i === currentPage ? "active" : ""}">
-          <a class="page-link" href="#" onclick="loadPage(${i}); return false;">${i}</a>
-        </li>
-      `);
-    }
-
-    /* next */
-    $pagination.append(`
-      <li class="page-item ${currentPage === totalPages ? "disabled" : ""}">
-        <a class="page-link" href="#" onclick="loadPage(${currentPage + 1}); return false;">&gt;</a>
-      </li>
-    `);
-  }
-
-
-  function loadPage(page) {
-    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-
-    if (page < 1 || page > totalPages) return;
-
+  function loadPage(page){
+    const total = Math.ceil(dataFiltered.length / rowsPerPage);
+    if(page < 1 || page > total) return;
     currentPage = page;
     renderTable();
   }
 
+  function renderTable(){
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
 
-  function applySearch() {
+    const tbody = $("#tableBody");
+    tbody.empty();
+
+    dataFiltered.slice(start, end).forEach((d, idx) => {
+      tbody.append(`
+        <tr>
+          <td>${start + idx + 1}</td>
+          <td>${d.menuCategory}</td>
+          <td>${d.menuName}</td>
+          <td>${d.size}</td>
+          <td>${d.menuCount.toLocaleString()}</td>
+          <td>${d.totalPrice.toLocaleString()}</td>
+        </tr>
+      `);
+    });
+
+    updatePaginationUI(currentPage, Math.ceil(dataFiltered.length / rowsPerPage));
+  }
+
+  function applySearch(){
     const keyword = $("#searchInput").val().trim();
-
-    filteredData =
-            keyword === ""
-                    ? detailData
-                    : detailData.filter(d => d.menuName.includes(keyword));
-
+    dataFiltered = keyword ? dataAll.filter(x => x.menuName.includes(keyword)) : dataAll;
     currentPage = 1;
     renderTable();
   }
 
   $("#searchBtn").on("click", applySearch);
-  $("#searchInput").on("keyup", e => {
-    if (e.key === "Enter") applySearch();
-  });
+  $("#searchInput").on("keyup", e => e.key === "Enter" && applySearch());
 
-
-
-  $(document).ready(function() {
-    const url = `/salesDetail?storeNo=${storeNo}&salesDate=${salesDate}`;
-
-    fetchUtil(url, data => {
-      detailData = data;
-      filteredData = detailData;
+  $(document).ready(()=>{
+    fetchUtil(`/salesDetail?storeNo=${storeNo}&salesDate=${salesDate}`, data => {
+      dataAll = data;
+      dataFiltered = dataAll;
       renderTable();
     });
   });
-
 </script>
 
 </body>
