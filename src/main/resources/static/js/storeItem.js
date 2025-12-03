@@ -9,6 +9,9 @@
     const VISIBLE_PAGES = 5; // 번호 5개 고정
     const STATE_KEY = 'storeItemState:' + location.pathname;
 
+    // ★ 폐기 사유 최대 글자수 (DB: disposal_reason varchar(100))
+    const MAX_REASON_LEN = 100;
+
     // 직영점 화면은 body에 data-store-no 필수
     const STORE_NO = !IS_MANAGER ? parseInt($body.data('storeNo') || '0', 10) : null;
 
@@ -165,7 +168,7 @@
 
     // 숫자 이외 키 차단(하한선/폐기 공통)
     $(document).on('keydown', '#limitNew, #disposeQtyInput, #disposeSupplyCount', function (e) {
-        if (['e','E','+','-','.'].includes(e.key)) e.preventDefault();
+        if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault();
     });
 
     // 공급단위 계산 → 정수 변환
@@ -348,6 +351,33 @@
             });
     });
 
+    // ★ 폐기 사유 글자 수 카운터 초기화
+    function initDisposeReasonCounter() {
+        const $reason = $('#disposeReason');
+        const $counter = $('#disposeReasonCounter');
+
+        // 매니저 화면 등에서 요소가 없을 수도 있으니 방어 코드
+        if (!$reason.length || !$counter.length) return;
+
+        // textarea 최대 글자수 셋팅
+        $reason.attr('maxlength', MAX_REASON_LEN);
+
+        // 카운터 갱신 함수
+        const update = () => {
+            const len = $reason.val().length;
+            $counter.text(`${len} / ${MAX_REASON_LEN}자`);
+        };
+
+        // 입력할 때마다 카운터 업데이트
+        $reason.on('input', update);
+
+        // 초기 세팅
+        update();
+    }
+
+    // 스크립트 로드 시 한 번 실행
+    initDisposeReasonCounter();
+
     /*** 직영점 전용: 폐기 모달 ***/
     function openDisposeModal($row) {
         if (IS_MANAGER) return;
@@ -363,7 +393,7 @@
         $('#disposeQtyInput').val('');
         $('#checkSupplyDispose').prop('checked', false);
         $('#disposeSupplyCount').val('').prop('disabled', true);
-        $('#disposeReason').val('');
+        $('#disposeReason').val('').trigger('input'); // 카운터도 초기화
 
         const conv = getConvFromRow($row);
         const { supplyUnit, stockUnit } = getUnitsFromRow($row);
@@ -385,6 +415,7 @@
         }
         disposeModalInstance.show();
     }
+
     $(document).on('click', '.btn-open-dispose', function () {
         if (!IS_MANAGER) openDisposeModal($(this).closest('tr'));
     });
@@ -416,6 +447,12 @@
         const qty = parseInt(raw, 10);
         const reason = ($('#disposeReason').val() || '').trim();
 
+        // 폐기 사유 길이 체크
+        if (reason.length > MAX_REASON_LEN) {
+            toast(`폐기 사유는 최대 ${MAX_REASON_LEN}자까지 입력 가능합니다.`, 'warning');
+            return;
+        }
+
         if (!Number.isFinite(qty) || qty <= 0) {
             toast('폐기 수량은 1 이상의 정수로 입력하세요.', 'warning');
             return;
@@ -435,7 +472,7 @@
         const headers = { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' };
         if (csrf) headers[csrf.header] = csrf.token;
 
-        fetch(`/stock/storeItem/${storeItemNo}/dispose`, {
+        fetch(`/store/stock/storeItem/${storeItemNo}/dispose`, {
             method: 'POST',
             headers,
             body: params.toString(),
@@ -444,7 +481,7 @@
             .then(async res => {
                 if (!res.ok) {
                     let msg = '폐기 등록에 실패했습니다.';
-                    try { const t = await res.text(); if (t) msg = t; } catch {}
+                    try { const t = await res.text(); if (t) msg = t; } catch { }
                     throw new Error(msg);
                 }
                 return res.json();
@@ -473,8 +510,8 @@
     $(document).on('hidden.bs.modal', '#disposeModal', function () {
         $('#disposeQtyInput').val('');
         $('#disposeSupplyCount').val('').prop('disabled', true);
-        $('#disposeReason').val('');
         $('#checkSupplyDispose').prop('checked', false);
+        $('#disposeReason').val('').trigger('input'); // 카운터도 0으로
     });
 
     /*** 본문 테이블 렌더 (두 한도 data-* 포함) ***/
@@ -486,8 +523,8 @@
         const currentText = (item.currentQuantity || 0).toLocaleString() + ' ' + (item.stockUnit || 'ea');
 
         const managerLimit = (item.managerLimit ?? null);
-        const storeLimit   = (item.storeLimit ?? null);
-        const ownerAttr    = (item.limitOwnerType || item.limitOwner || 'NONE');
+        const storeLimit = (item.storeLimit ?? null);
+        const ownerAttr = (item.limitOwnerType || item.limitOwner || 'NONE');
 
         if (IS_MANAGER) {
             return `
@@ -618,7 +655,7 @@
         if (category) params.append('category', category);
         if (keyword && searchType) { params.append('searchType', searchType); params.append('keyword', keyword); }
 
-        const baseUrl = IS_MANAGER ? '/stock/storeItem/manager/list/' : '/stock/storeItem/store/list/';
+        const baseUrl = IS_MANAGER ? '/manager/stock/storeItem/list/' : '/store/stock/storeItem/list/';
         fetch(baseUrl + page + '?' + params.toString())
             .then(res => { if (!res.ok) throw new Error('목록 조회 실패'); return res.json(); })
             .then(data => {

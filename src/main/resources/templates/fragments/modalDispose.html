@@ -60,9 +60,14 @@
                     <label class="form-label fw-bold">폐기 사유</label>
                     <textarea id="disposeReason"
                               class="form-control"
-                              rows="3"
+                              rows="3" maxlength="100"
                               placeholder="폐기 사유를 입력하세요"></textarea>
-
+                    <div class="text-end mt-1">
+                        <small id="disposeReasonCounter">0 / 100자</small>
+                    </div>
+                    <small class="text-muted">
+                        폐기 사유는 한글 기준 최대 100자까지 입력 가능합니다.
+                    </small>
                 </div>
 
                 <div class="modal-footer">
