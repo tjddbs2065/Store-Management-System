@@ -20,7 +20,7 @@ public class MenuDTO {
     private String menuExplain;
     private String size;
     private String menuImage;
-    private String menuPrice;
+    private int menuPrice;
     private String releaseStatus;
     private Timestamp inDate;
     private Timestamp editDate;

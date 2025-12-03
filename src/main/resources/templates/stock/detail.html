@@ -44,7 +44,7 @@
 
 <body>
 <div th:if="${role} == '본사' or ${role} == '관리자'"
-     th:replace="fragments/toolBarManager :: toolBarFragment"></div>
+     th:replace="fragments/toolBar :: toolBarFragment"></div>
 
 <div th:if="${role} == '직영'"
      th:replace="fragments/toolBarStore :: toolBarFragment"></div>

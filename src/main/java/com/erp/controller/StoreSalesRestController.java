@@ -37,7 +37,7 @@ public class StoreSalesRestController {
             @RequestParam(defaultValue = "1") int page
     ) {
 
-        Long storeNo = principal.getStoreNo();  // ★ 로그인한 직영점 번호
+        Long storeNo = principal.getStoreNo();
 
         Pageable pageable = PageRequest.of(page - 1, 10);
 

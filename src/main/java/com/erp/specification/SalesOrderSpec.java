@@ -6,6 +6,11 @@ import org.springframework.data.jpa.domain.Specification;
 import java.time.LocalDate;
 
 public class SalesOrderSpec {
+    public static Specification<SalesOrder> findByStoreNo(Long storeNo) {
+        return (root, query, cb) ->
+            cb.equal(root.get("store").get("storeNo"), storeNo);
+    }
+
     public static Specification<SalesOrder> findByDate(LocalDate date) {
         return (root, query, cb) -> {
             if (date == null) {

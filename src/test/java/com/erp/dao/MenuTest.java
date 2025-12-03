@@ -20,7 +20,7 @@ public class MenuTest {
                 .menuCode("SAUCE")
                 .menuExplain("맛있는 소스입니다")
                 .menuImage("https://picsum.photos/300/200")
-                .menuPrice("500")
+                .menuPrice(500)
                 .releaseStatus("출시 예정")
                 .build();
 
@@ -36,7 +36,7 @@ public class MenuTest {
                 .menuExplain("맛있는 피자입니다")
                 .size("단일")
                 .menuImage("https://picsum.photos/300/200")
-                .menuPrice("25000")
+                .menuPrice(25000)
                 .releaseStatus("출시 예정")
                 .build();
         menuDAO.addMenu(menu);

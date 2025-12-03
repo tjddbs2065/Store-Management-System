@@ -1,99 +1,130 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+                xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>주문 조회 (직영점)</title>
-
-    <!-- Bootstrap -->
+    <title>주문 조회</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/js/util.js"></script>
+    <script src="/js/modalStoreSearch.js"></script>
 
-    <!-- ============================
-         STYLE (inline 제거 후 분리)
-    ============================ -->
     <style>
-        body { background-color:#e5e5e5; }
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 2000;
+        }
 
-        .main-wrapper {
-            max-width:1500px;
-            margin:0 auto;
-            background:#fff;
+        .custom-btn {
+            background-color: #FFEEAA !important;
+            border-color: #FFEEAA !important;
+            color: #000;
+        }
+
+        .custom-btn:hover {
+            background-color: #f2da84 !important;
+            border-color: #f2da84 !important;
+        }
+
+        .custom-container {
+            max-width: 1500px;
+            padding: 65px;
         }
 
         .section-box {
-            background:#fff;
-            border:1px solid #ddd;
-            border-radius:10px;
-            padding:20px;
+            background: #fff;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            padding: 20px;
         }
 
         .table thead th {
-            background:#fbfbfb;
-            font-weight:600;
+            background-color: #fbfbfb;
+            font-weight: 600;
         }
 
         .pagination-wrapper {
-            display:flex;
-            justify-content:center;
+            display: flex;
+            justify-content: center;
+            width: 100%;
         }
 
-        /* input 및 이미지 스타일 분리 */
-        .w150 { width:150px; }
-        .detail-icon {
-            width:24px;
-            cursor:pointer;
+        #pagination .page-link {
+            cursor: pointer;
+        }
+
+        .w-150 {
+            width: 150px;
+        }
+
+        .w-180 {
+            width: 180px;
         }
     </style>
 </head>
-<body class="p-3">
 
-<div class="border border-secondary main-wrapper">
-
-    <!-- 제목 -->
-    <div class="p-3">
-        <div class="fs-3 fw-bold mb-3">주문 조회</div>
-    </div>
-
-    <!-- 조회 영역 -->
-    <div class="px-3 d-flex justify-content-end align-items-center gap-2 mb-2">
-        <span class="fw-semibold">주문 일자</span>
-        <input id="orderDate" type="date" class="form-control form-control-sm w150">
-        <button id="searchBtn" class="btn btn-warning btn-sm">조회</button>
-        <button id="resetBtn" class="btn btn-outline-secondary btn-sm">초기화</button>
-    </div>
-
-    <!-- 리스트 -->
-    <div class="px-3 pb-3">
-        <div class="section-box">
-
-            <table class="table table-hover align-middle mb-3">
-                <thead>
-                <tr class="text-center">
-                    <th>주문 번호</th>
-                    <th>주문 일시</th>
-                    <th>직영점</th>
-                    <th>총 판매 메뉴</th>
-                    <th>총 판매 금액</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody id="orderTableBody"></tbody>
-            </table>
-
-            <!-- 페이지네이션 -->
-            <div class="pagination-wrapper mb-3">
-                <ul id="pagination" class="pagination pagination-sm mb-0"></ul>
-            </div>
-
+<body class="bg-light">
+<header th:insert="fragments/toolBar :: toolBar"></header>
+<div class="container custom-container mt-5">
+    <div class="bg-white border rounded p-4">
+        <div class="p-3">
+            <div class="fs-3 fw-bold mb-3">주문 조회</div>
+            <button class="btn custom-btn" id="addSalesOrderBtn">주문 등록</button>
         </div>
+
+        <!-- 검색 영역 -->
+        <div class="px-3 d-flex justify-content-end align-items-center gap-2 mb-2">
+
+            <span class="fw-semibold">주문 일자</span>
+            <input id="dateInput" type="date" class="form-control form-control-sm w-150">
+            <div sec:authorize="hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')">
+                <span class="fw-semibold ms-3" >직영점</span>
+                <input id="storeInput" type="text" class="form-control form-control-sm w-180" readonly>
+                <div th:replace="fragments/modalStoreSearch :: modalStoreSearch"></div>
+                <button id="searchBtn" class="btn custom-btn">검색</button>
+                <button id="resetBtn" class="btn btn-outline-secondary">초기화</button>
+            </div>
+        </div>
+
+        <!-- 리스트 -->
+        <div class="px-3 pb-3">
+            <div class="section-box">
+
+                <table class="table table-hover align-middle" id="salesOrderList">
+                    <thead>
+                    <tr class="text-center">
+                        <th>주문 번호</th>
+                        <th>주문 일시</th>
+                        <th>직영점</th>
+                        <th>총 판매 메뉴</th>
+                        <th>총 판매 금액</th>
+                        <th>상세보기</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    </tbody>
+                </table>
+
+                <!-- ▼ 페이지네이션 추가 -->
+                <nav>
+                    <ul class="pagination justify-content-center" id="pagination">
+                    </ul>
+                </nav>
+                <!-- ▲ 페이지네이션 끝 -->
+
+            </div>
+        </div>
+
     </div>
 </div>
-
 <!-- ============================
-     상세 Modal
+     상세 모달
 ============================ -->
 <div class="modal fade" id="orderDetailModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered" style="max-width:520px;">
@@ -102,11 +133,14 @@
                 <h5 class="modal-title fw-bold">주문 상세보기</h5>
                 <button class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+
             <div class="modal-body">
+
                 <div class="mb-2">
                     <span class="fw-semibold">주문 일시</span>
                     <span id="detailOrderDate" class="ms-2"></span>
                 </div>
+
                 <div class="mb-3">
                     <span class="fw-semibold">직영점명</span>
                     <span id="detailStoreName" class="ms-2"></span>
@@ -115,7 +149,11 @@
                 <table class="table table-bordered text-center align-middle">
                     <thead class="table-light">
                     <tr>
-                        <th>메뉴</th><th>사이즈</th><th>가격</th><th>수량</th><th>총 금액</th>
+                        <th>메뉴</th>
+                        <th>사이즈</th>
+                        <th>가격</th>
+                        <th>수량</th>
+                        <th>총 금액</th>
                     </tr>
                     </thead>
                     <tbody id="detailMenuList"></tbody>
@@ -124,162 +162,136 @@
                 <div class="text-end fw-bold">
                     총 결제 금액 <span id="detailTotalPrice"></span>
                 </div>
+
             </div>
+
             <div class="modal-footer">
-                <button class="btn btn-warning" data-bs-dismiss="modal">닫기</button>
+                <button class="btn custom-btn" data-bs-dismiss="modal">닫기</button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- ============================
-     SCRIPT
+     SCRIPT (jQuery)
 ============================ -->
+<script type="application/javascript" src="/js/util.js"></script>
 <script>
-    const orders = [
-        { no:10, datetime:"2025-11-18 13:20:00", store:"가산점", menuCount:1, totalPrice:30000 },
-        { no:9,  datetime:"2025-11-18 13:21:00", store:"가산점", menuCount:2, totalPrice:32500 },
-        { no:8,  datetime:"2025-11-18 13:22:00", store:"가산점", menuCount:3, totalPrice:35000 },
-        { no:7,  datetime:"2025-11-18 13:23:00", store:"가산점", menuCount:4, totalPrice:37500 },
-        { no:6,  datetime:"2025-11-18 13:24:00", store:"가산점", menuCount:5, totalPrice:40000 },
-        { no:5,  datetime:"2025-11-18 13:25:00", store:"가산점", menuCount:1, totalPrice:42500 },
-        { no:4,  datetime:"2025-11-18 13:26:00", store:"가산점", menuCount:2, totalPrice:45000 },
-        { no:3,  datetime:"2025-11-18 13:27:00", store:"가산점", menuCount:3, totalPrice:47500 },
-        { no:2,  datetime:"2025-11-18 13:28:00", store:"가산점", menuCount:4, totalPrice:50000 },
-        { no:1,  datetime:"2025-11-18 13:29:00", store:"가산점", menuCount:5, totalPrice:52500 }
-    ];
+    const salesOrderTable = $("#salesOrderList");
 
-    const orderDetails = {};
-    orders.forEach(function(o){
-        orderDetails[o.no] = {
-            orderDate: o.datetime,
-            storeName: o.store,
-            menus: [
-                { name:"페퍼로니 피자", size:"라지", price:25000, qty:1 },
-                { name:"치즈 피자",     size:"미디움", price:15000, qty:1 }
-            ]
-        };
+    function loadPage(pageNo) {
+        const date = $("#dateInput").val();
+        const storeName = $("#storeInput").val();
+
+        const params = new URLSearchParams();
+        if (date) params.append("date", date);
+        if (storeName) params.append("storeName", storeName);
+
+        fetchUtil(`/sales/getSalesOrder/salesOrderList/${pageNo}?${params.toString()}`, data => {
+            loadSalesOrderList(data.list);
+            updatePaginationUI(data.pageNo, data.totalPages);
+        });
+    }
+
+
+    function loadSalesOrderList(data) {
+        const tbody = salesOrderTable.find("tbody");
+        tbody.empty();
+
+        data.forEach(salesOrder => {
+            let row = `
+              <tr class="text-center">
+                  <td data-salesorderno="${salesOrder.salesOrderNo}">
+                      ${salesOrder.salesOrderNo}
+                  </td>
+                  <td>${salesOrder.salesOrderDatetime}</td>
+                  <td>${salesOrder.storeName}</td>
+                  <td>${salesOrder.salesOrderCount}개</td>
+                  <td>${salesOrder.salesOrderAmount}원</td>
+                  <td>
+                    <button
+                        type="button"
+                        class="btn btn-sm detailBtn"
+                        data-salesorderno="${salesOrder.salesOrderNo}">
+                        <i class="bi bi-file-earmark-text" style="font-size: 1.3rem;"></i>
+                    </button>
+                  </td>
+              </tr>
+            `;
+
+            tbody.append(row);
+        })
+    }
+
+    $(window).on("load", function () {
+        loadPage(1);
     });
 
-    let currentPage = 1;
-    const pageSize = 5;
+    let orderModal;
 
-    function renderTable(){
-        const $tbody = $("#orderTableBody").empty();
-        const start = (currentPage - 1) * pageSize;
-        const pageData = orders.slice(start, start + pageSize);
+    $(function () {
+        orderModal = new bootstrap.Modal(document.getElementById("orderDetailModal"));
+    });
 
-        pageData.forEach(function(o){
-            $tbody.append(
-                "<tr class='text-center'>" +
-                "<td>"+o.no+"</td>" +
-                "<td>"+o.datetime+"</td>" +
-                "<td>"+o.store+"</td>" +
-                "<td>"+o.menuCount+"개</td>" +
-                "<td>"+o.totalPrice.toLocaleString()+"원</td>" +
-                "<td><img src='/image/detail.png' class='detail-icon detail-btn' data-order-no='"+o.no+"'></td>" +
-                "</tr>"
-            );
-        });
-    }
+    /* 상세 모달 */
+    $(document).on("click", ".detailBtn", function () {
+        const salesOrderNo = $(this).data("salesorderno");
 
-    function renderPagination(){
-        const $p = $("#pagination").empty();
-        const totalPages = Math.ceil(orders.length / pageSize);
+        fetchUtil(`/sales/getSalesOrder/salesOrderDetail/${salesOrderNo}`, data => {
+            console.log(data);
+            $("#detailOrderDate").text(data.salesOrderDatetime);
+            $("#detailStoreName").text(data.storeName);
+            $("#detailMenuList").empty();
 
-        $p.append("<li class='page-item "+(currentPage===1?"disabled":"")+"'><a class='page-link page-first' href='#'>&laquo;</a></li>");
-        $p.append("<li class='page-item "+(currentPage===1?"disabled":"")+"'><a class='page-link page-prev' href='#'>&lt;</a></li>");
+            data.menuList.forEach(m => {
+                $("#detailMenuList").append(`
+                <tr>
+                  <td>${m.menuName}</td>
+                  <td>${m.size}</td>
+                  <td>${m.price.toLocaleString()} 원</td>
+                  <td>${m.count}</td>
+                  <td>${m.totalPrice.toLocaleString()} 원</td>
+                </tr>
+            `);
+            });
 
-        for(let i=1;i<=totalPages;i++){
-            $p.append("<li class='page-item "+(currentPage===i?"active":"")+"'><a class='page-link page-num' data-page='"+i+"' href='#'>"+i+"</a></li>");
-        }
+            $("#detailTotalPrice").text(data.totalPrice.toLocaleString() + " 원");
 
-        $p.append("<li class='page-item "+(currentPage===totalPages?"disabled":"")+"'><a class='page-link page-next' href='#'>&gt;</a></li>");
-        $p.append("<li class='page-item "+(currentPage===totalPages?"disabled":"")+"'><a class='page-link page-last' href='#'>&raquo;</a></li>");
-    }
-
-    function refresh(){
-        renderTable();
-        renderPagination();
-    }
-
-    const orderModal = new bootstrap.Modal(document.getElementById("orderDetailModal"));
-
-    function openDetailModal(orderNo){
-        const data = orderDetails[orderNo];
-        if(!data) return;
-
-        $("#detailOrderDate").text(data.orderDate);
-        $("#detailStoreName").text(data.storeName);
-
-        const $list = $("#detailMenuList").empty();
-        let total = 0;
-
-        data.menus.forEach(function(m){
-            const sum = m.price * m.qty;
-            total += sum;
-
-            $list.append(
-                "<tr>" +
-                "<td>"+m.name+"</td>" +
-                "<td>"+m.size+"</td>" +
-                "<td>"+m.price.toLocaleString()+" 원</td>" +
-                "<td>"+m.qty+"</td>" +
-                "<td>"+sum.toLocaleString()+" 원</td>" +
-                "</tr>"
-            );
-        });
-
-        $("#detailTotalPrice").text(total.toLocaleString()+" 원");
-        orderModal.show();
-    }
-
-    $(document).ready(function(){
-
-        refresh();
-
-        $(document).on("click", ".detail-btn", function(){
-            openDetailModal($(this).data("orderNo"));
-        });
-
-        $(document).on("click", ".page-num", function(e){
-            e.preventDefault();
-            currentPage = Number($(this).data("page"));
-            refresh();
-        });
-
-        $(document).on("click", ".page-first", function(e){
-            e.preventDefault();
-            if(currentPage!==1){ currentPage=1; refresh(); }
-        });
-
-        $(document).on("click", ".page-prev", function(e){
-            e.preventDefault();
-            if(currentPage>1){ currentPage--; refresh(); }
-        });
-
-        $(document).on("click", ".page-next", function(e){
-            e.preventDefault();
-            const max = Math.ceil(orders.length/pageSize);
-            if(currentPage<max){ currentPage++; refresh(); }
-        });
-
-        $(document).on("click", ".page-last", function(e){
-            e.preventDefault();
-            const max = Math.ceil(orders.length/pageSize);
-            if(currentPage!==max){ currentPage=max; refresh(); }
-        });
-
-        $("#searchBtn").on("click", function(){
-            alert("조회 버튼 클릭 (직영점 버전)");
-        });
-
-        $("#resetBtn").on("click", function(){
-            $("#orderDate").val("");
-            currentPage = 1;
-            refresh();
+            orderModal.show();
         });
     });
+
+
+    $("#dateInput").on("change", function () {
+        const date = $(this).val();
+        const storeName = $("#storeInput").val();
+
+        loadPage(1, date, storeName);
+    });
+
+    $("#searchBtn").on("click", function () {
+        StoreSearchModal.open("", function (storeNo, storeName) {
+            $("#storeInput").val(storeName).trigger("input");
+        });
+    });
+
+    $("#storeInput").on("input", function () {
+        const date = $("#dateInput").val();
+        const storeName = $("#storeInput").val();
+        loadPage(1, date, storeName);
+    });
+
+    /* 검색 / 초기화 */
+    $("#resetBtn").on("click", function () {
+        $("#dateInput").val("");
+        $("#storeInput").val("");
+
+        loadPage(1);
+    });
+
+    $("#addSalesOrderBtn").on("click", function () {
+        location.href = "/sales/addSalesOrderUI"
+    })
 </script>
 
 </body>

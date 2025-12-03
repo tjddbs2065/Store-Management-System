@@ -2,6 +2,7 @@ package com.erp.repository;
 
 import com.erp.dto.SalesOrderDTO;
 import com.erp.dto.StoreDailyMenuSalesDTO;
+import com.erp.dto.StoreMenuSalesSummaryDTO;
 import com.erp.repository.entity.SalesOrder;
 import com.erp.repository.entity.StoreOrderDetail;
 import org.apache.ibatis.annotations.Param;
@@ -82,4 +83,29 @@ public interface StoreOrderDetailRepository extends JpaRepository<StoreOrderDeta
 
     List<StoreOrderDetail> findBySalesOrder(SalesOrder salesOrder);
 
+
+    @Query("""
+    select new com.erp.dto.StoreMenuSalesSummaryDTO(
+        so.store.storeName,
+        m.menuCategory,
+        m.menuName,
+        m.size,
+        SUM(sod.menuCount),
+        SUM(sod.menuPrice * sod.menuCount)
+    )
+    from SalesOrder so
+        join so.orderDetails sod
+        join sod.storeMenu sm
+        join sm.menu m
+    where so.store.storeNo = :storeNo
+      and so.salesOrderDatetime >= :start
+      and so.salesOrderDatetime < :end
+    group by so.store.storeName, m.menuCategory, m.menuName, m.size
+    order by SUM(sod.menuPrice * sod.menuCount) desc
+    """)
+    List<StoreMenuSalesSummaryDTO> findDailyMenuSummary(
+            @Param("storeNo") Long storeNo,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
 }

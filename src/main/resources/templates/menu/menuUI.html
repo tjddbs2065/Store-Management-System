@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+                xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>메뉴 조회</title>
@@ -7,6 +8,13 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <style>
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 2000;
+        }
         .menuCard {
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             cursor: pointer;
@@ -86,9 +94,9 @@
 
     </style>
 </head>
-<body class="bg-light py-3">
+<body class="bg-light">
 <!--계정별 툴바 다르게-->
-<header th:replace="fragments/toolBarManager :: toolBarManager"></header>
+<header th:replace="fragments/toolBar :: toolBar"></header>
 <div class="container custom-container mt-5">
     <div class="bg-white border rounded p-4">
         <!-- 제목 / 버튼 -->
@@ -96,7 +104,7 @@
             <h2 class="fw-bold">메뉴 조회</h2>
             <div>
                 <!--                직영점 로그인 시에는 메뉴등록버튼 안 보이게 / 직영점별 판매 메뉴 보기 -> 판매 메뉴 보기-->
-                <button class="btn btn-warning me-2 custom-btn" id="menuAddBtn">메뉴 등록</button>
+                <button class="btn btn-warning me-2 custom-btn" id="menuAddBtn" sec:authorize="hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')">메뉴 등록</button>
                 <button class="btn custom-btn" id="storeMenuBtn">직영점별 판매 메뉴 보기</button>
             </div>
         </div>

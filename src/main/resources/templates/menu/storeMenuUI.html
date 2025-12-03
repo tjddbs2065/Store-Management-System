@@ -4,120 +4,71 @@
     <meta charset="UTF-8">
     <title>직영점 판매 메뉴</title>
 
-    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <style>
-        th.statusChange {
-            width: 90px;
-        }
-
+        th.statusChange { width:90px; }
         .custom-btn {
-            background-color: #FFEEAA !important;
-            border-color: #FFEEAA !important;
-            color: #000;
+            background-color:#FFEEAA !important;
+            border-color:#FFEEAA !important;
+            color:#000;
         }
-
-        .custom-btn:hover {
-            background-color: #f2da84 !important;
-            border-color: #f2da84 !important;
-        }
-
-        /* 내부 스크롤 영역 */
-        .scroll-area {
-            height: 500px;
-            overflow-y: auto;
-        }
-
-
-        .scroll-area::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .scroll-area::-webkit-scrollbar-thumb {
-            background: #ced4da;
-            border-radius: 4px;
-        }
-
-        .table-fixed-header {
-            width: 100%;
-            border-spacing: 0;
-        }
-
+        .scroll-area { height:500px; overflow-y:auto; }
         .table-fixed-header thead th {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background: #f8f9fa; /* table-light 배경 */
+            position:sticky; top:0; background:#f8f9fa; z-index:10;
         }
-
-
     </style>
 </head>
 
 <body class="bg-light">
 
 <div class="container py-4">
-
     <div class="bg-white border rounded p-4">
 
-        <!-- 제목 -->
-        <h2 class="fw-bold mb-4">###(지점명) 판매 메뉴</h2>
+        <h2 class="fw-bold mb-4">직영점 판매 메뉴</h2>
 
-        <!-- 🔥 검색 영역 복구됨 -->
         <div class="border rounded p-3 mb-4">
-
             <div class="row g-3 align-items-end">
-
-                <!-- 판매 상태 -->
                 <div class="col-md-2">
                     <label class="form-label">판매 상태</label>
-                    <select class="form-select">
-                        <option>전체</option>
-                        <option>판매 중</option>
-                        <option>판매 중지</option>
+                    <select class="form-select" id="searchStatus">
+                        <option value="">전체</option>
+                        <option>판매중</option>
+                        <option>판매중단</option>
                         <option>품절</option>
                     </select>
                 </div>
 
-                <!-- 카테고리 -->
                 <div class="col-md-2">
                     <label class="form-label">카테고리</label>
-                    <select class="form-select">
-                        <option>전체</option>
+                    <select class="form-select" id="searchCategory">
+                        <option value="">전체</option>
                         <option>피자</option>
                         <option>사이드디시</option>
                         <option>음료</option>
                     </select>
                 </div>
 
-                <!-- 검색조건 -->
                 <div class="col-md-3">
                     <label class="form-label">메뉴 검색</label>
-                    <input type="text" class="form-control">
+                    <input type="text" class="form-control" id="searchName">
                 </div>
 
-                <!-- 검색 버튼 -->
                 <div class="col-md-1">
-                    <button class="btn custom-btn w-100">검색</button>
+                    <button class="btn custom-btn w-100" id="searchBtn">검색</button>
                 </div>
-
             </div>
-
         </div>
 
-        <!-- 선택 일괄 변경 -->
+
         <div class="text-end pb-1">
             <button class="btn custom-btn" id="statusSetAllBtn">선택 일괄 변경</button>
         </div>
 
-        <!-- 테이블 -->
         <div class="scroll-area">
             <table class="table align-middle text-center table-fixed-header">
                 <thead class="table-light">
-
                 <tr>
                     <th>메뉴 코드</th>
                     <th>메뉴 명</th>
@@ -128,484 +79,149 @@
                     <th><input type="checkbox" id="checkAll"></th>
                 </tr>
                 </thead>
-                <tbody>
 
-                <!-- 2사이즈 -->
-                <tr>
-                    <td rowspan="2">PEPPERONI_PIZZA</td>
-                    <td rowspan="2">페퍼로니 피자</td>
-
-                    <td>라지</td>
-                    <td>25,000</td>
-                    <td>판매 중</td>
-
-                    <td rowspan="2">
-                        <button class="btn btn-outline-secondary btn-sm statusSetBtn"
-                                data-bs-toggle="modal" data-bs-target="#statusSetModal">변경
-                        </button>
-                    </td>
-                    <td rowspan="2"><input type="checkbox" class="row-check"></td>
-                </tr>
-
-                <tr>
-                    <td>미디움</td>
-                    <td>18,000</td>
-                    <td>판매 중</td>
-                </tr>
-
-                <tr>
-                    <td>BECONCHEDDARCHEEZE_PIZZA</td>
-                    <td>베이컨 체다치즈 피자</td>
-
-                    <td>단일</td>
-                    <td>26,000</td>
-                    <td>판매 중</td>
-
-                    <td>
-                        <button class="btn btn-outline-secondary btn-sm statusSetBtn"
-                                data-bs-toggle="modal" data-bs-target="#statusSetModal">변경
-                        </button>
-                    </td>
-                    <td><input type="checkbox" class="row-check"></td>
-                </tr>
-
-                <!-- 1 -->
-                <tr>
-                    <td rowspan="2">BULGOGI_PIZZA</td>
-                    <td rowspan="2">불고기 피자</td>
-                    <td>라지</td>
-                    <td>28,000</td>
-                    <td>품절</td>
-                    <td rowspan="2">
-                        <button class="btn btn-outline-secondary btn-sm statusSetBtn" data-bs-toggle="modal"
-                                data-bs-target="#statusSetModal">변경
-                        </button>
-                    </td>
-                    <td rowspan="2"><input type="checkbox" class="row-check"></td>
-                </tr>
-                <tr>
-                    <td>미디움</td>
-                    <td>20,000</td>
-                    <td>품절</td>
-                </tr>
-
-                <!-- 2 -->
-                <tr>
-                    <td rowspan="2">POTATO_PIZZA</td>
-                    <td rowspan="2">포테이토 피자</td>
-                    <td>라지</td>
-                    <td>28,000</td>
-                    <td>판매 중</td>
-                    <td rowspan="2">
-                        <button class="btn btn-outline-secondary btn-sm statusSetBtn" data-bs-toggle="modal"
-                                data-bs-target="#statusSetModal">변경
-                        </button>
-                    </td>
-                    <td rowspan="2"><input type="checkbox" class="row-check"></td>
-                </tr>
-                <tr>
-                    <td>미디움</td>
-                    <td>20,000</td>
-                    <td>판매 중</td>
-                </tr>
-
-                <!-- 3 -->
-                <tr>
-                    <td rowspan="2">SUPER_SUPREME</td>
-                    <td rowspan="2">슈퍼슈프림 피자</td>
-                    <td>라지</td>
-                    <td>29,000</td>
-                    <td>판매 중지</td>
-                    <td rowspan="2">
-                        <button class="btn btn-outline-secondary btn-sm statusSetBtn" data-bs-toggle="modal"
-                                data-bs-target="#statusSetModal">변경
-                        </button>
-                    </td>
-                    <td rowspan="2"><input type="checkbox" class="row-check"></td>
-                </tr>
-                <tr>
-                    <td>미디움</td>
-                    <td>21,000</td>
-                    <td>판매 중지</td>
-                </tr>
-
-                <!-- 4 -->
-                <tr>
-                    <td rowspan="2">SWEET_POTATO</td>
-                    <td rowspan="2">고구마 피자</td>
-                    <td>라지</td>
-                    <td>27,000</td>
-                    <td>판매 중</td>
-                    <td rowspan="2">
-                        <button class="btn btn-outline-secondary btn-sm statusSetBtn" data-bs-toggle="modal"
-                                data-bs-target="#statusSetModal">변경
-                        </button>
-                    </td>
-                    <td rowspan="2"><input type="checkbox" class="row-check"></td>
-                </tr>
-                <tr>
-                    <td>미디움</td>
-                    <td>19,000</td>
-                    <td>판매 중</td>
-                </tr>
-
-                <!-- 5 (단일) -->
-                <tr>
-                    <td>GARLIC_BREAD</td>
-                    <td>갈릭 브레드</td>
-                    <td>단일</td>
-                    <td>8,000</td>
-                    <td>판매 중</td>
-                    <td>
-                        <button class="btn btn-outline-secondary btn-sm statusSetBtn" data-bs-toggle="modal"
-                                data-bs-target="#statusSetModal">변경
-                        </button>
-                    </td>
-                    <td><input type="checkbox" class="row-check"></td>
-                </tr>
-
-                <!-- 6 -->
-                <tr>
-                    <td rowspan="2">MEAT_PIZZA</td>
-                    <td rowspan="2">미트 피자</td>
-                    <td>라지</td>
-                    <td>30,000</td>
-                    <td>판매 중</td>
-                    <td rowspan="2">
-                        <button class="btn btn-outline-secondary btn-sm statusSetBtn" data-bs-toggle="modal"
-                                data-bs-target="#statusSetModal">변경
-                        </button>
-                    </td>
-                    <td rowspan="2"><input type="checkbox" class="row-check"></td>
-                </tr>
-                <tr>
-                    <td>미디움</td>
-                    <td>22,000</td>
-                    <td>판매 중</td>
-                </tr>
-
-                <!-- 7 -->
-                <tr>
-                    <td rowspan="2">BACON_PIZZA</td>
-                    <td rowspan="2">베이컨 피자</td>
-                    <td>라지</td>
-                    <td>29,000</td>
-                    <td>품절</td>
-                    <td rowspan="2">
-                        <button class="btn btn-outline-secondary btn-sm statusSetBtn" data-bs-toggle="modal"
-                                data-bs-target="#statusSetModal">변경
-                        </button>
-                    </td>
-                    <td rowspan="2"><input type="checkbox" class="row-check"></td>
-                </tr>
-                <tr>
-                    <td>미디움</td>
-                    <td>21,000</td>
-                    <td>품절</td>
-                </tr>
-
-                <!-- 8 -->
-                <tr>
-                    <td rowspan="2">BBQ_CHICKEN</td>
-                    <td rowspan="2">BBQ 치킨 피자</td>
-                    <td>라지</td>
-                    <td>31,000</td>
-                    <td>판매 중</td>
-                    <td rowspan="2">
-                        <button class="btn btn-outline-secondary btn-sm statusSetBtn" data-bs-toggle="modal"
-                                data-bs-target="#statusSetModal">변경
-                        </button>
-                    </td>
-                    <td rowspan="2"><input type="checkbox" class="row-check"></td>
-                </tr>
-                <tr>
-                    <td>미디움</td>
-                    <td>23,000</td>
-                    <td>판매 중</td>
-                </tr>
-
-                <!-- 9 (단일) -->
-                <tr>
-                    <td>COCA_COLA</td>
-                    <td>코카콜라 1.25L</td>
-                    <td>단일</td>
-                    <td>2,500</td>
-                    <td>판매 중</td>
-                    <td>
-                        <button class="btn btn-outline-secondary btn-sm statusSetBtn" data-bs-toggle="modal"
-                                data-bs-target="#statusSetModal">변경
-                        </button>
-                    </td>
-                    <td><input type="checkbox" class="row-check"></td>
-                </tr>
-
-                <!-- 10 (단일) -->
-                <tr>
-                    <td>SPRITE</td>
-                    <td>스프라이트 1.25L</td>
-                    <td>단일</td>
-                    <td>2,500</td>
-                    <td>품절</td>
-                    <td>
-                        <button class="btn btn-outline-secondary btn-sm statusSetBtn" data-bs-toggle="modal"
-                                data-bs-target="#statusSetModal">변경
-                        </button>
-                    </td>
-                    <td><input type="checkbox" class="row-check"></td>
-                </tr>
-
-                <!-- 11 -->
-                <tr>
-                    <td rowspan="2">DELUXE_PIZZA</td>
-                    <td rowspan="2">디럭스 피자</td>
-                    <td>라지</td>
-                    <td>29,000</td>
-                    <td>판매 중</td>
-                    <td rowspan="2">
-                        <button class="btn btn-outline-secondary btn-sm statusSetBtn" data-bs-toggle="modal"
-                                data-bs-target="#statusSetModal">변경
-                        </button>
-                    </td>
-                    <td rowspan="2"><input type="checkbox" class="row-check"></td>
-                </tr>
-                <tr>
-                    <td>미디움</td>
-                    <td>21,000</td>
-                    <td>판매 중</td>
-                </tr>
-
-                <!-- 12 (단일) -->
-                <tr>
-                    <td>CHEESE_BREAD</td>
-                    <td>치즈 브레드</td>
-                    <td>단일</td>
-                    <td>7,000</td>
-                    <td>판매 중지</td>
-                    <td>
-                        <button class="btn btn-outline-secondary btn-sm statusSetBtn" data-bs-toggle="modal"
-                                data-bs-target="#statusSetModal">변경
-                        </button>
-                    </td>
-                    <td><input type="checkbox" class="row-check"></td>
-                </tr>
+                <tbody id="menuTableBody">
 
                 </tbody>
+
             </table>
         </div>
+
     </div>
 </div>
 
 
-<!-- 🔥 판매 변경 모달 (2사이즈 + 단일 자동 지원) -->
+
 <div class="modal fade" id="statusSetModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-
             <div class="modal-header">
                 <h5 class="modal-title fw-bold">판매 변경</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body">
-                <!-- 메뉴명 -->
                 <div class="row mb-2">
                     <label class="col-3 fw-semibold">메뉴 명</label>
-                    <div class="col"><span id="menuName" class="badge bg-light text-dark border px-3 py-2"></span></div>
+                    <div class="col"><span id="modalMenuName" class="badge bg-light text-dark border px-3 py-2"></span></div>
                 </div>
 
-                <!-- 사이즈 헤더 -->
-                <div class="row mt-3 mb-1" id="sizeHeader">
-                    <label class="col-3 fw-semibold">사이즈</label>
-                    <label class="col-3 fw-semibold">판매 상태</label>
-                </div>
-
-                <!-- 라지 -->
-                <div class="row mb-2 align-items-center size-row" id="sizeLage">
-                    <label class="col-3">라지</label>
-                    <div class="col-3">
-                        <select class="form-select form-select-sm size-status" data-size="L">
-                            <option>판매 중</option>
-                            <option>판매 중지</option>
+                <div class="row">
+                    <label class="col-3 fw-semibold">상태</label>
+                    <div class="col">
+                        <select class="form-select" id="modalStatusSelect">
+                            <option>판매중</option>
+                            <option>판매중단</option>
                             <option>품절</option>
                         </select>
                     </div>
-                </div>
-
-                <!-- 미디움 -->
-                <div class="row mb-2 align-items-center size-row" id="sizeMedium">
-                    <label class="col-3">미디움</label>
-                    <div class="col-3">
-                        <select class="form-select form-select-sm size-status" data-size="M">
-                            <option>판매 중</option>
-                            <option>판매 중지</option>
-                            <option>품절</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- 단일 -->
-                <div class="row mb-2 align-items-center d-none" id="sizeOne">
-                    <label class="col-3">단일</label>
-                    <div class="col-3">
-                        <select class="form-select form-select-sm" id="oneSizeSelect">
-                            <option>판매 중</option>
-                            <option>판매 중지</option>
-                            <option>품절</option>
-                        </select>
-                    </div>
-                </div>
-                <!-- 🔥 일괄 변경용 사이즈 행 (전체) -->
-                <div class="row mb-2 align-items-center d-none" id="sizeAll">
-                    <label class="col-3">전체</label>
-                    <div class="col-3">
-                        <select class="form-select form-select-sm" id="allSizeSelect">
-                            <option>판매 중</option>
-                            <option>판매 중지</option>
-                            <option>품절</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn custom-btn" id="saveBtn">저장</button>
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
                 </div>
             </div>
 
-
+            <div class="modal-footer">
+                <button class="btn custom-btn">저장</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="alertModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content text-center border border-primary">
-      <div class="modal-body">
-        <p id="alertMessage" class="fs-5 fw-bold mb-4 text-dark"></p>
-        <div class="d-flex justify-content-center gap-3">
-          <button type="button" class="btn px-4 custom-btn " data-bs-dismiss="modal">확인</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 
 <script>
-  function showAlert(message, onClose) {
-    $("#alertMessage").text(message);
-    $("#alertModal").off("hidden.bs.modal").on("hidden.bs.modal", function () {
-      if (typeof onClose === "function") onClose();
-    });
-    $("#alertModal").modal("show");
-  }
 
-  // 선택 일괄 변경 버튼 - model/controller 안 나뉘어 있음
-    $(document).on("click", "#statusSetAllBtn", function () {
-        const checkedRows = $(".row-check:checked");
-        if (checkedRows.length === 0) {
-            showAlert("선택된 항목이 없습니다.");
+    function loadMenuTable(){
+
+        const menuName = $("#searchName").val();
+        const salesStatus = $("#searchStatus").val();
+        const menuCategory = $("#searchCategory").val();
+
+        $.get(`/storeMenu/getMenu?menuName=${menuName}&salesStatus=${salesStatus}&menuCategory=${menuCategory}`, function(data){
+
+            const tbody = $("#menuTableBody");
+            tbody.empty();
+
+            data.forEach(group => {
+
+                const items = group.items;
+
+                // 사이즈 순서 정렬 (라지 → 미디움 → 단일)
+                const sorted = [...items].sort((a,b)=>{
+                    const order = { "라지":1, "미디움":2, "단일":3 };
+                    return order[a.size] - order[b.size];
+                });
+
+                const rowSpan = sorted.length;
+
+                sorted.forEach((item, i)=>{
+
+                    let html = "<tr>";
+
+                    if(i === 0){
+                        html += `
+                        <td rowspan="${rowSpan}">${group.menuCode}</td>
+                        <td rowspan="${rowSpan}">${group.menuName}</td>
+                    `;
+                    }
+
+                    html += `
+                    <td>${item.size}</td>
+                    <td>${item.menuPrice.toLocaleString()}</td>
+                    <td>${item.salesStatus}</td>
+                `;
+
+                    if(i === 0){
+                        html += `
+                        <td rowspan="${rowSpan}">
+                            <button class="btn btn-outline-secondary btn-sm statusSetBtn" data-menu="${group.menuName}">
+                                변경
+                            </button>
+                        </td>
+                        <td rowspan="${rowSpan}">
+                            <input type="checkbox" class="row-check">
+                        </td>
+                    `;
+                    }
+
+                    html += "</tr>";
+                    tbody.append(html);
+                });
+
+            });
+
+        });
+    }
+
+    $("#searchBtn").on("click", loadMenuTable);
+    $(document).ready(loadMenuTable);
+
+
+
+    $("#checkAll").on("change", function(){
+        $(".row-check").prop("checked", this.checked);
+    });
+
+
+
+    $("#statusSetAllBtn").on("click", function(){
+
+        const checked = $(".row-check:checked");
+
+        if(checked.length === 0){
+            alert("선택된 항목이 없습니다.");
             return;
         }
-        let menuSet = new Set();
-        // 선택한 모든 행 정보 수집
-        checkedRows.each(function () {
-            const row = $(this).closest("tr");
-            // rowspan이 있는 경우 (라지 행)
-            const menu = row.find("td").eq(1).text().trim() || row.prev().find("td").eq(1).text().trim();
-            menuSet.add(menu);
-        });
 
-        /* -----------------------------------
-            메뉴명 문구 설정
-        ----------------------------------- */
-        let menuText = "";
-        if (menuSet.size === 1) {
-            menuText = Array.from(menuSet)[0];
-        } else {
-            const arr = Array.from(menuSet);
-            menuText = `${arr[0]} 외 ${menuSet.size - 1}건`;
-        }
-
-        // 모달 세팅
-        $("#menuName").text(menuText);
-
-        // 🔥 개별 사이즈 모두 숨기기
-        $("#sizeLage").addClass("d-none");
-        $("#sizeMedium").addClass("d-none");
-        $("#sizeOne").addClass("d-none");
-
-        // 🔥 전체 사이즈 행만 보이기
-        $("#sizeAll").removeClass("d-none");
-
+        $("#modalMenuName").text(`선택된 ${checked.length}개 메뉴`);
         $("#statusSetModal").modal("show");
     });
 
 
-    /* -----------------------------------
-       1) 단일/복수 사이즈 모달 제어
-    ------------------------------------*/
-    const openStatusModal = (menu, sizeMap) => {
-
-        $("#menuName").text(menu);
-
-        // 🔥 모든 행 숨김
-        $("#sizeLage").addClass("d-none");
-        $("#sizeMedium").addClass("d-none");
-        $("#sizeOne").addClass("d-none");
-        $("#sizeAll").addClass("d-none");
-
-        // 라지/미디움 (2사이즈)
-        if (sizeMap["L"] !== undefined) {
-            $("#sizeLage").removeClass("d-none");
-            $("#sizeMedium").removeClass("d-none");
-
-            $(".size-status").each(function () {
-                const size = $(this).data("size");
-                $(this).val(sizeMap[size]);
-            });
-        }
-        // 단일
-        else {
-            $("#sizeOne").removeClass("d-none");
-            $("#oneSizeSelect").val(sizeMap["ONE"]);
-        }
-    };
-
-
-    /* -----------------------------------
-       2) 변경 버튼
-    ------------------------------------*/
-    $(document).on("click", ".statusSetBtn", function () {
-
-        const row = $(this).closest("tr");
-
-        const menu = row.find("td").eq(1).text().trim();
-
-        const size = row.find("td").eq(2).text().trim();
-        let sizeMap = {};
-
-        // 두 줄짜리(라지/미디움)
-        if (size === "라지") {
-            sizeMap["L"] = row.find("td").eq(4).text().trim();
-            sizeMap["M"] = row.next().find("td").eq(1).text().trim();
-        }
-        // 단일
-        else {
-            sizeMap["ONE"] = row.find("td").eq(4).text().trim();
-        }
-
-        openStatusModal(menu, sizeMap);
+    $(document).on("click", ".statusSetBtn", function(){
+        const menu = $(this).data("menu");
+        $("#modalMenuName").text(menu);
+        $("#statusSetModal").modal("show");
     });
-
-  /* -----------------------------------
-     4) 전체 체크박스
-  ------------------------------------*/
-  $("#checkAll").on("change", function () {
-      $(".row-check").prop("checked", this.checked);
-  });
-
-
-
 </script>
 
 </body>

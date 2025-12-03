@@ -13,8 +13,11 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
-public class MenuController {
+public class    MenuController {
     private final MenuService menuService;
+
+
+
 
     @GetMapping("menu")
     private String member(){

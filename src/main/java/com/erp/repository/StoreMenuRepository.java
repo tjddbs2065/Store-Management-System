@@ -116,4 +116,27 @@ public interface StoreMenuRepository extends JpaRepository<StoreMenu, Long> {
                 Pageable pageable
         );
 
+        @Query("""
+             SELECT new com.erp.dto.StoreMenuDTO(
+                    sm.storeMenuNo,
+                    s.storeName,
+                    m.menuCode,
+                    m.menuName,
+                    m.size,
+                    m.menuPrice,
+                    sm.salesStatus
+                )
+                FROM StoreMenu sm
+                    JOIN sm.store s
+                    JOIN sm.menu m
+                WHERE
+                    s.storeNo = :storeNo AND
+                    (sm.salesStatus = '판매중') AND
+                    (m.releaseStatus = '출시 중') AND
+                    (m.delDate IS NULL)
+            """)
+            List<StoreMenuDTO> findStoreMenuByStoreNo(
+                    @Param("storeNo") Long storeNo
+        );
+
 }

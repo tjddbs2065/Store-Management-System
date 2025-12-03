@@ -15,13 +15,6 @@ public class StoreDAOTest {
     private ManagerDAO managerDAO;
     @Autowired
     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-    @Test
-    void pw(){
-        String raw = "123qwe";
-        String raw2= "1q2w3e4r";
-        String encode = encoder.encode(raw2);
-        System.out.println(encode);
-    }
 
     @Test
     void countStoresTest() { System.out.println(storeDAO.countStores()); }
@@ -88,8 +81,8 @@ public class StoreDAOTest {
     @Test
     void setStoreTest() {
         ManagerDTO manager = new ManagerDTO();
-        manager.setManagerId("kosta123");
-        manager.setPw(encoder.encode("1234"));
+        manager.setManagerId("storeManager3");
+        manager.setPw(encoder.encode("123"));
         manager.setEmail("storeManager3@test.com");
         manager.setManagerName("표수정");
         manager.setPhoneNumber("010-1331-2222");

@@ -5,15 +5,25 @@
     <title>매출관리 SPA (본사)</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="/js/util.js"></script>
+    <script src="/js/modalStoreSearch.js"></script>
 
     <style>
-        body { background-color:#fdfdfdf; }
-        .layout-container { max-width:1500px; margin:0 auto; }
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 2000;
+        }
+        body { background-color: #fdfdfd;      padding-top: 65px !important; }
 
+
+        .layout-container { max-width:1500px; margin:0 auto; }
         .w-150 { width:150px; }
         .w-120 { width:120px; }
 
@@ -28,9 +38,9 @@
     </style>
 </head>
 
-<body class="p-2">
-
-<div class="border border-primary p-2 layout-container">
+<body>
+<header th:insert="fragments/toolBar :: toolBar"></header>
+<div class="p-2 layout-container">
 
     <div class="mt-3 px-2">
         <div class="d-flex align-items-center mb-2">
@@ -72,7 +82,10 @@
                     <span>~</span>
                     <input id="endInput" type="month" class="form-control form-control-sm w-150">
                 </div>
-                <button id="getSalesBtn" class="btn btn-primary btn-sm">조회</button>
+                <input id="storeInput" type="text" class="form-control form-control-sm w-150"
+                       placeholder="눌러보세요">
+                <button id="getSalesBtn" class="btn btn-primary btn-sm ms-1">조회</button>
+                <button id="resetBtn" class="btn btn-primary btn-sm ms-1">초기화</button>
             </div>
         </div>
 
@@ -143,8 +156,20 @@
         </div>
     </div>
 </div>
-
+<th:block th:replace="fragments/modalStoreSearch :: modalStoreSearch"></th:block>
 <script>
+    function updateKpiTitles(storeNo){
+        if(storeNo){
+            $(".kpi-title").eq(2).text("평균 단가");
+        } else {
+            $(".kpi-title").eq(2).text("평균 직영점 매출");
+        }
+    }
+
+    $(document).on("click", "#logoutBtn", function () {
+            location.href = "/logout";
+    });
+
     $(document).on("change", "#startInput", function () {
         const start = $(this).val();
         $("#endInput").attr("min", start);
@@ -218,17 +243,28 @@
         });
     }
 
-    function loadTrend(type, start, end){
-        fetchUtil(`/salesChart?startDate=${start}&endDate=${end}&type=${type}`, data => {
+    function loadTrend(type, start, end, storeNo){
+        const sn = storeNo ? `&storeNo=${storeNo}` : "";
+        fetchUtil(`/salesChart?startDate=${start}&endDate=${end}&type=${type}${sn}`, data => {
             createMainChart(data.labels, data.values);
         });
     }
 
-    function loadKPI(type, start, end){
-        fetchUtil(`/KPI?type=${type}&startDate=${start}&endDate=${end}`, data => {
+    function loadKPI(type, start, end, storeNo){
+        const sn = storeNo ? `&storeNo=${storeNo}` : "";
+
+        fetchUtil(`/KPI?type=${type}&startDate=${start}&endDate=${end}${sn}`, data => {
+            updateKpiTitles(storeNo);
             $("#kpi-totalSales").text(data.totalSales.toLocaleString());
             $("#kpi-totalMenu").text(data.totalMenuCount.toLocaleString());
-            $("#kpi-avgStore").text(data.avgStoreSales.toLocaleString());
+            if(storeNo){
+                const avgPrice = data.totalMenuCount > 0
+                    ? (data.totalSales / data.totalMenuCount)
+                    : 0;
+                $("#kpi-avgStore").text(avgPrice.toFixed(0).toLocaleString()); // 소수점 없음
+            } else {
+                $("#kpi-avgStore").text(data.avgStoreSales.toLocaleString());
+            }
             $("#kpi-growth").text(data.growthRate.toFixed(1)+"%");
         });
     }
@@ -237,14 +273,15 @@
         const type = $("input[name='period']:checked").attr("id");
         const start = $("#startInput").val();
         const end   = $("#endInput").val();
+        const storeNo = $("#storeInput").data("storeno");
 
         if (!start || !end) {
             alert("조회기간을 입력하세요.");
             return;
         }
 
-        loadTrend(type, start, end);
-        loadKPI(type, start, end);
+        loadTrend(type, start, end, storeNo);
+        loadKPI(type, start, end, storeNo);
     });
 
     let top5Chart;
@@ -382,7 +419,7 @@
 
         fetchUtil(`/salesList?startDate=${start}&endDate=${end}&storeName=${storeName}&page=${page}`, data => {
             renderList(data.list);
-            renderPagination(data.totalPages, data.currentPage);
+            updatePaginationUI(data.currentPage, data.totalPages);
         });
     }
 
@@ -417,33 +454,9 @@
         });
     }
 
-    function renderPagination(totalPages, currentPage){
-        const $pag = $("#pagination");
-        $pag.empty();
-
-        $pag.append(`
-            <li class="page-item ${currentPage===1?"disabled":""}">
-                <a class="page-link" href="#" onclick="loadList(${currentPage-1}); return false;">&lt;</a>
-            </li>
-        `);
-
-        for(let i=1;i<=totalPages;i++){
-            $pag.append(`
-                <li class="page-item ${currentPage===i?"active":""}">
-                    <a class="page-link" href="#" onclick="loadList(${i}); return false;">${i}</a>
-                </li>
-            `);
-        }
-
-        $pag.append(`
-            <li class="page-item ${currentPage===totalPages?"disabled":""}">
-                <a class="page-link" href="#" onclick="loadList(${currentPage+1}); return false;">&gt;</a>
-            </li>
-        `);
-    }
 
     $("#list-searchBtn").on("click", () => loadList(1));
-
+    $("#list-storeName").on("keyup", e => e.key === "Enter" && loadList(1));
     $(document).on("click", ".detailBtn", function(){
         const storeNo = $(this).data("store-no");
         const date    = $(this).data("sales-date");
@@ -493,6 +506,57 @@
         loadList(1);
     });
 
+    $("#resetBtn").on("click",function(){
+        $("#day").prop("checked", true);
+        updatePeriodInputs("day");
+
+        const today = new Date();
+
+        let startObj, endObj;
+
+
+        if (today.getDate() === 1) {
+            const prevLast  = new Date(today.getFullYear(), today.getMonth(), 0);      // 전월 말일
+            const prevStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);  // 전월 1일
+            startObj = prevStart;
+            endObj   = prevLast;
+        } else {
+            const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);     // 이번 달 1일
+            const yesterday  = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);                                // 어제
+            startObj = monthStart;
+            endObj   = yesterday;
+        }
+
+        const toDate = d =>
+            `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
+        const s = toDate(startObj);
+        const e = toDate(endObj);
+        $("#startInput").val(s);
+        $("#endInput").val(e);
+
+        loadTrend("day", s, e);
+        loadKPI("day", s, e);
+    });
+
+    $("#storeInput").on("click", function () {
+        StoreSearchModal.open(
+            $("#storeInput").val(),
+            function (storeNo, storeName) {
+                $("#storeInput").val(storeName);
+                $("#storeInput").data("storeno", storeNo);
+            }
+        );
+    });
+
+    function loadPage(page){
+        loadList(page);
+    }
+
+
 </script>
+
+
 </body>
 </html>

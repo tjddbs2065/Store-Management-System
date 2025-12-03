@@ -29,7 +29,7 @@ public class Menu {
     @Column(nullable = false)
     private String size;
     private String menuImage;
-    private String menuPrice;
+    private Integer menuPrice;
     @Column(nullable = false)
     private String releaseStatus;
     @Column(nullable = false)

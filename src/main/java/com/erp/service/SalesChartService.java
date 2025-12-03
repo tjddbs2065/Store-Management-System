@@ -25,7 +25,12 @@ public class SalesChartService {
     private final StoreSalesRepository storeSalesRepository;
     private final StoreOrderDetailRepository storeOrderDetailRepository;
 
-
+    public SalesChartDTO getSalesChartByDate(String start, String end, String type, Long storeNo) {
+        if (storeNo != null) {
+            return getSalesChartByStore(storeNo, start, end, type);
+        }
+        return getSalesChartByDate(start, end, type);
+    }
     public SalesChartDTO getSalesChartByStore(Long storeNo, String start, String end, String type) {
 
         LocalDate startDate = convert(start, type, false);

@@ -140,7 +140,7 @@ public class StoreOrderDetailRepositoryTest {
                 .salesOrder(salesOrder)
                 .storeMenu(menu1)
                 .menuCount(2)
-                .menuPrice(Integer.parseInt(menu1.getMenu().getMenuPrice()))  // menu entity 안에 price 필드라고 가정
+                .menuPrice(menu1.getMenu().getMenuPrice())  // menu entity 안에 price 필드라고 가정
                 .build();
         storeOrderDetailRepository.save(detail1);
 
@@ -149,7 +149,7 @@ public class StoreOrderDetailRepositoryTest {
                 .salesOrder(salesOrder)
                 .storeMenu(menu2)
                 .menuCount(1)
-                .menuPrice(Integer.parseInt(menu2.getMenu().getMenuPrice()))
+                .menuPrice(menu2.getMenu().getMenuPrice())
                 .build();
         storeOrderDetailRepository.save(detail2);
 

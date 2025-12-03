@@ -2,6 +2,7 @@ package com.erp.service;
 
 import com.erp.dto.SalesListDTO;
 import com.erp.dto.StoreDailyMenuSalesDTO;
+import com.erp.dto.StoreMenuSalesSummaryDTO;
 import com.erp.repository.StoreOrderDetailRepository;
 import com.erp.repository.StoreSalesRepository;
 import com.erp.repository.entity.StoreSales;
@@ -24,12 +25,12 @@ public class SalesListService {
     private final StoreOrderDetailRepository storeOrderDetailRepository;
 
 
-    public List<StoreDailyMenuSalesDTO> getSalesDetail(Long storeNo, LocalDate salesDate){
+    public List<StoreMenuSalesSummaryDTO> getSalesDetail(Long storeNo, LocalDate salesDate){
 
         LocalDateTime start = salesDate.atStartOfDay();
         LocalDateTime end   = salesDate.plusDays(1).atStartOfDay();
 
-        return storeOrderDetailRepository.findDailyMenuSalesByStore(storeNo, start, end);
+        return storeOrderDetailRepository.findDailyMenuSummary(storeNo, start, end);
     }
 
 
