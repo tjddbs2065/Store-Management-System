@@ -319,10 +319,10 @@
         const keyword = $("#searchInput").val().trim();
 
         const param = {
-            itemName: null,
+            itemName: "",
             itemCategory: category === "전체" ? null : category,
-            ingredientName: null,
-            itemCode: null
+            ingredientName: "",
+            itemCode: ""
         };
 
         if (keyword !== "") {
