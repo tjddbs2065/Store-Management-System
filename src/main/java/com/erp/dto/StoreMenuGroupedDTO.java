@@ -13,6 +13,6 @@ import java.util.List;
 public class StoreMenuGroupedDTO {
     private String menuCode;
     private String menuName;
-
+    private String menuCategory;
     private List<StoreMenuDTO> items = new ArrayList<>();
 }

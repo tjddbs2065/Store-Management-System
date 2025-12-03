@@ -44,6 +44,7 @@ public class StoreMenuService {
             grouped.putIfAbsent(code, new StoreMenuGroupedDTO(
                     dto.getMenuCode(),
                     dto.getMenuName(),
+                    dto.getMenuCategory(),
                     new ArrayList<>()
             ));
             grouped.get(code).getItems().add(dto);

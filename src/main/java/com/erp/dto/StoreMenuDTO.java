@@ -15,4 +15,5 @@ public class StoreMenuDTO {
     private String size;
     private Integer menuPrice;
     private String salesStatus;
+    private String menuCategory;
 }
