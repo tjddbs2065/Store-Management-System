@@ -2,6 +2,12 @@
 <!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.erp.dao.StoreDAO">
+    <select id="getActiveStores" resultType="com.erp.dto.StoreDTO">
+        select store_no
+        from store
+        where closed_date is null
+    </select>
+
     <select id="getStoreNoByManager" resultType="long">
         SELECT store_no
         FROM store

@@ -14,7 +14,9 @@
         WHERE menu_no = #{menuNo}
     </update>
 
-    <insert id="addMenu" parameterType="com.erp.dto.MenuDTO">
+    <insert id="addMenu" parameterType="com.erp.dto.MenuDTO"
+            useGeneratedKeys="true"
+            keyProperty="menuNo">
         INSERT INTO menu (menu_name,
                           menu_code,
                           menu_category,

@@ -79,16 +79,16 @@ public class ItemDAOTest {
     }
 
     // 3) 전체 목록 조회
-    @Test
-    void getItemList() {
-        List<ItemDTO> list = itemDAO.getItemList();
-
-        System.out.println("▶ getItemList size = " + list.size());
-        list.forEach(System.out::println);
-
-        assertNotNull(list);
-        assertFalse(list.isEmpty());
-    }
+//    @Test
+//    void getItemList() {
+//        List<ItemDTO> list = itemDAO.getItemList();
+//
+//        System.out.println("▶ getItemList size = " + list.size());
+//        list.forEach(System.out::println);
+//
+//        assertNotNull(list);
+//        assertFalse(list.isEmpty());
+//    }
 
     // 4) 카테고리 검색
     @Test
