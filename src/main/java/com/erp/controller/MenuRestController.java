@@ -26,12 +26,13 @@ public class MenuRestController {
         return ResponseEntity.ok(menuList);
     }
 
-//    @PostMapping("/addMenu")
-//    public ResponseEntity<List<MenuDTO>> addMenu(
-//            @RequestBody MenuDTO menuDTO
-//    ){
-//        List<MenuDTO> menus = menuService.addMenu()
-//    }
+    @PostMapping("/addMenu")
+    public ResponseEntity<?> addMenu(
+            @RequestBody MenuDTO menuDTO
+    ){
+        menuService.addMenu(menuDTO);
+        return ResponseEntity.ok("메뉴 등록 완료");
+    }
 
     @GetMapping("/itemList")
     public ResponseEntity<List<ItemDTO>> getItemList(
