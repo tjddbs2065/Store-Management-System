@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,17 +32,16 @@ public class MenuRestController {
             @RequestBody MenuDTO menuDTO
     ){
         menuService.addMenu(menuDTO);
-        return ResponseEntity.ok("메뉴 등록 완료");
+        return ResponseEntity.ok().body(Map.of("message", "Request addSalesOrder success"));
     }
 
     @GetMapping("/itemList")
     public ResponseEntity<List<ItemDTO>> getItemList(
-            @RequestParam(required = false) String itemName,
             @RequestParam(required = false) String itemCategory,
             @RequestParam(required = false) String ingredientName,
             @RequestParam(required = false) String itemCode
     ) {
-        List<ItemDTO> itemList = itemService.getItemList(itemName, itemCategory, ingredientName, itemCode);
+        List<ItemDTO> itemList = itemService.getItemList(itemCategory, ingredientName, itemCode);
         return ResponseEntity.ok(itemList);
     }
 }

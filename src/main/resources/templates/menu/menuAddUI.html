@@ -96,7 +96,7 @@
 
             <div class="col-md-4">
                 <label class="form-label fw-semibold">카테고리</label>
-                <select class="form-select">
+                <select class="form-select" id="menuCategory">
                     <option>피자</option>
                     <option>사이드디시</option>
                     <option>음료</option>
@@ -106,12 +106,12 @@
 
             <div class="col-md-4">
                 <label class="form-label fw-semibold">메뉴 코드</label>
-                <input type="text" class="form-control">
+                <input type="text" class="form-control" id="menuCode">
             </div>
 
             <div class="col-md-4">
                 <label class="form-label fw-semibold">메뉴 명</label>
-                <input type="text" class="form-control">
+                <input type="text" class="form-control" id="menuName">
             </div>
 
             <!-- 사이즈 여부 -->
@@ -131,7 +131,7 @@
             <div class="col-md-4 price-large">
                 <label class="form-label fw-semibold">라지 가격</label>
                 <div class="input-group input-group-sm w-auto">
-                    <input type="number" class="form-control">
+                    <input type="number" class="form-control" id="largePrice">
                     <span class="input-group-text">원</span>
                 </div>
             </div>
@@ -140,7 +140,7 @@
             <div class="col-md-4 price-medium">
                 <label class="form-label fw-semibold">미디움 가격</label>
                 <div class="input-group input-group-sm w-auto">
-                    <input type="number" class="form-control">
+                    <input type="number" class="form-control" id="mediumPrice">
                     <span class="input-group-text">원</span>
                 </div>
             </div>
@@ -149,19 +149,19 @@
             <div class="col-md-4 price-single" style="display:none;">
                 <label class="form-label fw-semibold">판매 가격</label>
                 <div class="input-group input-group-sm w-auto">
-                    <input type="number" class="form-control">
+                    <input type="number" class="form-control" id="singlePrice">
                     <span class="input-group-text">원</span>
                 </div>
             </div>
 
             <div class="col-12">
                 <label class="form-label fw-semibold">설명</label>
-                <textarea class="form-control" rows="3"></textarea>
+                <textarea class="form-control" rows="3" id="menuExplain"></textarea>
             </div>
 
             <div class="col-md-4">
                 <label class="form-label fw-semibold">출시 상태</label>
-                <select class="form-select">
+                <select class="form-select" id="releaseStatus">
                     <option>출시 예정</option>
                     <option>출시 중</option>
                     <option>출시 중지</option>
@@ -170,7 +170,7 @@
 
             <div class="col-md-4">
                 <label class="form-label fw-semibold">대표 이미지</label>
-                <input type="file" class="form-control">
+                <input type="file" class="form-control" id="menuImage">
             </div>
 
         </div>
@@ -207,7 +207,7 @@
     <!-- 버튼 영역 -->
     <!-- ===================== -->
     <div class="text-center mt-3">
-        <button class="btn custom-btn">등록</button>
+        <button class="btn custom-btn" id="addMenuBtn">등록</button>
         <button class="btn btn-outline-secondary me-2" id="resetBtn">초기화</button>
     </div>
 
@@ -296,9 +296,96 @@
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="alertModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center border border-primary">
+            <div class="modal-body">
+                <p id="alertMessage" class="fs-5 fw-bold mb-4 text-dark"></p>
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="button" class="btn px-4 custom-btn" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
+    $("#addMenuBtn").on("click", function () {
+        addMenu();
+    });
+
+    function addMenu() {
+        const isSize = $("input[name='sizeYn']:checked").val() === "Y";
+        const menuCategory = $("#menuCategory").val();
+        const menuCode = $("#menuCode").val();
+        const menuName = $("#menuName").val();
+        const menuExplain = $("#menuExplain").val();
+        const releaseStatus = $("#releaseStatus").val();
+
+        const largePrice = $("#largePrice").val();
+        const mediumPrice = $("#mediumPrice").val();
+        const singlePrice = $("#singlePrice").val();
+
+        const ingredients = [];
+
+        $("#recipeList tr").each(function () {
+            const itemNo = $(this).attr("data-itemno");
+            const qty1 = $(this).find("input").eq(0).val();
+            const qty2 = $(this).find("input").eq(1).val();
+            let ingredient = { itemNo: itemNo };
+            if (isSize) {
+                ingredient.quantityLarge = qty1;
+                ingredient.quantityMedium = qty2;
+            } else {
+                ingredient.quantity = qty1;
+            }
+
+            ingredients.push(ingredient);
+        });
+
+        const requestBody = {
+            menuCategory: menuCategory,
+            menuCode: menuCode,
+            menuName: menuName,
+            menuExplain: menuExplain,
+            size: isSize ? "Y" : "N",
+            releaseStatus: releaseStatus,
+
+            menuPriceLarge: isSize ? parseInt(largePrice || 0) : null,
+            menuPriceMedium: isSize ? parseInt(mediumPrice || 0) : null,
+            menuPrice: !isSize ? parseInt(singlePrice || 0) : null,
+
+            menuImage: null,      // 파일 업로드는 나중에
+
+            ingredients: ingredients
+        };
+
+        console.log("보내는 JSON:", requestBody);
+
+        fetchUtil(`/menu/addMenu`,
+        result => {
+            if (result.message === "fail") {
+                showAlert("메뉴 등록 실패", () => {
+                    location.href = `/menu/addMenuUI`;
+                })
+            }else {
+                showAlert("메뉴 등록 성공", () => {
+                    location.href = `/menu/menuUI`;
+                });
+            }
+        },
+            "POST",
+            requestBody
+        )
+    }
+    function showAlert(message, onClose) {
+        $("#alertMessage").text(message);
+        $("#alertModal").off("hidden.bs.modal").on("hidden.bs.modal", function () {
+            if (typeof onClose === "function") onClose();
+        });
+        $("#alertModal").modal("show");
+    }
+
     $("#ingredientModal").on("shown.bs.modal", function () {
         loadItemList();
     });
@@ -319,8 +406,7 @@
         const keyword = $("#searchInput").val().trim();
 
         const param = {
-            itemName: "",
-            itemCategory: category === "전체" ? null : category,
+            itemCategory: category === "전체" ? "" : category,
             ingredientName: "",
             itemCode: ""
         };
@@ -345,7 +431,7 @@
             let row = `
         <tr class="text-center">
              <td><input type="checkbox" class="row-check"></td>
-            <td data-itemno>${itemList.itemCode}</td>
+            <td data-itemno = "${itemList.itemNo}">${itemList.itemCode}</td>
             <td>${itemList.ingredientName}</td>
             <td>${itemList.itemCategory}</td>
             <td>${itemList.stockUnit}</td>
@@ -392,15 +478,16 @@
             const row = $(this).closest("tr");
             const cols = row.children();
 
-            const code = cols.eq(1).text();   // 품목코드
-            const name = cols.eq(2).text();   // 재료명
-            const unit = cols.eq(4).text();   // 단위
+            const itemNo = cols.eq(1).attr("data-itemno");   // ★ 추가
+            const code = cols.eq(1).text();
+            const name = cols.eq(2).text();
+            const unit = cols.eq(4).text();
 
             let html = "";
 
             if (isSize) {
                 html = `
-            <tr>
+            <tr data-itemno="${itemNo}">   <!-- ★ itemNo 저장 -->
                 <td>${code}</td>
                 <td>${name}</td>
                 <td>${unit}</td>
@@ -417,7 +504,7 @@
             </tr>`;
             } else {
                 html = `
-            <tr>
+            <tr data-itemno="${itemNo}">
                 <td>${code}</td>
                 <td>${name}</td>
                 <td>${unit}</td>
@@ -438,6 +525,7 @@
 
         $("#ingredientModal").modal("hide");
     });
+
 
 
     // 삭제 버튼

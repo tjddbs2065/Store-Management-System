@@ -119,9 +119,6 @@
         <if test="itemCode != null and itemCode != ''">
             AND item_code LIKE CONCAT('%', #{itemCode}, '%')
         </if>
-        <if test="itemName != null and itemName != ''">
-            AND item_name LIKE CONCAT('%', #{itemName}, '%')
-        </if>
         <if test="ingredientName != null and ingredientName != ''">
             AND ingredient_name LIKE CONCAT('%', #{ingredientName}, '%')
         </if>
@@ -211,5 +208,16 @@
             del_date
         FROM ITEM
         WHERE item_no = #{itemNo} AND del_date IS NULL
+    </select>
+
+    <select id="getItemByItemNo" resultMap="ItemMap">
+        SELECT
+            item_no,
+            item_code,
+            item_category,
+            ingredient_name,
+            stock_unit
+        FROM item
+        WHERE item_no = #{itemNo}
     </select>
 </mapper>

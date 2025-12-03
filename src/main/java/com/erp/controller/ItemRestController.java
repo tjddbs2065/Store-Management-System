@@ -36,7 +36,7 @@ public class ItemRestController {
         if (itemName != null && !itemName.isBlank())   return ResponseEntity.ok(itemService.getItemsByItemName(itemName));
         if (itemCode != null && !itemCode.isBlank())   return ResponseEntity.ok(itemService.getItemsByItemCode(itemCode));
         if (ingredient != null && !ingredient.isBlank()) return ResponseEntity.ok(itemService.getItemsByIngredient(ingredient));
-        return ResponseEntity.ok(itemService.getItemList(itemName, category, ingredient, itemCode));
+        return ResponseEntity.ok(itemService.getItemList(category, ingredient, itemCode));
     }
 
     /** 등록 (ADMIN/MANAGER만) */

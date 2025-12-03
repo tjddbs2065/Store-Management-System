@@ -19,7 +19,7 @@ public interface ItemDAO {
     int removeItem(Long itemNo);
 
     // 4) 전체 목록 조회
-    List<ItemDTO> getItemList(@Param("itemName") String itemName, @Param("itemCategory") String itemCategory,
+    List<ItemDTO> getItemList(@Param("itemCategory") String itemCategory,
                               @Param("ingredientName") String ingredientName, @Param("itemCode") String itemCode);
 
     // 5) 카테고리 검색
@@ -37,4 +37,5 @@ public interface ItemDAO {
     // 9) 상세 조회
     ItemDTO getItemDetail(Long itemNo);
 
+    ItemDTO getItemByItemNo(@Param("itemNo") Long itemNo);
 }
