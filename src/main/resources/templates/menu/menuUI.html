@@ -97,8 +97,8 @@
 <body class="bg-light">
 <!--계정별 툴바 다르게-->
 <header th:replace="fragments/toolBar :: toolBar"></header>
-<div class="container custom-container mt-5">
-    <div class="bg-white border rounded p-4">
+<div class="container custom-container mt-5 my-5">
+    <div class="bg-white border rounded p-5">
         <!-- 제목 / 버튼 -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold">메뉴 조회</h2>
@@ -312,12 +312,12 @@
     });
     $(document).on("click", ".detailBtn", function () {
         const menuNo = $(this).data("menuNo");
-        location.href = `/menuDetail?menuNo=${menuNo}`;
+        location.href = `/menu/menuDetailUI?menuNo=${menuNo}`;
     });
 
     $(document).on("click", ".menuBox", function () {
         const menuNo = $(this).data("menuNo");
-        location.href = `/menuDetail?menuNo=${menuNo}`;
+        location.href = `/menu/menuDetailUI?menuNo=${menuNo}`;
     });
 
     $("#menuAddBtn").click(() => {
