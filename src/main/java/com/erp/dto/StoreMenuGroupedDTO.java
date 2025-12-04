@@ -11,8 +11,9 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 public class StoreMenuGroupedDTO {
+    private String storeName;
     private String menuCode;
     private String menuName;
-
+    private String menuCategory;
     private List<StoreMenuDTO> items = new ArrayList<>();
 }

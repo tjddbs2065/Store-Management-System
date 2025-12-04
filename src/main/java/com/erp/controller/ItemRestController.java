@@ -36,7 +36,7 @@ public class ItemRestController {
         if (itemName != null && !itemName.isBlank())     return ResponseEntity.ok(itemService.getItemsByItemName(itemName));
         if (itemCode != null && !itemCode.isBlank())     return ResponseEntity.ok(itemService.getItemsByItemCode(itemCode));
         if (ingredient != null && !ingredient.isBlank()) return ResponseEntity.ok(itemService.getItemsByIngredient(ingredient));
-        return ResponseEntity.ok(itemService.getItemList());
+        return ResponseEntity.ok(itemService.getItemList(category, ingredient, itemCode));
     }
 
     /** 등록 (ADMIN/MANAGER만) — UI에서 버튼 숨겨도 서버는 최소 권한 보호 */

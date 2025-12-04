@@ -19,9 +19,13 @@ public class ItemStoreQuantityDTO {
 
     private String stockUnit;
     private String supplyUnit;
+    private Integer convertStock;
     private String supplier;
     private Integer itemPrice;
 
     private Integer itemQuantity;
-    private Integer limit;
+    private Integer storeLimit;
+    private Integer managerLimit;
+
+    private Long itemOrderCnt;
 }

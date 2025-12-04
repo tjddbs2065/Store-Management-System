@@ -7,6 +7,8 @@ import java.util.List;
 
 @Mapper
 public interface StoreDAO {
+    List<StoreDTO> getActiveStores();
+
     int countStores();
     List<StoreDTO> getStores();
     List<StoreDTO> getStoresByAddress(String address);

@@ -8,7 +8,16 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <style>
-        th.statusChange { width:90px; }
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 2000;
+        }
+        body { background-color: #fdfdfd; padding-top: 65px !important; }
+        .container { max-width:1500px; }
+        th.statusChange { width: 90px; }
         .custom-btn {
             background-color:#FFEEAA !important;
             border-color:#FFEEAA !important;
@@ -23,13 +32,16 @@
 
 <body class="bg-light">
 
+<header th:insert="fragments/toolBar :: toolBar"></header>
+
 <div class="container py-4">
     <div class="bg-white border rounded p-4">
 
-        <h2 class="fw-bold mb-4">직영점 판매 메뉴</h2>
+        <h2 class="fw-bold mb-4">직영점 판매 메뉴 - [[${storeName}]]</h2>
 
         <div class="border rounded p-3 mb-4">
             <div class="row g-3 align-items-end">
+
                 <div class="col-md-2">
                     <label class="form-label">판매 상태</label>
                     <select class="form-select" id="searchStatus">
@@ -47,20 +59,12 @@
                         <option>피자</option>
                         <option>사이드디시</option>
                         <option>음료</option>
+                        <option>기타</option>
                     </select>
                 </div>
 
-                <div class="col-md-3">
-                    <label class="form-label">메뉴 검색</label>
-                    <input type="text" class="form-control" id="searchName">
-                </div>
-
-                <div class="col-md-1">
-                    <button class="btn custom-btn w-100" id="searchBtn">검색</button>
-                </div>
             </div>
         </div>
-
 
         <div class="text-end pb-1">
             <button class="btn custom-btn" id="statusSetAllBtn">선택 일괄 변경</button>
@@ -71,6 +75,7 @@
                 <thead class="table-light">
                 <tr>
                     <th>메뉴 코드</th>
+                    <th>카테고리</th>
                     <th>메뉴 명</th>
                     <th>사이즈</th>
                     <th>가격</th>
@@ -79,11 +84,7 @@
                     <th><input type="checkbox" id="checkAll"></th>
                 </tr>
                 </thead>
-
-                <tbody id="menuTableBody">
-
-                </tbody>
-
+                <tbody id="menuTableBody"></tbody>
             </table>
         </div>
 
@@ -91,138 +92,269 @@
 </div>
 
 
-
 <div class="modal fade" id="statusSetModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
+
             <div class="modal-header">
                 <h5 class="modal-title fw-bold">판매 변경</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body">
-                <div class="row mb-2">
-                    <label class="col-3 fw-semibold">메뉴 명</label>
-                    <div class="col"><span id="modalMenuName" class="badge bg-light text-dark border px-3 py-2"></span></div>
-                </div>
 
-                <div class="row">
-                    <label class="col-3 fw-semibold">상태</label>
+                <div class="row mb-3">
+                    <label class="col-3 fw-semibold">메뉴 명</label>
                     <div class="col">
-                        <select class="form-select" id="modalStatusSelect">
-                            <option>판매중</option>
-                            <option>판매중단</option>
-                            <option>품절</option>
-                        </select>
+                        <span id="modalMenuName" class="badge bg-light text-dark border px-3 py-2"></span>
                     </div>
                 </div>
+
+                <div class="row mb-2">
+                    <label class="col-3 fw-semibold">사이즈</label>
+                    <label class="col-3 fw-semibold">판매 상태</label>
+                </div>
+
+                <div id="modalSizeArea"></div>
+
             </div>
 
             <div class="modal-footer">
-                <button class="btn custom-btn">저장</button>
+                <button class="btn custom-btn" id="saveStatusBtn">저장</button>
                 <button class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="alertModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center border border-primary">
+            <div class="modal-body">
+                <p id="alertMessage" class="fs-5 fw-bold mb-4 text-dark"></p>
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="button" class="btn px-4 custom-btn" data-bs-dismiss="modal">확인</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 
+<script src="/js/util.js"></script>
 
 <script>
+    function showAlert(msg){
+        $("#alertMessage").text(msg);
+        $("#alertModal").modal("show");
+    }
 
-    function loadMenuTable(){
+    function collectUpdates(){
+        const updates = [];
+        const bulkSelect = $("#bulkStatusSelect");
 
-        const menuName = $("#searchName").val();
-        const salesStatus = $("#searchStatus").val();
-        const menuCategory = $("#searchCategory").val();
+        if(bulkSelect && bulkSelect.length > 0){
+            const status = bulkSelect.val();
 
-        $.get(`/storeMenu/getMenu?menuName=${menuName}&salesStatus=${salesStatus}&menuCategory=${menuCategory}`, function(data){
-
-            const tbody = $("#menuTableBody");
-            tbody.empty();
-
-            data.forEach(group => {
-
-                const items = group.items;
-
-                // 사이즈 순서 정렬 (라지 → 미디움 → 단일)
-                const sorted = [...items].sort((a,b)=>{
-                    const order = { "라지":1, "미디움":2, "단일":3 };
-                    return order[a.size] - order[b.size];
+            window.bulkItems.forEach(function(item){
+                updates.push({
+                    storeMenuNo: item.storeMenuNo,
+                    salesStatus: status
                 });
-
-                const rowSpan = sorted.length;
-
-                sorted.forEach((item, i)=>{
-
-                    let html = "<tr>";
-
-                    if(i === 0){
-                        html += `
-                        <td rowspan="${rowSpan}">${group.menuCode}</td>
-                        <td rowspan="${rowSpan}">${group.menuName}</td>
-                    `;
-                    }
-
-                    html += `
-                    <td>${item.size}</td>
-                    <td>${item.menuPrice.toLocaleString()}</td>
-                    <td>${item.salesStatus}</td>
-                `;
-
-                    if(i === 0){
-                        html += `
-                        <td rowspan="${rowSpan}">
-                            <button class="btn btn-outline-secondary btn-sm statusSetBtn" data-menu="${group.menuName}">
-                                변경
-                            </button>
-                        </td>
-                        <td rowspan="${rowSpan}">
-                            <input type="checkbox" class="row-check">
-                        </td>
-                    `;
-                    }
-
-                    html += "</tr>";
-                    tbody.append(html);
-                });
-
             });
 
+            return updates;
+        }
+
+        $("#modalSizeArea select").each(function(){
+            updates.push({
+                storeMenuNo: $(this).data("storemenu"),
+                salesStatus: $(this).val()
+            });
+        });
+
+        return updates;
+    }
+
+    $(document).on("click", "#saveStatusBtn", function(){
+
+        const updates = collectUpdates();
+
+        fetchUtil(
+            "/storeMenu/updateStatus",
+            function(){
+                $("#statusSetModal").modal("hide");
+                loadMenuTable();
+                $("#checkAll, .row-check").prop("checked", false);
+            },
+            "POST",
+            updates
+        );
+    });
+
+    function renderMenuTable(data){
+
+        const tbody = $("#menuTableBody");
+        tbody.empty();
+
+        if(!data || data.length === 0){
+            tbody.append('<tr><td colspan="8" class="text-center">데이터가 없습니다.</td></tr>');
+            return;
+        }
+
+        data.forEach(function(group){
+
+            const items = group.items;
+
+            const sorted = items.slice().sort(function(a, b){
+                const order = { "라지":1, "미디움":2, "단일":3 };
+                return order[a.size] - order[b.size];
+            });
+
+            const rowSpan = sorted.length;
+
+            sorted.forEach(function(item, i){
+
+                let html = "<tr>";
+
+                if(i === 0){
+                    html += '\
+                        <td rowspan="' + rowSpan + '">' + group.menuCode + '</td>\
+                        <td rowspan="' + rowSpan + '">' + item.menuCategory + '</td>\
+                        <td rowspan="' + rowSpan + '">' + group.menuName + '</td>\
+                    ';
+                }
+
+                html += '\
+                    <td>' + item.size + '</td>\
+                    <td>' + item.menuPrice.toLocaleString() + '</td>\
+                    <td>' + item.salesStatus + '</td>\
+                ';
+
+                if(i === 0){
+                    html += '\
+                        <td rowspan="' + rowSpan + '">\
+                            <button class="btn btn-outline-secondary btn-sm statusSetBtn"\
+                                data-menu="' + group.menuName + '"\
+                                data-items="' + btoa(encodeURIComponent(JSON.stringify(sorted))) + '">\
+                                변경\
+                            </button>\
+                        </td>\
+                        <td rowspan="' + rowSpan + '">\
+                            <input type="checkbox" class="row-check">\
+                        </td>\
+                    ';
+                }
+
+                html += "</tr>";
+                tbody.append(html);
+            });
         });
     }
 
-    $("#searchBtn").on("click", loadMenuTable);
-    $(document).ready(loadMenuTable);
+    function loadMenuTable() {
+
+        const salesStatus  = $("#searchStatus").val();
+        const menuCategory = $("#searchCategory").val();
+
+        fetchUtil(
+            "/storeMenu/getMenu?salesStatus=" + salesStatus + "&menuCategory=" + menuCategory,
+            function(data){
+                renderMenuTable(data);
+            }
+        );
+    }
 
 
+    $(document).ready(function(){
+        loadMenuTable();
+    });
+
+    $("#searchStatus").on("change", function(){
+        loadMenuTable();
+    });
+
+    $("#searchCategory").on("change", function(){
+        loadMenuTable();
+    });
 
     $("#checkAll").on("change", function(){
         $(".row-check").prop("checked", this.checked);
     });
 
+    $(document).on("click", ".statusSetBtn", function(){
 
+        const menuName = $(this).data("menu");
+        const items = JSON.parse(decodeURIComponent(atob($(this).data("items"))));
 
-    $("#statusSetAllBtn").on("click", function(){
+        $("#modalMenuName").text(menuName);
+        const area = $("#modalSizeArea").empty();
 
-        const checked = $(".row-check:checked");
+        items.forEach(function(item){
+            area.append('\
+                <div class="row mb-2">\
+                    <label class="col-3 fw-semibold">' + item.size + '</label>\
+                    <div class="col">\
+                        <select class="form-select" data-storemenu="' + item.storeMenuNo + '">\
+                            <option ' + (item.salesStatus === '판매중' ? "selected" : "") + '>판매중</option>\
+                            <option ' + (item.salesStatus === '판매중단' ? "selected" : "") + '>판매중단</option>\
+                            <option ' + (item.salesStatus === '품절' ? "selected" : "") + '>품절</option>\
+                        </select>\
+                    </div>\
+                </div>\
+            ');
+        });
 
-        if(checked.length === 0){
-            alert("선택된 항목이 없습니다.");
+        $("#statusSetModal").modal("show");
+    });
+
+    $(document).on("click", "#statusSetAllBtn", function(){
+
+        const checkedRows = $(".row-check:checked");
+        if(checkedRows.length === 0){
+            showAlert("선택된 항목이 없습니다.");
             return;
         }
 
-        $("#modalMenuName").text(`선택된 ${checked.length}개 메뉴`);
+        window.bulkItems = [];
+
+        let totalItems = 0;
+        let firstName = null;
+
+        checkedRows.each(function(){
+            const row = $(this).closest("tr");
+            const encoded = row.find(".statusSetBtn").data("items");
+            const items = JSON.parse(decodeURIComponent(atob(encoded)));
+
+            window.bulkItems.push.apply(window.bulkItems, items);
+
+            totalItems += items.length;
+            if(!firstName) firstName = items[0].menuName;
+        });
+
+        $("#modalMenuName").text(firstName + " 외 " + (totalItems - 1) + "건");
+
+        $("#modalSizeArea").html('\
+            <div class="row mb-2">\
+                <label class="col-3 fw-semibold">전체</label>\
+                <div class="col">\
+                    <select class="form-select" id="bulkStatusSelect">\
+                        <option>판매중</option>\
+                        <option>판매중단</option>\
+                        <option>품절</option>\
+                    </select>\
+                </div>\
+            </div>\
+        ');
+
         $("#statusSetModal").modal("show");
     });
 
-
-    $(document).on("click", ".statusSetBtn", function(){
-        const menu = $(this).data("menu");
-        $("#modalMenuName").text(menu);
-        $("#statusSetModal").modal("show");
-    });
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

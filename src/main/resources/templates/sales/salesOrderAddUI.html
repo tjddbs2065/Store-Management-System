@@ -1,169 +1,170 @@
-<!DOCTYPE html>
-<html lang="ko">
+<!DOCTYPE html >
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>주문 등록</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="/js/util.js"></script>
-  <script src="/js/modalStoreSearch.js"></script>
+    <meta charset="UTF-8">
+    <title>주문 등록</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/js/util.js"></script>
+    <script src="/js/modalStoreSearch.js"></script>
 
-  <style>
-    .custom-btn {
-      background-color: #FFEEAA !important;
-      border-color: #FFEEAA !important;
-      color: #000;
-    }
+    <style>
+        .custom-btn {
+            background-color: #FFEEAA !important;
+            border-color: #FFEEAA !important;
+            color: #000;
+        }
 
-    .custom-btn:hover {
-      background-color: #f2da84 !important;
-      border-color: #f2da84 !important;
-    }
-  </style>
+        .custom-btn:hover {
+            background-color: #f2da84 !important;
+            border-color: #f2da84 !important;
+        }
+    </style>
 </head>
-
 <body class="bg-light">
-<div class="container">
+<header th:replace="fragments/toolBar :: toolBar"></header>
+<div class="container custom-container mt-5 my-5">
+    <div class="bg-white border rounded p-5">
 
-  <!-- 제목 -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold">주문 등록</h2>
-  </div>
+        <!-- 제목 -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">주문 등록</h2>
+        </div>
 
-  <!-- 직영점 선택 -->
-  <div class="px-3 d-flex align-items-center gap-2 mb-2">
-    <span class="fw-semibold ms-auto">직영점</span>
-    <input id="storeInput" type="text" class="form-control form-control-sm" style="width: 150px" readonly>
-    <div th:replace="fragments/modalStoreSearch :: modalStoreSearch"></div>
-    <button id="searchBtn" class="btn custom-btn">검색</button>
-    <button id="resetBtn" class="btn btn-outline-secondary">초기화</button>
-  </div>
+        <!-- 직영점 선택 -->
+        <div class="px-3 d-flex align-items-center gap-2 mb-2">
+            <span class="fw-semibold ms-auto">직영점</span>
+            <input id="storeInput" type="text" class="form-control form-control-sm" style="width: 150px" readonly>
+            <div th:replace="fragments/modalStoreSearch :: modalStoreSearch"></div>
+            <button id="searchBtn" class="btn custom-btn">검색</button>
+            <button id="resetBtn" class="btn btn-outline-secondary">초기화</button>
+        </div>
 
-  <!-- 메뉴 검색 -->
-  <div class="card mb-4">
-    <div class="card-header fw-semibold">메뉴 추가</div>
-    <div class="card-body">
-          <button class="btn btn-secondary" id="searchMenuBtn">검색</button>
+        <!-- 메뉴 검색 -->
+        <div class="card mb-4">
+            <div class="card-header fw-semibold">메뉴 추가</div>
+            <div class="card-body">
+                <button class="btn btn-secondary" id="searchMenuBtn">검색</button>
+            </div>
+        </div>
+
+        <!-- 선택된 메뉴 목록 -->
+        <div class="card mb-4">
+            <div class="card-header fw-semibold">주문 메뉴 목록</div>
+            <div class="card-body">
+                <table class="table table-bordered align-middle text-center">
+                    <thead class="table-light">
+                    <tr>
+                        <th style="width: 20%">메뉴명</th>
+                        <th style="width: 15%">사이즈</th>
+                        <th style="width: 15%">판매 금액(원)</th>
+                        <th style="width: 15%">판매 수량</th>
+                        <th style="width: 10%">삭제</th>
+                    </tr>
+                    </thead>
+                    <tbody id="orderMenuList">
+                    <!-- 메뉴 추가 시 append -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 버튼 -->
+        <div class="d-flex justify-content-end mt-4">
+            <button class="btn btn-success me-2 px-4" id="submitOrder">주문 등록</button>
+            <button class="btn btn-outline-secondary px-4" id="cancelBtn">취소</button>
+        </div>
+
     </div>
-  </div>
-
-  <!-- 선택된 메뉴 목록 -->
-  <div class="card mb-4">
-    <div class="card-header fw-semibold">주문 메뉴 목록</div>
-    <div class="card-body">
-      <table class="table table-bordered align-middle text-center">
-        <thead class="table-light">
-        <tr>
-          <th style="width: 20%">메뉴명</th>
-          <th style="width: 15%">사이즈</th>
-          <th style="width: 15%">판매 금액(원)</th>
-          <th style="width: 15%">판매 수량</th>
-          <th style="width: 10%">삭제</th>
-        </tr>
-        </thead>
-        <tbody id="orderMenuList">
-        <!-- 메뉴 추가 시 append -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- 버튼 -->
-  <div class="d-flex justify-content-end mt-4">
-    <button class="btn btn-success me-2 px-4" id="submitOrder">주문 등록</button>
-    <button class="btn btn-outline-secondary px-4" id="cancelBtn">취소</button>
-  </div>
-
 </div>
-
 <!-- ==========================
      메뉴 검색 모달
 =========================== -->
 <div class="modal fade" id="menuSearchModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
 
-      <div class="modal-header">
-        <h5 class="modal-title fw-semibold">메뉴 선택</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
+            <div class="modal-header">
+                <h5 class="modal-title fw-semibold">메뉴 선택</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
 
-      <div class="modal-body">
-        <!-- 메뉴 리스트 테이블 -->
-        <table class="table table-hover align-middle text-center">
-          <thead class="table-light">
-          <tr>
-            <th style="width: 10%">
-              <input type="checkbox" id="menuCheckAll">
-            </th>
-            <th>메뉴명</th>
-            <th>사이즈</th>
-            <th>가격(원)</th>
-          </tr>
-          </thead>
-          <tbody id="menuSearchTableBody">
-          <!-- JS로 메뉴 렌더링 -->
-          </tbody>
-        </table>
+            <div class="modal-body">
+                <!-- 메뉴 리스트 테이블 -->
+                <table class="table table-hover align-middle text-center">
+                    <thead class="table-light">
+                    <tr>
+                        <th style="width: 10%">
+                            <input type="checkbox" id="menuCheckAll">
+                        </th>
+                        <th>메뉴명</th>
+                        <th>사이즈</th>
+                        <th>가격(원)</th>
+                    </tr>
+                    </thead>
+                    <tbody id="menuSearchTableBody">
+                    <!-- JS로 메뉴 렌더링 -->
+                    </tbody>
+                </table>
 
-      </div>
+            </div>
 
-      <div class="modal-footer">
-        <button class="btn btn-success" id="menuSelectConfirm">선택 완료</button>
-      </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" id="menuSelectConfirm">선택 완료</button>
+            </div>
 
+        </div>
     </div>
-  </div>
 </div>
 <div class="modal fade" id="alertModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content text-center border border-primary">
-      <div class="modal-body">
-        <p id="alertMessage" class="fs-5 fw-bold mb-4 text-dark"></p>
-        <div class="d-flex justify-content-center gap-3">
-          <button type="button" class="btn px-4 custom-btn" data-bs-dismiss="modal">확인</button>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center border border-primary">
+            <div class="modal-body">
+                <p id="alertMessage" class="fs-5 fw-bold mb-4 text-dark"></p>
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="button" class="btn px-4 custom-btn" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 
 
 <script>
-  let selectedStoreNo = null;
+    let selectedStoreNo = null;
 
-  $("#searchBtn").on("click", function () {
-    StoreSearchModal.open("", function (storeNo, storeName) {
-      $("#storeInput")
-              .val(storeName)
-              .data("storeno", storeNo);  // storeNo 저장
+    $("#searchBtn").on("click", function () {
+        StoreSearchModal.open("", function (storeNo, storeName) {
+            $("#storeInput")
+                .val(storeName)
+                .data("storeno", storeNo);  // storeNo 저장
+        });
     });
-  });
 
-  $("#searchMenuBtn").on("click", function () {
+    $("#searchMenuBtn").on("click", function () {
 
-    const storeNo = $("#storeInput").data("storeno");
+        const storeNo = $("#storeInput").data("storeno");
 
-    if (!storeNo) {
-      alert("직영점을 먼저 선택하세요!");
-      return;
-    }
+        if (!storeNo) {
+            alert("직영점을 먼저 선택하세요!");
+            return;
+        }
 
-    selectedStoreNo = storeNo;
-    $("#menuSearchModal").modal("show");
-    loadMenuList(storeNo);
-  });
+        selectedStoreNo = storeNo;
+        $("#menuSearchModal").modal("show");
+        loadMenuList(storeNo);
+    });
 
-  function loadMenuList(storeNo) {
+    function loadMenuList(storeNo) {
 
-    fetchUtil(`/storeMenu/getStoreMenu/${storeNo}`, data => {
+        fetchUtil(`/storeMenu/getStoreMenu/${storeNo}`, data => {
 
-      const tbody = $("#menuSearchTableBody");
-      tbody.empty();
+            const tbody = $("#menuSearchTableBody");
+            tbody.empty();
 
-      data.forEach(m => {
-        tbody.append(`
+            data.forEach(m => {
+                tbody.append(`
         <tr>
           <td>
             <input type="checkbox" class="menuCheck"
@@ -177,28 +178,28 @@
           <td>${m.menuPrice}</td>
         </tr>
       `);
-      });
+            });
+        });
+    }
+
+    $("#menuCheckAll").on("change", function () {
+        $(".menuCheck").prop("checked", $(this).is(":checked"));
     });
-  }
-
-  $("#menuCheckAll").on("change", function () {
-    $(".menuCheck").prop("checked", $(this).is(":checked"));
-  });
 
 
-  $("#menuSelectConfirm").on("click", function () {
+    $("#menuSelectConfirm").on("click", function () {
 
-    $(".menuCheck:checked").each(function () {
+        $(".menuCheck:checked").each(function () {
 
-      const storeMenuNo = $(this).data("storemenuno");
-      const name = $(this).data("name");
-      const size = $(this).data("size");
-      const price = $(this).data("price");
+            const storeMenuNo = $(this).data("storemenuno");
+            const name = $(this).data("name");
+            const size = $(this).data("size");
+            const price = $(this).data("price");
 
-      // 중복 방지
-      if ($(`#orderMenuList tr[data-storemenuno="${storeMenuNo}"]`).length > 0) return;
+            // 중복 방지
+            if ($(`#orderMenuList tr[data-storemenuno="${storeMenuNo}"]`).length > 0) return;
 
-      const newRow = `
+            const newRow = `
       <tr data-storemenuno="${storeMenuNo}">
         <td>${name}</td>
         <td>${size}</td>
@@ -212,87 +213,88 @@
       </tr>
     `;
 
-      $("#orderMenuList").append(newRow);
+            $("#orderMenuList").append(newRow);
+        });
+
+        $("#menuSearchModal").modal("hide");
     });
 
-    $("#menuSearchModal").modal("hide");
-  });
-
-  $(document).on("click", ".removeBtn", function () {
-    $(this).closest("tr").remove();
-  });
-
-  $("#submitOrder").click(() => {
-    const storeNo = $("#storeInput").data("storeno");
-    if (!storeNo) {
-      alert("직영점을 선택하세요.");
-      return;
-    }
-
-    const menuList = [];
-    const detailList = [];
-
-    $("#orderMenuList tr").each(function () {
-
-      const storeMenuNo = $(this).data("storemenuno");
-      const qty = $(this).find(".qtyInput").val();
-      const price = Number($(this).find(".priceInput").text());
-
-
-      menuList.push({
-        storeMenuNo: storeMenuNo
-      });
-
-      detailList.push({
-        count: qty,
-        price: price
-      });
+    $(document).on("click", ".removeBtn", function () {
+        $(this).closest("tr").remove();
     });
 
-    if (menuList.length === 0) {
-      alert("메뉴를 1개 이상 선택하세요.");
-      return;
-    }
+    $("#submitOrder").click(() => {
+        const storeNo = $("#storeInput").data("storeno");
+        if (!storeNo) {
+            alert("직영점을 선택하세요.");
+            return;
+        }
 
-    const requestBody = {
-      storeNo: storeNo,
-      menuList: menuList,
-      detailList: detailList
-    };
+        const menuList = [];
+        const detailList = [];
 
-    fetchUtil(
+        $("#orderMenuList tr").each(function () {
+
+            const storeMenuNo = $(this).data("storemenuno");
+            const qty = $(this).find(".qtyInput").val();
+            const price = Number($(this).find(".priceInput").text());
+
+
+            menuList.push({
+                storeMenuNo: storeMenuNo
+            });
+
+            detailList.push({
+                count: qty,
+                price: price
+            });
+        });
+
+        if (menuList.length === 0) {
+            alert("메뉴를 1개 이상 선택하세요.");
+            return;
+        }
+
+        const requestBody = {
+            storeNo: storeNo,
+            menuList: menuList,
+            detailList: detailList
+        };
+
+        fetchUtil(
             "/sales/getSalesOrder/addSalesOrder",
             result => {
-              if (result.message === "fail")
-                showAlert("재고 부족으로 실패", () =>{
-                  location.href = "/sales/salesOrderUI";
-                })
-              else{
-              showAlert("주문 등록 완료", () => {
-                location.href = "/sales/salesOrderUI";
-              });}
+                if (result.message === "fail")
+                    showAlert("재고 부족으로 실패", () => {
+                        location.href = "/sales/salesOrderUI";
+                    })
+                else {
+                    showAlert("주문 등록 완료", () => {
+                        location.href = "/sales/salesOrderUI";
+                    });
+                }
             },
             "POST",
             requestBody
-    );
-  });
-
-  $("#cancelBtn").click(() => {
-    history.back();
-  });
-
-  $("#resetBtn").on("click", function () {
-    $("#storeInput").val("").removeData("storeno");
-    $("#orderMenuList").empty();
-  });
-
-  function showAlert(message, onClose) {
-    $("#alertMessage").text(message);
-    $("#alertModal").off("hidden.bs.modal").on("hidden.bs.modal", function () {
-      if (typeof onClose === "function") onClose();
+        );
     });
-    $("#alertModal").modal("show");
-  }
+
+    $("#cancelBtn").click(() => {
+        history.back();
+    });
+
+    $("#resetBtn").on("click", function () {
+        $("#storeInput").val("").removeData("storeno");
+        $("#orderMenuList").empty();
+    });
+
+    function showAlert(message, onClose) {
+        $("#alertMessage").text(message);
+        $("#alertModal").off("hidden.bs.modal").on("hidden.bs.modal", function () {
+            if (typeof onClose === "function") onClose();
+        });
+        $("#alertModal").modal("show");
+    }
 
 
 </script>

@@ -1,5 +1,6 @@
 package com.erp.service;
 
+import com.erp.repository.entity.StoreMenu;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class MenuServiceTest {
     @Autowired
     MenuService menuService;
+    @Autowired
+    StoreMenuService storeMenuService;
+
+    @Test
+    void searchMenuTest(){
+        System.out.println(storeMenuService.searchMenu("피자",null,null));
+
+    }
+
 
     @Test
     public void getMenuListTest(){

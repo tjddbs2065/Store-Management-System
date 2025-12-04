@@ -109,9 +109,19 @@
             item_name,
             ingredient_name,
             supplier,
-            item_price
+            item_price,
+            stock_unit
         FROM ITEM
         WHERE del_date IS NULL
+        <if test="itemCategory != null and itemCategory != ''">
+            AND item_category = #{itemCategory}
+        </if>
+        <if test="itemCode != null and itemCode != ''">
+            AND item_code LIKE CONCAT('%', #{itemCode}, '%')
+        </if>
+        <if test="ingredientName != null and ingredientName != ''">
+            AND ingredient_name LIKE CONCAT('%', #{ingredientName}, '%')
+        </if>
         ORDER BY item_no DESC
     </select>
 
@@ -200,4 +210,14 @@
         WHERE item_no = #{itemNo} AND del_date IS NULL
     </select>
 
+    <select id="getItemByItemNo" resultMap="ItemMap">
+        SELECT
+            item_no,
+            item_code,
+            item_category,
+            ingredient_name,
+            stock_unit
+        FROM item
+        WHERE item_no = #{itemNo}
+    </select>
 </mapper>

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.stream.Collectors;
@@ -13,18 +14,16 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
-public class    MenuController {
+@RequestMapping("menu")
+public class MenuController {
     private final MenuService menuService;
 
-
-
-
-    @GetMapping("menu")
+    @GetMapping("/menuUI")
     private String member(){
         return "menu/menuUI";
     }
 
-    @GetMapping("menuDetail")
+    @GetMapping("/menuDetailUI")
     public String menuDetail(@RequestParam Long menuNo, Model model) {
 
         MenuDTO menu = menuService.getMenuDetail(menuNo);
@@ -40,5 +39,10 @@ public class    MenuController {
         model.addAttribute("hasSize", menu.isHasSize());
 
         return "menu/menuDetailUI";
+    }
+
+    @GetMapping("/menuAddUI")
+    public String menuAdd() {
+        return "menu/menuAddUI";
     }
 }

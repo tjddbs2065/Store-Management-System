@@ -81,7 +81,7 @@ public class StoreDAOTest {
     @Test
     void setStoreTest() {
         ManagerDTO manager = new ManagerDTO();
-        manager.setManagerId("storeManager3");
+        manager.setManagerId("kosta123");
         manager.setPw(encoder.encode("123"));
         manager.setEmail("storeManager3@test.com");
         manager.setManagerName("표수정");

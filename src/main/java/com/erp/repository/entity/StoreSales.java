@@ -16,6 +16,7 @@ import java.util.Date;
 @Table(name = "store_sales")
 public class StoreSales {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long storeSalesNo;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_no")

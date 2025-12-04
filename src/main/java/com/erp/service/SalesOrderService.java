@@ -33,6 +33,7 @@ public class SalesOrderService {
     private final MenuIngredientRepository menuIngredientRepository;
     private final StoreItemRepository storeItemRepository;
     private final StoreStockRepository storeStockRepository;
+    private final StoreSalesRepository storeSalesRepository;
 
     @Transactional
     public SalesOrderDTO addSalesOrder(SalesOrderRequestDTO request) {
@@ -56,6 +57,7 @@ public class SalesOrderService {
 
         salesOrderRepository.save(salesOrder);
 
+        updateStoreSales(store, salesOrder);
         // 주문 상세 + 재고 차감
         for (int i = 0; i < menuDTOList.size(); i++) {
 
@@ -111,6 +113,27 @@ public class SalesOrderService {
         }
 
         return SalesOrderDTO.fromEntity(salesOrder);
+    }
+
+    private void updateStoreSales(Store store, SalesOrder salesOrder) {
+        LocalDate salesDate = salesOrder.getSalesOrderDatetime().toLocalDate();
+        int orderAmount = salesOrder.getSalesOrderAmount();
+
+        StoreSales storeSales = storeSalesRepository
+                .findByStoreStoreNoAndSalesDate(store.getStoreNo(), salesDate)
+                .orElse(null);
+
+        if (storeSales == null) {
+            storeSales = StoreSales.builder()
+                    .store(store)
+                    .salesDate(salesDate)
+                    .salesPrice(orderAmount)   // 첫 금액
+                    .build();
+        } else {
+            storeSales.setSalesPrice(storeSales.getSalesPrice() + orderAmount);
+        }
+
+        storeSalesRepository.save(storeSales);
     }
 
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 <meta charset="UTF-8">
 <title>발주 관리 - Scroll Fixed Final</title>
@@ -15,14 +16,12 @@
         margin:0;
         padding:0;
         overflow:hidden;
-        max-width: 1500px;
     }
 
     body {
         display:flex;
         flex-direction:column;
         background:#f8f9fa;
-        max-width: 1500px;
     }
 
     h3 { margin:0; padding:20px 20px 0 20px; }
@@ -46,14 +45,15 @@
 
     /* 각 패널 */
     .panel {
-        flex:1;
         background:#fff;
         border-radius:12px;
         padding:20px;
         box-shadow:0 1px 4px rgba(0,0,0,0.08);
         display:flex;
         flex-direction:column;
-        min-height:0; /* 핵심 */
+        min-height:0;
+        flex: 1;
+        border:1px solid #dee2e6;
     }
 
     /* 내부 스크롤 영역 */
@@ -104,112 +104,130 @@
     .table thead { background:#2ca058; color:white; }
     .table td { vertical-align:middle; }
 
+    #content-area{
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-width: 1500px;
+    }
 </style>
 </head>
 
 <body>
+<header th:replace="fragments/toolBar :: toolBar"></header>
+<div id="content-area" class="container">
+    <h3 class="fw-bold">발주 관리</h3>
 
-<h3 class="fw-bold">발주 관리</h3>
+    <!-- ▣ 상단 1/3 (좌측 + 우측) -->
+    <div class="top-section">
 
-<!-- ▣ 상단 1/3 (좌측 + 우측) -->
-<div class="top-section">
-
-    <!-- 좌측 영역 -->
-    <div class="panel">
-        <div>
-            <h5 class="fw-semibold mb-3">발주 추천 목록</h5>
-            <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#proposalModal" id="item_proposal_history">
-                제안 내역
-            </button>
+        <!-- 좌측 영역 -->
+        <div class="panel">
+            <div class="d-flex">
+                <h5 class="fw-semibold m-1 me-3">발주 추천 목록</h5>
+                <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#proposalModal" id="item_proposal_history">
+                    제안 내역
+                </button>
+            </div>
+            <div class="scroll-area">
+                <table id="item_proposal" class="table table-rounded table-sm align-middle shadow-sm">
+                    <thead>
+                        <tr>
+                            <th>제안일자</th>
+                            <th>품목명</th>
+                            <th>수량</th>
+                            <th>사유</th>
+                            <th class="text-center">관리</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div class="scroll-area">
-            <table id="item_proposal" class="table table-rounded table-sm align-middle shadow-sm">
-                <thead>
-                    <tr>
-                        <th>제안일자</th>
-                        <th>품목명</th>
-                        <th>수량</th>
-                        <th>사유</th>
-                        <th class="text-center">관리</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+
+        <!-- 우측 영역 -->
+        <div class="panel">
+            <h5 class="fw-semibold m-1 me-3">선택한 품목</h5>
+
+            <div class="scroll-area">
+                <table id="item_selected" class="table table-rounded table-sm align-middle shadow-sm">
+                    <thead>
+                        <tr>
+                            <th>품목명</th>
+                            <th>공급단위</th>
+                            <th>수량</th>
+                            <th>금액</th>
+                            <th class="text-center">삭제</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                <div>총 품목수: <strong><span id="total-cnt"></span><label>개</label></strong></div>
+                <div>총 발주액: <strong><span id="total-price"></span><label>원</label></strong></div>
+                <button class="btn btn-warning" id="order_request">발주 요청</button>
+            </div>
         </div>
+
     </div>
 
-    <!-- 우측 영역 -->
-    <div class="panel">
-        <h5 class="fw-semibold mb-3">선택한 품목</h5>
+    <!-- ▣ 하단 2/3 (재고 현황) -->
+    <div class="bottom-section">
 
-        <div class="scroll-area">
-            <table id="item_selected" class="table table-rounded table-sm align-middle shadow-sm">
-                <thead>
-                    <tr>
-                        <th>품목명</th>
-                        <th>공급단위</th>
-                        <th>수량</th>
-                        <th>금액</th>
-                        <th class="text-center">삭제</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+        <div class="panel">
+            <div class="d-flex">
+                <div class="d-flex justify-content-center align-items-center">
+                    <h5 class="fw-semibold me-3">재고 현황</h5>
+                </div>
+                <select class="form-select me-2" style="width:150px;" id="sort_select">
+                    <option>기본순</option><option>추천순</option><option>하한선순</option>
+                </select>
+
+                <select class="form-select me-2" style="width:150px;" id="category_select">
+                    <option>전체</option>
+                    <option>도우</option>
+                    <option>치즈</option>
+                    <option>토핑</option>
+                    <option>소스</option>
+                    <option>향신료</option>
+                    <option>야채</option>
+                    <option>면</option>
+                    <option>사이드</option>
+                    <option>음료</option>
+                </select>
+
+                <input type="text" id="search-input" class="form-control me-2" style="width:200px;" placeholder="검색어 입력">
+                <button id="search-btn" class="btn btn-warning">조회</button>
+            </div>
+
+            <div class="scroll-area">
+                <table id="item_toOrder" class="table table-rounded table-hover table-sm align-middle shadow-sm">
+                    <thead>
+                        <tr>
+                            <th>품목코드</th>
+                            <th>품목명</th>
+                            <th>카테고리</th>
+                            <th>하한선</th>
+                            <th>실재고</th>
+                            <th>공급단위</th>
+                            <th>공급가격</th>
+                            <th class="text-center">담기</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-            <div>총 품목수: <strong><span id="total-cnt"></span><label>개</label></strong></div>
-            <div>총 발주액: <strong><span id="total-price"></span><label>원</label></strong></div>
-            <button class="btn btn-warning" id="order_request">발주 요청</button>
-        </div>
     </div>
-
 </div>
-
-<!-- ▣ 하단 2/3 (재고 현황) -->
-<div class="bottom-section">
-
-    <div class="panel">
-        <h5 class="fw-semibold mb-3">재고 현황</h5>
-
-        <div class="d-flex mb-3">
-            <select class="form-select me-2" style="width:150px;">
-                <option>기본순</option><option>추천순</option><option>하한선순</option>
-            </select>
-
-            <select class="form-select me-2" style="width:150px;">
-                <option>전체</option><option>도우</option><option>소스</option><option>치즈</option>
-            </select>
-
-            <input type="text" id="search-input" class="form-control me-2" style="width:200px;" placeholder="검색어 입력">
-            <button id="search-btn" class="btn btn-warning">조회</button>
-        </div>
-
-        <div class="scroll-area">
-            <table id="item_toOrder" class="table table-rounded table-hover table-sm align-middle shadow-sm">
-                <thead>
-                    <tr>
-                        <th>품목코드</th>
-                        <th>품목명</th>
-                        <th>카테고리</th>
-                        <th>하한선</th>
-                        <th>실재고</th>
-                        <th>공급단위</th>
-                        <th>공급가격</th>
-                        <th class="text-center">담기</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </div>
-
-    </div>
-
-</div>
-
 <!-- =========================
       ▣ 제안 내역 모달 영역
      ========================= -->
@@ -263,7 +281,6 @@
     // 제안 확인 이벤트
     itemProposal.on("click", ".approve_btn", function (){
         const oldRow = $(this).closest("tr");
-        const newRow = $("<tr>");
         const itemName = oldRow.find("td").eq(1).text();
 
         if (hasDuplicate(itemName)) {
@@ -273,12 +290,12 @@
 
         const proposalNo = $(this).closest("tr").data("proposal_no");
         fetchUtil(`/itemOrder/respondItemProposal/${proposalNo}`, (data)=>{
-            console.log("test");
         }, "PUT");
         const itemRow = $("#item_toOrder tbody tr").filter(function(){
             return $(this).find("td").eq(1).text().trim() === itemName;
         });
 
+        const newRow = $("<tr>").data("itemno", itemRow.data("itemno"));
         $("<td>").text(itemName).appendTo(newRow); // 품목 명
 
         $("<td>").text(itemRow.find("td").eq(5).text()).appendTo(newRow); // 공급 단위
@@ -423,21 +440,42 @@
 
     searchButton.on("click", function(){
         const keyword = searchInput.val().trim().toLowerCase();
-        const rows = itemToOrder.find("tbody tr");
+        const rows = originalRows.slice();
 
-        rows.each(function(){
-            const code = $(this).find("td").eq(0).text().trim().toLowerCase();
-            const name = $(this).find("td").eq(1).text().trim().toLowerCase();
-            const category = $(this).find("td").eq(2).text().trim().toLowerCase();
+        let categorySelected = $("#category_select").val();
+        categorySelected = categorySelected === "전체" ? "" : categorySelected;
 
-            // 키워드 포함 여부 확인
-            const isMatch =
-                code.includes(keyword) ||
+        const filtered = rows.filter(tr=>{
+            const $td = $(tr).find("td");
+            const code = $td.eq(0).text().trim().toLowerCase();
+            const name = $td.eq(1).text().trim().toLowerCase();
+            const category = $td.eq(2).text().trim().toLowerCase();
+
+            const keywordMatch = code.includes(keyword) ||
                 name.includes(keyword) ||
                 category.includes(keyword);
+            const categoryMatch = category.includes(categorySelected);
 
-            $(this).toggle(isMatch || keyword === "");
-        })
+            return keywordMatch && categoryMatch;
+        });
+
+        const sortSelect = $("#sort_select").val();
+        if(sortSelect === "추천순")
+            filtered.sort((a, b) => {
+                const prevOrderCnt = $(a).data("itemordercnt");
+                const currentOrderCnt = $(b).data("itemordercnt");
+                return currentOrderCnt - prevOrderCnt;
+            });
+        else if(sortSelect === "기본순")
+            filtered.sort((a, b) => {
+                const prevOrderCnt = $(a).data("index");
+                const currentOrderCnt = $(b).data("index");
+                return prevOrderCnt - currentOrderCnt;
+            });
+
+        const tbody = itemToOrder.find("tbody");
+        tbody.empty();
+        filtered.forEach(tr => tbody.append(tr));
     });
 
     // 중복 검사
@@ -458,7 +496,7 @@
 
         data.forEach((item) => {
             const date = new Date(item.proposalDate);
-            let row = `<tr data-proposal_no="${item.proposalNo}">
+            let row = `<tr data-proposal_no="${item.proposalNo}" >
                    <td>${date.getFullYear()+"-"+String(date.getMonth()).padStart(2, "0")+"-"+String(date.getDate()).padStart(2, "0")}</td>
                    <td>${item.itemName}</td>
                    <td>${item.quantity}</td>
@@ -500,23 +538,27 @@
         });
     });
 
+    let originalRows = [];
     function load_itemList(data){
         const tbody = $("#item_toOrder tbody");
         tbody.empty();
+        originalRows = [];
 
-        data.forEach(item => {
-            let row = `<tr data-itemno="${item.itemNo}">
+        data.forEach((item, idx) => {
+            let row = $(`<tr data-itemno="${item.itemNo}" data-itemordercnt="${item.itemOrderCnt}" data-index="${idx}">
                            <td>${item.itemCode}</td>
                            <td>${item.itemName}</td>
                            <td>${item.itemCategory}</td>
-                           <td>${item.limit == null ? "-" : item.limit}</td>
-                           <td class="text-danger fw-semibold">${item.itemQuantity == null ? "0" : item.itemQuantity}</td>
+                           <td>${item.storeLimit == null ? "-" : item.storeLimit}</td>
+                           <td class="text-danger fw-semibold" data-convert_stock="${item.convertStock}">${item.itemQuantity == null ? "0" : item.itemQuantity}</td>
                            <td>${item.supplyUnit}</td>
                            <td data-price="${item.itemPrice}">${(item.itemPrice).toLocaleString()}</td>
                            <td class="text-center">
                            <button class="btn btn-warning btn-sm add_btn">담기</button>
                            </td>
-                       </tr>`;
+                       </tr>`);
+
+            originalRows.push(row[0]);
             tbody.append(row);
         });
     }
@@ -531,10 +573,12 @@
         itemSelected.find("tbody tr").each(function(){
             const itemNo = $(this).data("itemno");
             const itemQuantity = $(this).find("td").eq(2).find("input").val();
+            const itemConvertStock = $(this).find("td").eq(2).find("input").val() * $(this).find("td").eq(3).data("convert_stock");
             const itemOrderPrice = $(this).find("td").eq(3).data("price");
             list.orderList.push({
                 itemNo : itemNo,
                 itemQuantity : itemQuantity,
+                itemConvertStock: itemConvertStock,
                 itemOrderPrice : itemOrderPrice
             });
         });

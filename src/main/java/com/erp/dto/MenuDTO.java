@@ -25,6 +25,9 @@ public class MenuDTO {
     private Timestamp inDate;
     private Timestamp editDate;
     private Timestamp delDate;
+    private Integer menuPriceLarge;
+    private Integer menuPriceMedium;
+
 
     private List<MenuIngredientDTO> ingredients;
     private List<MenuDTO> sizeList;   // 같은 코드의 메뉴(L/M/단일)를 모두 포함

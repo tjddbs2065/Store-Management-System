@@ -32,6 +32,10 @@ public class ManagerDAOTest {
                 .role("ROLE_ADMIN")
                 .build();
 
+//        if ("test123".equals(manager.getManagerId())){
+//            System.out.println("아이디 중복");
+//            return;
+//        }
         managerDAO.addManager(manager);
     }
 

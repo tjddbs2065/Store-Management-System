@@ -21,10 +21,13 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
         i.itemName,
         i.stockUnit,
         i.supplyUnit,
+        i.convertStock,
         i.supplier,
         i.itemPrice,
+        ss.currentQuantity,
         si.storeLimit,
-        ss.currentQuantity
+        si.managerLimit,
+        count(id)
     )
     from Item i
     left join StoreItem si on i.itemNo = si.itemNo and si.storeNo = :storeNo
@@ -33,6 +36,11 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
         from StoreStock ss2
         where ss2.storeItemNo = si.storeItemNo
         )
+    left join ItemOrderDetail id on id.itemNo.itemNo = si.itemNo
+    group by
+        i.itemNo, i.itemCode, i.itemCategory, i.itemName,
+        i.stockUnit, i.supplyUnit, i.convertStock, i.supplier,
+        i.itemPrice, ss.currentQuantity, si.storeLimit, si.managerLimit
     """)
     List<ItemStoreQuantityDTO> findAllWithQuantity(Long storeNo);
 }

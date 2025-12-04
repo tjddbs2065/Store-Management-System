@@ -8,23 +8,21 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/js/util.js"></script>
 
     <style>
-        body {
-            background-color: #f5f5f5 !important;
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 2000;
         }
 
-        /* 계정등록 화면처럼 전체를 감싸는 큰 흰색 박스 */
-        .wrapper-box {
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            border: 1px solid #ddd;
+        .custom-container {
             max-width: 1500px;
-            margin: 0 auto;
         }
 
-        /* 내부 구간(기본정보/레시피정보) 박스 스타일 */
         .section-inner {
             background: white;
             border: 1px solid #ddd;
@@ -74,147 +72,143 @@
     </style>
 </head>
 
-<body class="py-5">
-
-<div class="wrapper-box">
+<body class="bg-light">
+<header th:replace="fragments/toolBar :: toolBar"></header>
+<div class="container custom-container mt-5">
 
     <!-- 제목 + 목록버튼 -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold">메뉴 등록</h2>
-        <button class="btn btn-outline-secondary" id="menuListBtn">목록</button>
-    </div>
-
-    <!-- ===================== -->
-    <!-- 기본 정보 section -->
-    <!-- ===================== -->
-    <div class="section-inner">
-
-        <h5 class="fw-bold mb-4">기본 정보</h5>
-
-        <div class="row g-4">
-
-            <div class="col-md-4">
-                <label class="form-label fw-semibold">카테고리</label>
-                <select class="form-select">
-                    <option>피자</option>
-                    <option>사이드디시</option>
-                    <option>음료</option>
-                </select>
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label fw-semibold">메뉴 코드</label>
-                <input type="text" class="form-control">
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label fw-semibold">메뉴 명</label>
-                <input type="text" class="form-control">
-            </div>
-
-            <!-- 사이즈 여부 -->
-            <div class="col-md-4">
-                <label class="form-label fw-semibold d-block">사이즈</label>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="sizeYn" value="Y" checked>
-                    <label class="form-check-label">유</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="sizeYn" value="N">
-                    <label class="form-check-label">무</label>
-                </div>
-            </div>
-
-            <!-- 가격 라지 -->
-            <div class="col-md-4 price-large">
-                <label class="form-label fw-semibold">라지 가격</label>
-                <div class="input-group input-group-sm w-auto">
-                    <input type="number" class="form-control">
-                    <span class="input-group-text">원</span>
-                </div>
-            </div>
-
-            <!-- 가격 미디움 -->
-            <div class="col-md-4 price-medium">
-                <label class="form-label fw-semibold">미디움 가격</label>
-                <div class="input-group input-group-sm w-auto">
-                    <input type="number" class="form-control">
-                    <span class="input-group-text">원</span>
-                </div>
-            </div>
-
-            <!-- 가격 단일 -->
-            <div class="col-md-4 price-single" style="display:none;">
-                <label class="form-label fw-semibold">판매 가격</label>
-                <div class="input-group input-group-sm w-auto">
-                    <input type="number" class="form-control">
-                    <span class="input-group-text">원</span>
-                </div>
-            </div>
-
-            <div class="col-12">
-                <label class="form-label fw-semibold">설명</label>
-                <textarea class="form-control" rows="3"></textarea>
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label fw-semibold">출시 상태</label>
-                <select class="form-select">
-                    <option>출시 예정</option>
-                    <option>출시 중</option>
-                    <option>출시 중지</option>
-                </select>
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label fw-semibold">대표 이미지</label>
-                <input type="file" class="form-control">
-            </div>
-
-        </div>
-    </div>
-
-    <!-- ===================== -->
-    <!-- 레시피 section -->
-    <!-- ===================== -->
-    <div class="section-inner">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold">레시피(재료) 정보</h5>
-            <button class="btn btn-sm custom-btn" data-bs-toggle="modal" data-bs-target="#ingredientModal">
-                + 재료 불러오기
-            </button>
+    <div class="bg-white border rounded p-5 my-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">메뉴 등록</h2>
+            <button class="btn btn-outline-secondary" id="menuListBtn">목록</button>
         </div>
 
-        <table class="table text-center align-middle">
-            <thead class="table-light">
-            <tr>
-                <th>품목코드</th>
-                <th>재료명</th>
-                <th>단위</th>
-                <th class="size-option">라지 정량</th>
-                <th class="size-option">미디움 정량</th>
-                <th class="qty-single-header" style="display:none;">정량</th>
-                <th>삭제</th>
-            </tr>
-            </thead>
-            <tbody id="recipeList"></tbody>
-        </table>
+        <!-- ===================== -->
+        <!-- 기본 정보 section -->
+        <!-- ===================== -->
+        <div class="section-inner">
+
+            <h5 class="fw-bold mb-4">기본 정보</h5>
+
+            <div class="row g-4">
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">카테고리</label>
+                    <select class="form-select" id="menuCategory">
+                        <option>피자</option>
+                        <option>사이드디시</option>
+                        <option>음료</option>
+                        <option>기타</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">메뉴 코드</label>
+                    <input type="text" class="form-control" id="menuCode">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">메뉴 명</label>
+                    <input type="text" class="form-control" id="menuName">
+                </div>
+
+                <!-- 사이즈 여부 -->
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold d-block">사이즈</label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="sizeYn" value="Y" checked>
+                        <label class="form-check-label">유</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="sizeYn" value="N">
+                        <label class="form-check-label">무</label>
+                    </div>
+                </div>
+
+                <!-- 가격 라지 -->
+                <div class="col-md-4 price-large">
+                    <label class="form-label fw-semibold">라지 가격</label>
+                    <div class="input-group input-group-sm w-auto">
+                        <input type="number" class="form-control" id="largePrice">
+                        <span class="input-group-text">원</span>
+                    </div>
+                </div>
+
+                <!-- 가격 미디움 -->
+                <div class="col-md-4 price-medium">
+                    <label class="form-label fw-semibold">미디움 가격</label>
+                    <div class="input-group input-group-sm w-auto">
+                        <input type="number" class="form-control" id="mediumPrice">
+                        <span class="input-group-text">원</span>
+                    </div>
+                </div>
+
+                <!-- 가격 단일 -->
+                <div class="col-md-4 price-single" style="display:none;">
+                    <label class="form-label fw-semibold">판매 가격</label>
+                    <div class="input-group input-group-sm w-auto">
+                        <input type="number" class="form-control" id="singlePrice">
+                        <span class="input-group-text">원</span>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-semibold">설명</label>
+                    <textarea class="form-control" rows="3" id="menuExplain"></textarea>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">출시 상태</label>
+                    <select class="form-select" id="releaseStatus">
+                        <option>출시 예정</option>
+                        <option>출시 중</option>
+                        <option>출시 중지</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">대표 이미지</label>
+                    <input type="file" class="form-control" id="menuImage">
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ===================== -->
+        <!-- 레시피 section -->
+        <!-- ===================== -->
+        <div class="section-inner">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold">레시피(재료) 정보</h5>
+                <button class="btn btn-sm custom-btn" data-bs-toggle="modal" data-bs-target="#ingredientModal">
+                    + 재료 불러오기
+                </button>
+            </div>
+
+            <table class="table text-center align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th>품목코드</th>
+                    <th>재료명</th>
+                    <th>단위</th>
+                    <th class="size-option">라지 정량</th>
+                    <th class="size-option">미디움 정량</th>
+                    <th class="qty-single-header" style="display:none;">정량</th>
+                    <th>삭제</th>
+                </tr>
+                </thead>
+                <tbody id="recipeList"></tbody>
+            </table>
+        </div>
+
+        <div class="text-center mt-3">
+            <button class="btn custom-btn" id="addMenuBtn">등록</button>
+            <button class="btn btn-outline-secondary me-2" id="resetBtn">초기화</button>
+        </div>
+
     </div>
+</div>
 
-    <!-- ===================== -->
-    <!-- 버튼 영역 -->
-    <!-- ===================== -->
-    <div class="text-center mt-3">
-        <button class="btn custom-btn">등록</button>
-        <button class="btn btn-outline-secondary me-2" id="resetBtn">초기화</button>
-    </div>
-
-</div> <!-- wrapper-box END -->
-
-
-<!-- ============================= -->
-<!-- 재료 불러오기 모달 -->
-<!-- ============================= -->
 <div class="modal fade" id="ingredientModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
@@ -232,12 +226,17 @@
                     <!-- 카테고리 -->
                     <div class="col-md-3">
                         <label class="form-label fw-semibold">카테고리</label>
-                        <select class="form-select">
+                        <select class="form-select" id="modalCategory">
                             <option>전체</option>
                             <option>도우</option>
                             <option>소스</option>
                             <option>치즈</option>
+                            <option>면</option>
+                            <option>사이드</option>
+                            <option>야채</option>
+                            <option>음료</option>
                             <option>토핑</option>
+                            <option>향신료</option>
                         </select>
                     </div>
 
@@ -250,14 +249,11 @@
                         </select>
                     </div>
 
-                    <!-- 검색 input + 버튼 (딱 붙게) -->
-                    <!-- 검색 input + 버튼 (딱 붙게) -->
-                    <!-- 검색 input + 버튼 (딱 붙게) -->
                     <div class="col-md-5 d-flex align-items-end">
 
                         <div class="input-group">
-                            <input type="text" id="searchInput" class="form-control" >
-                            <button class="btn custom-btn px-4" type="button">
+                            <input type="text" id="searchInput" class="form-control">
+                            <button class="btn custom-btn px-4" type="button" id="modalSearchBtn">
                                 검색
                             </button>
                         </div>
@@ -278,31 +274,6 @@
                         </thead>
 
                         <tbody id="ingredientTableBody">
-
-                        <tr>
-                            <td><input type="checkbox" class="row-check"></td>
-                            <td>DOUGH-M</td>
-                            <td>피자 도우 M</td>
-                            <td>도우</td>
-                            <td>ea</td>
-                        </tr>
-
-                        <tr>
-                            <td><input type="checkbox" class="row-check"></td>
-                            <td>CHEESE-MOZZ</td>
-                            <td>모짜렐라 치즈</td>
-                            <td>치즈</td>
-                            <td>g</td>
-                        </tr>
-
-                        <tr>
-                            <td><input type="checkbox" class="row-check"></td>
-                            <td>SAUCE-TOMATO</td>
-                            <td>토마토 소스</td>
-                            <td>소스</td>
-                            <td>g</td>
-                        </tr>
-
                         </tbody>
                     </table>
                 </div>
@@ -317,13 +288,155 @@
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="alertModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center border border-primary">
+            <div class="modal-body">
+                <p id="alertMessage" class="fs-5 fw-bold mb-4 text-dark"></p>
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="button" class="btn px-4 custom-btn" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
+    $("#addMenuBtn").on("click", function () {
+        addMenu();
+    });
+
+    function addMenu() {
+        const isSize = $("input[name='sizeYn']:checked").val() === "Y";
+        const menuCategory = $("#menuCategory").val();
+        const menuCode = $("#menuCode").val();
+        const menuName = $("#menuName").val();
+        const menuExplain = $("#menuExplain").val();
+        const releaseStatus = $("#releaseStatus").val();
+
+        const largePrice = $("#largePrice").val();
+        const mediumPrice = $("#mediumPrice").val();
+        const singlePrice = $("#singlePrice").val();
+
+        const ingredients = [];
+
+        $("#recipeList tr").each(function () {
+            const itemNo = $(this).attr("data-itemno");
+            const qty1 = $(this).find("input").eq(0).val();
+            const qty2 = $(this).find("input").eq(1).val();
+            let ingredient = {itemNo: itemNo};
+            if (isSize) {
+                ingredient.quantityLarge = qty1;
+                ingredient.quantityMedium = qty2;
+            } else {
+                ingredient.quantity = qty1;
+            }
+
+            ingredients.push(ingredient);
+        });
+
+        const requestBody = {
+            menuCategory: menuCategory,
+            menuCode: menuCode,
+            menuName: menuName,
+            menuExplain: menuExplain,
+            size: isSize ? "Y" : "N",
+            releaseStatus: releaseStatus,
+
+            menuPriceLarge: isSize ? parseInt(largePrice || 0) : null,
+            menuPriceMedium: isSize ? parseInt(mediumPrice || 0) : null,
+            menuPrice: !isSize ? parseInt(singlePrice || 0) : null,
+
+            menuImage: null,      // 파일 업로드는 나중에
+
+            ingredients: ingredients
+        };
+
+        console.log("보내는 JSON:", requestBody);
+
+        fetchUtil(`/menu/addMenu`,
+            result => {
+                if (result.message === "fail") {
+                    showAlert("메뉴 등록 실패", () => {
+                        location.href = `/menu/addMenuUI`;
+                    })
+                } else {
+                    showAlert("메뉴 등록 성공", () => {
+                        location.href = `/menu/menuUI`;
+                    });
+                }
+            },
+            "POST",
+            requestBody
+        )
+    }
+
+    function showAlert(message, onClose) {
+        $("#alertMessage").text(message);
+        $("#alertModal").off("hidden.bs.modal").on("hidden.bs.modal", function () {
+            if (typeof onClose === "function") onClose();
+        });
+        $("#alertModal").modal("show");
+    }
+
+    $("#ingredientModal").on("shown.bs.modal", function () {
+        loadItemList();
+    });
+
+    function loadItemList(param = {}) {
+
+        const query = new URLSearchParams(param).toString();
+
+        fetchUtil(`/menu/itemList?${query}`, data => {
+            renderItemList(data);
+        });
+    }
+
+    $("#modalSearchBtn").on("click", function () {
+
+        const category = $("#modalCategory").val();
+        const searchType = $("#searchType").val();
+        const keyword = $("#searchInput").val().trim();
+
+        const param = {
+            itemCategory: category === "전체" ? "" : category,
+            ingredientName: "",
+            itemCode: ""
+        };
+
+        if (keyword !== "") {
+            if (searchType === "code") {
+                param.itemCode = keyword;
+            } else if (searchType === "name") {
+                param.ingredientName = keyword;
+            }
+        }
+
+        loadItemList(param);
+    });
+
+
+    function renderItemList(data) {
+        const tbody = $("#ingredientTableBody");
+        tbody.empty();
+
+        data.forEach(itemList => {
+            let row = `
+        <tr class="text-center">
+             <td><input type="checkbox" class="row-check"></td>
+            <td data-itemno = "${itemList.itemNo}">${itemList.itemCode}</td>
+            <td>${itemList.ingredientName}</td>
+            <td>${itemList.itemCategory}</td>
+            <td>${itemList.stockUnit}</td>
+        </tr>
+        `;
+            tbody.append(row);
+        });
+    }
 
     // 목록 이동
     $("#menuListBtn").click(() => {
-        location.href = "menuUI.html";
+        location.href = `/menu/menuUI`;
     });
 
     // 사이즈 유무 전환
@@ -358,15 +471,16 @@
             const row = $(this).closest("tr");
             const cols = row.children();
 
-            const code = cols.eq(1).text();   // 품목코드
-            const name = cols.eq(2).text();   // 재료명
-            const unit = cols.eq(4).text();   // 단위
+            const itemNo = cols.eq(1).attr("data-itemno");   // ★ 추가
+            const code = cols.eq(1).text();
+            const name = cols.eq(2).text();
+            const unit = cols.eq(4).text();
 
             let html = "";
 
             if (isSize) {
                 html = `
-            <tr>
+            <tr data-itemno="${itemNo}">   <!-- ★ itemNo 저장 -->
                 <td>${code}</td>
                 <td>${name}</td>
                 <td>${unit}</td>
@@ -383,7 +497,7 @@
             </tr>`;
             } else {
                 html = `
-            <tr>
+            <tr data-itemno="${itemNo}">
                 <td>${code}</td>
                 <td>${name}</td>
                 <td>${unit}</td>

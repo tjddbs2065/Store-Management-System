@@ -30,4 +30,9 @@ public class RestAdviceController {
     public ResponseEntity<Map<String, String>> RuntimeException(RuntimeException e) {
         return ResponseEntity.status(500).body(Map.of("message", e.getMessage()));
     }
+
+    @ExceptionHandler(StoreNotFoundException.class)
+    public ResponseEntity<Map<String, String>> StoreNotFoundException(StoreNotFoundException e) {
+        return ResponseEntity.status(400).body(Map.of("message", e.getMessage()));
+    }
 }

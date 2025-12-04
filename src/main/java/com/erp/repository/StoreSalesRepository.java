@@ -13,9 +13,12 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface StoreSalesRepository extends JpaRepository<StoreSales,Long> {
+
+    Optional<StoreSales> findByStoreStoreNoAndSalesDate(Long storeNo, LocalDate salesDate);
     List<StoreSales> findBySalesDateBetween(LocalDate startDate, LocalDate endDate);
     List<StoreSales> findByStore_StoreNoAndSalesDateBetween(Long storeNo, LocalDate startDate, LocalDate endDate);
     @Query("""
