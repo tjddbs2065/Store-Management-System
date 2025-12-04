@@ -2,11 +2,9 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>재고 품목 등록</title>
+    <title>새 품목 등록</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <style>
         body { background-color: #f5f5f5 !important; }
@@ -46,7 +44,7 @@
         }
     </style>
 </head>
-<body>
+<body th:attr="data-role=${role}">
 
 <header th:replace="fragments/toolBar :: toolBar"></header>
 
@@ -57,192 +55,176 @@
 
                 <!-- 제목 + 목록 -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="fw-bold mb-0">재고 품목 등록</h2>
+                    <h2 class="fw-bold mb-0">새 품목 등록</h2>
                     <button class="btn btn-outline-secondary"
                             th:onclick="|location.href='@{/item/get}'|">
                         전체 품목 목록으로
                     </button>
                 </div>
 
-                <!-- 기본 정보 -->
-                <section class="mb-3">
-                    <h5 class="fw-bold mb-3">기본 정보</h5>
-                    <div class="border rounded-3 p-3">
-                        <div class="row g-4">
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">카테고리</label>
-                                <select class="form-select">
-                                    <option selected disabled>선택</option>
-                                    <option>치즈</option>
-                                    <option>도우</option>
-                                    <option>소스</option>
-                                    <option>토핑</option>
-                                    <option>야채</option>
-                                    <option>사이드</option>
-                                    <option>기타</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">품목 코드</label>
-                                <input type="text" class="form-control" placeholder="예: MOZZ-2.5KG">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">품목 명</label>
-                                <input type="text" class="form-control" placeholder="예: 모짜렐라 2.5kg 블럭">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">재료 명</label>
-                                <input type="text" class="form-control" placeholder="예: 피자 치즈">
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 규격·공급 정보 -->
-                <section class="mb-3">
-                    <h5 class="fw-bold mb-3">규격·공급 정보</h5>
-                    <div class="border rounded-3 p-3">
-                        <div class="row g-4">
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">기준 단위</label>
-                                <select class="form-select">
-                                    <option selected disabled>선택</option>
-                                    <option>g</option>
-                                    <option>kg</option>
-                                    <option>ml</option>
-                                    <option>l</option>
-                                    <option>ea</option>
-                                    <option>dz</option>
-                                    <option>set</option>
-                                    <option>box</option>
-                                    <option>can</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">공급 단위</label>
-                                <select class="form-select">
-                                    <option selected disabled>선택</option>
-                                    <option>ea</option>
-                                    <option>box</option>
-                                    <option>set</option>
-                                    <option>can</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">환산 (1 공급단위)</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="number" class="form-control" placeholder="예: 2500">
-                                    <span class="input-group-text">기준단위</span>
+                <form id="itemFormAdd">
+                    <!-- 기본 정보 -->
+                    <section class="mb-3">
+                        <h5 class="fw-bold mb-3">기본 정보</h5>
+                        <div class="border rounded-3 p-3">
+                            <div class="row g-4">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">카테고리</label>
+                                    <select class="form-select" id="itemCategory">
+                                        <option value="" selected disabled>선택</option>
+                                        <option>도우</option>
+                                        <option>치즈</option>
+                                        <option>토핑</option>
+                                        <option>소스</option>
+                                        <option>향신료</option>
+                                        <option>야채</option>
+                                        <option>면</option>
+                                        <option>사이드</option>
+                                        <option>음료</option>
+                                    </select>
                                 </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">공급 가격</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="number" class="form-control" placeholder="예: 45000">
-                                    <span class="input-group-text">원</span>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">품목 코드</label>
+                                    <input type="text" class="form-control" id="itemCode" placeholder="예: MOZZ-2.5KG">
                                 </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">공급사</label>
-                                <input type="text" class="form-control" placeholder="예: 신선신선 치즈">
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 보관 정보 -->
-                <section class="mb-3">
-                    <h5 class="fw-bold mb-3">보관 정보</h5>
-                    <div class="border rounded-3 p-3">
-                        <div class="row g-4">
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold d-block">보관 방식</label>
-                                <div class="btn-group" role="group">
-                                    <input type="radio" class="btn-check" name="storageType" id="storageRoom" checked>
-                                    <label class="btn btn-outline-secondary" for="storageRoom">상온</label>
-
-                                    <input type="radio" class="btn-check" name="storageType" id="storageCold">
-                                    <label class="btn btn-outline-secondary" for="storageCold">냉장</label>
-
-                                    <input type="radio" class="btn-check" name="storageType" id="storageFrozen">
-                                    <label class="btn btn-outline-secondary" for="storageFrozen">냉동</label>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">품목 명</label>
+                                    <input type="text" class="form-control" id="itemName" placeholder="예: 모짜렐라 2.5kg 블럭">
                                 </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">보관기한 타입</label>
-                                <select class="form-select" id="expirationType">
-                                    <option selected disabled>선택</option>
-                                    <option value="AFTER_DAYS">입고 후 n일</option>
-                                    <option value="AFTER_MONTHS">입고 후 n개월</option>
-                                    <option value="FIFO">선입 선출</option>
-                                    <option value="EXPIRY_LEFT">남은 유통기한 기준</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-4" id="expirationDaysBox" style="display:none;">
-                                <label class="form-label fw-semibold">보관기한</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="number" class="form-control" placeholder="예: 7">
-                                    <span class="input-group-text">일</span>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">재료 명</label>
+                                    <input type="text" class="form-control" id="ingredientName" placeholder="예: 피자 치즈">
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
 
-                <!-- 기타 정보 -->
-                <section class="mb-3">
-                    <h5 class="fw-bold mb-3">기타 정보</h5>
-                    <div class="border rounded-3 p-3">
-                        <div class="row g-4">
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">품목 이미지</label><br>
-                                <div class="img-drop" onclick="document.getElementById('itemImage').click();">+</div>
-                                <input type="file" id="itemImage" class="form-control mt-2" style="max-width:220px;">
-                            </div>
-                            <div class="col-md-8">
-                                <label class="form-label fw-semibold">비고</label>
-                                <textarea class="form-control" rows="5" placeholder="메모를 입력하세요"></textarea>
+                    <!-- 규격·공급 정보 -->
+                    <section class="mb-3">
+                        <h5 class="fw-bold mb-3">규격·공급 정보</h5>
+                        <div class="border rounded-3 p-3">
+                            <div class="row g-4">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">기준 단위</label>
+                                    <select class="form-select" id="stockUnit">
+                                        <option value="" selected disabled>선택</option>
+                                        <option>g</option>
+                                        <option>kg</option>
+                                        <option>ml</option>
+                                        <option>l</option>
+                                        <option>ea</option>
+                                        <option>dz</option>
+                                        <option>set</option>
+                                        <option>box</option>
+                                        <option>can</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">공급 단위</label>
+                                    <select class="form-select" id="supplyUnit">
+                                        <option value="" selected disabled>선택</option>
+                                        <option>ea</option>
+                                        <option>box</option>
+                                        <option>set</option>
+                                        <option>can</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">환산 (1 공급단위)</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" class="form-control" id="convertStock" placeholder="예: 2500">
+                                        <span class="input-group-text">기준단위</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">공급 가격</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" class="form-control" id="itemPrice" placeholder="예: 45000">
+                                        <span class="input-group-text">원</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">공급사</label>
+                                    <input type="text" class="form-control" id="supplier" placeholder="예: 신선신선 치즈">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
 
-                <div class="text-center mt-3">
-                    <button class="btn custom-btn">등록</button>
-                    <button class="btn gray-btn ms-2"
-                            th:onclick="|location.href='@{/item/get}'|">
-                        취소
-                    </button>
-                </div>
+                    <!-- 보관 정보 -->
+                    <section class="mb-3">
+                        <h5 class="fw-bold mb-3">보관 정보</h5>
+                        <div class="border rounded-3 p-3">
+                            <div class="row g-4">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold d-block">보관 방식</label>
+                                    <div class="btn-group" role="group">
+                                        <input type="radio" class="btn-check" name="storageType" id="storageRoom" value="상온" checked>
+                                        <label class="btn btn-outline-secondary" for="storageRoom">상온</label>
+
+                                        <input type="radio" class="btn-check" name="storageType" id="storageCold" value="냉장">
+                                        <label class="btn btn-outline-secondary" for="storageCold">냉장</label>
+
+                                        <input type="radio" class="btn-check" name="storageType" id="storageFrozen" value="냉동">
+                                        <label class="btn btn-outline-secondary" for="storageFrozen">냉동</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">보관기한 타입</label>
+                                    <select class="form-select" id="expirationType">
+                                        <option value="" selected disabled>선택</option>
+                                        <option value="입고 후 n일">입고 후 n일</option>
+                                        <option value="선입 선출">선입 선출</option>
+                                        <option value="남은 유통기한 기준">남은 유통기한 기준</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4" id="expirationDaysBox" style="display:none;">
+                                    <label class="form-label fw-semibold">보관기한</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" class="form-control" id="expiration" placeholder="예: 7">
+                                        <span class="input-group-text">일</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 기타 정보 -->
+                    <section class="mb-3">
+                        <h5 class="fw-bold mb-3">기타 정보</h5>
+                        <div class="border rounded-3 p-3">
+                            <div class="row g-4">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">품목 이미지</label><br>
+                                    <div class="img-drop" id="imgDropAdd">+</div>
+                                    <input type="file" id="itemImage" class="form-control mt-2" style="max-width:220px;">
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label fw-semibold">비고</label>
+                                    <textarea class="form-control" id="note" rows="5" placeholder="메모를 입력하세요"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="text-center mt-3">
+                        <button type="button" class="btn custom-btn" id="btnItemSave">등록</button>
+                        <button type="button" class="btn gray-btn ms-2"
+                                th:onclick="|location.href='@{/item/get}'|">
+                            취소
+                        </button>
+                    </div>
+                </form>
 
             </div>
         </div>
     </div>
 </main>
 
-<script>
-    $("#expirationType").on("change", function () {
-        const val = $(this).val();
-        if (val === "AFTER_DAYS") {
-            $("#expirationDaysBox").show();
-        } else {
-            $("#expirationDaysBox").hide();
-        }
-    });
-
-    $(".img-drop").on("dragover", function (e) {
-        e.preventDefault();
-        $(this).css("border-color", "#999");
-    }).on("dragleave", function () {
-        $(this).css("border-color", "#ccc");
-    }).on("drop", function (e) {
-        e.preventDefault();
-        $("#itemImage")[0].files = e.originalEvent.dataTransfer.files;
-        $(this).css("border-color", "#ccc");
-    });
-</script>
-
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/item.js"></script>
 </body>
 </html>
