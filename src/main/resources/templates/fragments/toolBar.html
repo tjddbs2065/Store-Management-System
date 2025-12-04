@@ -110,10 +110,13 @@
 
                     <a href="/manager/stock/storeItem"
                        sec:authorize="hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')">재고 현황 조회</a>
-             
+                    <a href="/store/stock/storeItem"
+                       sec:authorize="hasAnyRole('ROLE_STORE')">재고 현황 조회</a>
                     <a href="/manager/stock/storeStock"
                        sec:authorize="hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')">재고 변동 조회</a>
-               
+                    <a href="/store/stock/storeStock"
+                       sec:authorize="hasAnyRole('ROLE_STORE')">재고 변동 조회</a>
+
                     <a href="#" sec:authorize="hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')">발주 승인 대기</a>
                     <a href="/itemOrder/itemOrder" sec:authorize="hasAnyRole('ROLE_STORE')">발주</a>
                     <a href="/itemOrder/itemOrderList" sec:authorize="hasAnyRole('ROLE_STORE')">발주 내역 조회</a>
