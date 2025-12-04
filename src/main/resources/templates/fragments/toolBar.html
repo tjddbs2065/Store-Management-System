@@ -105,7 +105,6 @@
             <div class="menu-item dropdown">
                 <span>품목/재고 ▾</span>
                 <div class="dropdown-menu">
-                    <a href="#" sec:authorize="hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')">품목 등록</a>
                     <a href="/item/get">품목 조회</a>
 
                     <a href="/manager/stock/storeItem"
@@ -117,7 +116,6 @@
                     <a href="/store/stock/storeStock"
                        sec:authorize="hasAnyRole('ROLE_STORE')">재고 변동 조회</a>
 
-                    <a href="#" sec:authorize="hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')">발주 승인 대기</a>
                     <a href="/itemOrder/itemOrder" sec:authorize="hasAnyRole('ROLE_STORE')">발주</a>
                     <a href="/itemOrder/itemOrderList" sec:authorize="hasAnyRole('ROLE_STORE')">발주 내역 조회</a>
                     <a href="/itemOrder/itemOrderListManager" sec:authorize="hasAnyRole('ROLE_MANAGER')">발주 내역 조회</a>
