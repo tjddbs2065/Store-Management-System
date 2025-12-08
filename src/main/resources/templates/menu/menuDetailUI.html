@@ -75,6 +75,7 @@
             <h5 class="fw-bold mb-3">기본 정보</h5>
             <div class="row g-3">
                 <input type="hidden" id="menuNos" th:value="${menuNos}">
+                <input type="hidden" id="menuNo" th:value="${menu.menuNo}">
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">카테고리</label>
                     <div class="border rounded px-3 py-2 bg-light" th:text="${menu.menuCategory}"></div>
@@ -199,7 +200,8 @@
 
 
     $("#menuSetBtn").click(() => {
-        location.href = `/menuSet?menuNo=${menuNo}`;
+        const menuNo = $("#menuNo").val();
+        location.href = `/menu/menuSet?menuNo=${menuNo}`;
     })
     $("#menuListBtn").click(() => {
         location.href = `/menu/menuUI`;
