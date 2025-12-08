@@ -56,18 +56,19 @@ type: description
 
 명령형(add, fix, update…)
 
-✔ Commit Types
-타입	의미	예시
-feat	새로운 기능 추가	feat: add sales chart
-fix	버그 수정	fix: correct stock amount calc
-style	UI, CSS, 포맷 변경(기능 영향 없음)	style: update menu table
-refactor	리팩터링(로직 변화 없음)	refactor: clean sales service
-docs	문서 작업	docs: update api spec
-test	테스트 코드 추가/수정	test: add item repository test
-delete	불필요 코드·파일 삭제	delete: remove unused dto
-revert	이전 커밋 되돌리기	revert: wrong calc commit
-merge	브랜치 병합	merge: feature/menu into develop
-wip	작업중(임시)	wip: implement manager filter
+| 타입     | 코드     | 설명                          | 예시                              |
+|----------|----------|-----------------------------|-----------------------------------|
+| feat     | 기능 추가 | 새로운 기능, API, 화면 추가          | add login screen                  |
+| fix      | 버그 수정 | 오류 해결, 잘못된 로직 수정            | fix sales detail                  |
+| style    | UI/스타일 | CSS, 레이아웃, 포맷 변경 (기능 변화 없음) | style item table layout           |
+| refactor | 리팩터링  | 코드 구조 개선, 공통화 (기능 변화 없음)    | refactor stock filtering logic    |
+| docs     | 문서      | README, 문서, ERD 업데이트        | docs update API spec              |
+| test     | 테스트    | 테스트 코드 추가/수정                | test item repository test         |
+| delete   | 삭제      | 사용하지 않는 파일/코드 삭제            | delete deprecated dto             |
+| revert   | 되돌리기   | 이전 커밋 취소                    | revert wrong calculation commit   |
+| wip      | 작업중    | 미완성 기능 임시 커밋                | wip implement stock movement      |
+| merge      | 작업중    | 브랜치 병합 커밋                | merge feature/item into main      |
+
 📦 4. 팀 운영 규칙 요약
 ✔ main에는 직접 커밋하지 않는다.
 ✔ feature는 기능 단위로 생성한다.
