@@ -76,6 +76,14 @@
             background-color: #C9C9C9 !important;
             border-color: #ffffff !important;
         }
+        .recipe-input {
+            width: 80px !important;
+            height: 32px !important;    /* 테이블 행 높이 딱 맞게 조정 */
+            padding: 4px 8px !important;
+            margin: 0 auto;             /* 가운데 정렬 */
+            display: block;
+        }
+
     </style>
 </head>
 
@@ -204,12 +212,12 @@
                 <td th:text="${ing.stockUnit}"></td>
                 <td class="size-option">
                     <input type="number"
-                           class="form-control form-control-sm w-auto qty-large"
+                           class="form-control recipe-input form-control-sm w-auto qty-large"
                            th:value="${ing.quantityLarge}">
                 </td>
                 <td class="size-option">
                     <input type="number"
-                           class="form-control form-control-sm w-auto qty-medium"
+                           class="form-control recipe-input form-control-sm w-auto qty-medium"
                            th:value="${ing.quantityMedium}">
                 </td>
                 <td class="qty-single-cell" style="display:none;"></td>
@@ -229,7 +237,7 @@
                 <td class="size-option" style="display:none;"></td>
                 <td class="qty-single-cell">
                     <input type="number"
-                           class="form-control form-control-sm w-auto qty-single"
+                           class="form-control recipe-input form-control-sm w-auto qty-single"
                            th:value="${ing.quantity}">
                 </td>
                 <td>
