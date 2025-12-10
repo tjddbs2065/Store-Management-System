@@ -454,13 +454,15 @@
             "/menu/setMenu",
             () => {
                 alert("메뉴가 저장되었습니다.");
-                location.href = "/menu/menuUI";
+                const menuNo = $("#baseMenuNo").val();
+                location.href = `/menu/menuDetailUI?menuNo=${menuNo}`;
             },
             "POST",
             menuRequest
         );
     });
 
+    // 취소
     $("#cancelBtn").click(function () {
         history.back();
     });
