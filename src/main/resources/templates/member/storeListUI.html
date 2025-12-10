@@ -10,7 +10,9 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/util.js"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=55b8e6a9e27878899b29b23d80c19d82&libraries=services,clusterer,drawing"></script>
     <style>
+
         body {
             background-color: #e5e5e5;
         }
@@ -53,9 +55,13 @@
         }
 
         /* 페이지네이션 가운데 정렬 */
-        #paginationArea ul {
+        #pagination ul {
             justify-content: center;
         }
+        #pagination li {
+            cursor: pointer;
+        }
+
     </style>
 </head>
 
@@ -141,9 +147,8 @@
 
                 <!-- 우측 지도 -->
                 <div class="col-5">
-                    <div style="width:100%; height:500px;">
-<!--                        <img src="/image/map_sample.png"-->
-<!--                             style="width:100%;height:100%;object-fit:cover;border-radius:8px;">-->
+                    <div id="map" style="width:100%; height:500px;">
+
                     </div>
                 </div>
 
@@ -285,9 +290,58 @@
         fetchUtil(`/getStoreList?${params.toString()}`, data => {
             renderStoreList(data.content);
             updatePaginationUI(pageNo + 1, data.totalPages);
+            loadMap(data.content);
         });
+
+
     }
 
+    let map;
+    const imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
+    const imageSize = new kakao.maps.Size(24, 35);
+
+    function loadMap(data){
+        var container = document.getElementById('map');
+        var options = {
+            center: new kakao.maps.LatLng(37.47984, 126.88279),
+            level: 10
+        };
+
+        map = new kakao.maps.Map(container, options);
+        loadMarkers(data);
+    }
+
+    function loadMarkers(data) {
+
+        if (!data) return;
+
+        const positions = data.map(store => ({
+            content: `<div>${store.storeName}</div>`,
+            latlng: new kakao.maps.LatLng(store.latitude, store.longitude)
+        }));
+
+        positions.forEach(pos => {
+            const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+
+            const marker = new kakao.maps.Marker({
+                map: map,
+                position: pos.latlng,
+                image: markerImage
+            });
+
+            const infowindow = new kakao.maps.InfoWindow({
+                content: pos.content
+            });
+
+            kakao.maps.event.addListener(marker, 'mouseover', () => {
+                infowindow.open(map, marker);
+            });
+
+            kakao.maps.event.addListener(marker, 'mouseout', () => {
+                infowindow.close();
+            });
+        });
+    }
 
     function renderStoreList(data) {
         const tbody = storeTable.find("tbody");
@@ -348,6 +402,7 @@
             openStoreDetail($(this).data("no"));
         });
     });
+
 </script>
 
 </body>

@@ -8,7 +8,9 @@
         s.store_name,
         s.address,
         s.store_status,
-        m.manager_name
+        m.manager_name,
+        s.latitude,
+        s.longitude
         from store s
         join manager m
         on s.store_manager_id = m.manager_id
