@@ -85,13 +85,21 @@
             display: block;
         }
     </style>
+
     <div class="top-bar">
         <div class="left-section">
-            <button class="logo-btn">
+
+            <!-- 로고: 역할별 첫 페이지로 이동, 배경/박스 없이 이미지만 -->
+            <a href="/manager/salesMain"
+               sec:authorize="hasAnyRole('ROLE_MANAGER','ROLE_ADMIN')">
                 <img src="/image/logo.png" alt="회사 로고" style="height:50px;">
-            </button>
-            <button class="company-name-btn">피자 인잇( )</button>
-            <button class="company-name-btn">회사 명</button>
+            </a>
+            <a href="/store/storeSalesMain"
+               sec:authorize="hasRole('ROLE_STORE')">
+                <img src="/image/logo.png" alt="회사 로고" style="height:50px;">
+            </a>
+
+            <!-- 회사명 버튼들은 제거 -->
 
             <div class="menu-item dropdown">
                 <span>매출 ▾</span>
@@ -133,22 +141,32 @@
                 </div>
             </div>
 
-            <div class="menu-item">
-                <a href="/storeListUI">직영점 목록</a>
+            <!-- 직영점 목록 : span + onclick 으로 파란 밑줄 제거 -->
+            <div class="menu-item" onclick="location.href='/storeListUI'">
+                <span>직영점 목록</span>
             </div>
 
-            <!-- ⬇ 관리자 전용 직원 목록 메뉴 -->
-            <div class="menu-item" sec:authorize="hasRole('ROLE_ADMIN')">
-                <a href="/admin/memberListUI">직원 목록</a>
+            <!-- 계정관리 (관리자 전용 드롭다운) -->
+            <div class="menu-item dropdown" sec:authorize="hasRole('ROLE_ADMIN')">
+                <span>계정관리 ▾</span>
+                <div class="dropdown-menu">
+                    <a href="/admin/memberAddUI">계정 등록</a>
+                    <a href="/admin/memberListUI">계정 목록 조회</a>
+                </div>
             </div>
         </div>
 
         <div class="right-section">
             <span sec:authorize="hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')">본사</span>
-            <span class="store-name" sec:authorize="hasRole('ROLE_STORE')"
+            <span class="store-name"
+                  sec:authorize="hasRole('ROLE_STORE')"
                   sec:authentication="principal.store.storeName"></span>
-            <span class="name" sec:authentication="principal.manager.managerName"></span>
-            <a href="/logout" class="logout-btn" id="logoutBtn">로그아웃</a>
+            <span class="name"
+                  sec:authentication="principal.manager.managerName"></span>
+
+            <!-- 로그아웃: a -> span 으로 변경 (CSS는 그대로 사용) -->
+            <span class="logout-btn" id="logoutBtn"
+                  onclick="location.href='/logout'">로그아웃</span>
         </div>
     </div>
 </div>

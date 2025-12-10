@@ -200,7 +200,7 @@
             fetchUtil('/admin/member/store/menuStopRole', function (res) {
                 console.log('menuStopRole updated:', res);
                 // 필요하면 여기서 toast 띄우기
-            }, 'PATCH', payload);
+            }, 'POST', payload);
         });
 
         // 첫 로딩: 본사 직원 1페이지

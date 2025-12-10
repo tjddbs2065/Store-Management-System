@@ -42,14 +42,14 @@ public class MemberRestController {
     }
 
     /**
-     * 직영점 메뉴 판매 중지 권한 변경
-     * PATCH /admin/member/store/menuStopRole
+     * 직영점 메뉴 판매중단 권한 변경
+     * POST /admin/member/store/menuStopRole
      * JSON: { "storeNo": 1, "menuStopRole": "Y" }
      */
-    @PatchMapping("/store/menuStopRole")
+    @PostMapping("/store/menuStopRole")
     @PreAuthorize("hasRole('ADMIN')")
-    public Map<String, String> updateStoreMenuStopRole(@RequestBody StoreDTO dto) {
-        memberService.updateStoreMenuStopRole(dto.getStoreNo(), dto.getMenuStopRole());
+    public Map<String, String> setStoreMenuStopRole(@RequestBody StoreDTO dto) {
+        memberService.setStoreMenuStopRole(dto.getStoreNo(), dto.getMenuStopRole());
         return Map.of("message", "ok");
     }
 }

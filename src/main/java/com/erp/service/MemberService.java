@@ -46,7 +46,7 @@ public class MemberService {
     /**
      * 직영점 메뉴 판매 중지 권한 변경
      */
-    public void updateStoreMenuStopRole(long storeNo, String menuStopRole) {
+    public void setStoreMenuStopRole(long storeNo, String menuStopRole) {
         // Y / N 이외 값 들어와도 기본은 N 으로 처리
         String safeRole = "Y".equalsIgnoreCase(menuStopRole) ? "Y" : "N";
 
