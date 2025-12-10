@@ -7,4 +7,7 @@ import java.util.List;
 
 public interface MenuIngredientRepository extends JpaRepository<MenuIngredient, Long> {
     List<MenuIngredient> findByMenu_MenuNo(Long menuNo);
+
+    void deleteByMenu_MenuNo(Long menuNo);
 }
+

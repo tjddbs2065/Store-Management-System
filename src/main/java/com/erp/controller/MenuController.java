@@ -18,6 +18,24 @@ import java.util.stream.Collectors;
 public class MenuController {
     private final MenuService menuService;
 
+    @GetMapping("menuSet")
+    private String menuSet(@RequestParam Long menuNo, Model model){
+
+        MenuDTO menu = menuService.getMenuDetail(menuNo);
+
+        String menuNos = menu.getSizeList().stream()
+                .map(s -> String.valueOf(s.getMenuNo()))
+                .collect(Collectors.joining(","));
+
+        model.addAttribute("menuNos", menuNos);
+        model.addAttribute("menu", menu);
+        model.addAttribute("sizeList", menu.getSizeList());
+        model.addAttribute("ingredients", menu.getIngredients());
+        model.addAttribute("hasSize", menu.isHasSize());
+
+        return "menu/menuSetUI";
+    }
+
     @GetMapping("/menuUI")
     private String member(){
         return "menu/menuUI";

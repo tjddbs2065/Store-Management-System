@@ -59,7 +59,7 @@
         WHERE menu_code = #{menuCode}
           AND del_date IS NULL; </select>
     <select id="getMenuByMenuNo" resultType="com.erp.dto.MenuDTO">
-        SELECT menu_no, menu_code, menu_name, menu_category, size, menu_price, release_status, menu_image
+        SELECT menu_no, menu_code, menu_name, menu_category, size, menu_price, release_status, menu_image, menu_explain
         FROM menu
         WHERE menu_no = #{menuNo}
           AND del_date IS NULL; </select>

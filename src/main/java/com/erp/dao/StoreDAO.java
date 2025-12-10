@@ -4,6 +4,7 @@ import com.erp.dto.StoreDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface StoreDAO {
@@ -21,5 +22,7 @@ public interface StoreDAO {
     void setStoreRole(StoreDTO store);
     List<StoreDTO> getStoresByAdmin();
     Long getStoreNoByManager(String managerId);
+    List<StoreDTO> getStoresList(Map<String, Object> params);
+    long countStoreList(Map<String, Object> params);
 
 }

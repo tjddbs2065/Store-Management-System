@@ -35,7 +35,7 @@
     <insert id="addItem"
             parameterType="com.erp.dto.ItemDTO"
             useGeneratedKeys="true" keyProperty="itemNo">
-        INSERT INTO ITEM (
+        INSERT INTO item (
             item_category,
             item_code,
             item_name,
@@ -73,7 +73,7 @@
 
     <!-- 2) 수정 -->
     <update id="setItem" parameterType="com.erp.dto.ItemDTO">
-        UPDATE ITEM
+        UPDATE item
         SET
             item_category   = #{itemCategory},
             item_code       = #{itemCode},
@@ -95,7 +95,7 @@
 
     <!-- 3) 삭제(소프트 삭제) -->
     <update id="removeItem">
-        UPDATE ITEM
+        UPDATE item
         SET del_date = NOW()
         WHERE item_no = #{itemNo}
     </update>
@@ -111,7 +111,7 @@
             supplier,
             item_price,
             stock_unit
-        FROM ITEM
+        FROM item
         WHERE del_date IS NULL
         <if test="itemCategory != null and itemCategory != ''">
             AND item_category = #{itemCategory}
@@ -135,7 +135,7 @@
             ingredient_name,
             supplier,
             item_price
-        FROM ITEM
+        FROM item
         WHERE del_date IS NULL
           AND item_category =#{itemCategory}
     </select>
@@ -150,7 +150,7 @@
             ingredient_name,
             supplier,
             item_price
-        FROM ITEM
+        FROM item
         WHERE del_date IS NULL
           AND item_name LIKE CONCAT('%', #{itemName}, '%')
     </select>
@@ -165,7 +165,7 @@
             ingredient_name,
             supplier,
             item_price
-        FROM ITEM
+        FROM item
         WHERE del_date IS NULL
           AND item_code LIKE CONCAT('%', #{itemCode}, '%')
     </select>
@@ -180,7 +180,7 @@
             ingredient_name,
             supplier,
             item_price
-        FROM ITEM
+        FROM item
         WHERE del_date IS NULL
           AND ingredient_name LIKE CONCAT('%', #{ingredientName}, '%')
     </select>
@@ -206,7 +206,7 @@
             in_date,
             edit_date,
             del_date
-        FROM ITEM
+        FROM item
         WHERE item_no = #{itemNo} AND del_date IS NULL
     </select>
 

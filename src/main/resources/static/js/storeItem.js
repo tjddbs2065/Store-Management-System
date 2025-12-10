@@ -309,7 +309,10 @@
         const headers = { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' };
         if (csrf) headers[csrf.header] = csrf.token;
 
-        fetch(`/stock/storeItem/${storeItemNo}/limit`, {
+        const base = IS_MANAGER ? '/manager/stock/storeItem' : '/store/stock/storeItem';
+
+        fetch(`${base}/${storeItemNo}/limit`, {
+
             method: 'POST',
             headers,
             body: params.toString(),

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>메뉴 수정</title>
@@ -8,13 +9,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/js/util.js"></script>
 
     <style>
         body {
             background-color: #f5f5f5 !important;
         }
 
-        /* 계정등록과 동일: 전체를 감싸는 큰 박스 */
         .wrapper-box {
             background: white;
             padding: 40px;
@@ -24,7 +25,6 @@
             margin: 0 auto;
         }
 
-        /* 내부 구역(기본정보/레시피정보) */
         .section-inner {
             background: white;
             border: 1px solid #ddd;
@@ -49,37 +49,40 @@
             overflow-y: auto;
         }
 
-        /* 숫자 input 화살표 제거 */
         input[type=number]::-webkit-inner-spin-button,
         input[type=number]::-webkit-outer-spin-button {
             -webkit-appearance: none;
-            margin: 0;
         }
-        input[type=number] {
-            -moz-appearance: textfield;
-        }
+        input[type=number] { -moz-appearance: textfield; }
 
-        /* 노란 커스텀 버튼 */
         .custom-btn {
             background-color: #FFEEAA !important;
             border-color: #FFEEAA !important;
             color: #000;
         }
+
         .custom-btn:hover {
             background-color: #f2da84 !important;
             border-color: #f2da84 !important;
         }
 
-        /* 회색 버튼 */
         .gray-btn {
             background-color: #D9D9D9 !important;
             border: #ffffff !important;
         }
+
         .gray-btn:hover {
             background-color: #C9C9C9 !important;
             border-color: #ffffff !important;
         }
 
+        .recipe-input {
+            width: 80px !important;
+            height: 32px !important;
+            padding: 4px 8px !important;
+            margin: 0 auto;
+            display: block;
+        }
     </style>
 </head>
 
@@ -87,15 +90,14 @@
 
 <div class="wrapper-box">
 
-    <!-- 제목 + 뒤로가기 -->
+    <input type="hidden" id="menuNos" th:value="${menuNos}">
+    <input type="hidden" id="hasSize" th:value="${hasSize}">
+    <input type="hidden" id="baseMenuNo" th:value="${menu.menuNo}">
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">메뉴 수정</h2>
-        <button class="btn btn-outline-secondary" onclick="history.back()">뒤로가기</button>
     </div>
 
-    <!-- ===================== -->
-    <!-- 기본 정보 section -->
-    <!-- ===================== -->
     <div class="section-inner">
         <h5 class="fw-bold mb-4">기본 정보</h5>
 
@@ -103,86 +105,75 @@
 
             <div class="col-md-4">
                 <label class="form-label fw-semibold">카테고리</label>
-                <select class="form-select" disabled>
-                    <option>피자</option>
-                    <option>사이드디시</option>
-                    <option>음료</option>
-                </select>
+                <div class="border rounded px-3 py-2 bg-light" th:text="${menu.menuCategory}"></div>
+                <input type="hidden" id="menuCategory" th:value="${menu.menuCategory}">
             </div>
 
             <div class="col-md-4">
                 <label class="form-label fw-semibold">메뉴 코드</label>
-                <input type="text" class="form-control" value="PEPPERONI_PIZZA">
+                <input type="text" class="form-control" id="menuCode" th:value="${menu.menuCode}">
             </div>
 
             <div class="col-md-4">
                 <label class="form-label fw-semibold">메뉴 명</label>
-                <input type="text" class="form-control" value="페퍼로니 피자">
+                <input type="text" class="form-control" id="menuName" th:value="${menu.menuName}">
             </div>
 
-            <!-- 사이즈 여부 -->
             <div class="col-md-4">
                 <label class="form-label fw-semibold d-block">사이즈</label>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="sizeYn" value="Y" checked disabled>
+                    <input class="form-check-input" type="radio" name="sizeYn" value="Y" th:checked="${hasSize}" disabled>
                     <label class="form-check-label">유</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="sizeYn" value="N" disabled>
+                    <input class="form-check-input" type="radio" name="sizeYn" value="N" th:checked="${!hasSize}" disabled>
                     <label class="form-check-label">무</label>
                 </div>
             </div>
 
-            <!-- 가격 -->
-            <div class="col-md-4 price-large">
-                <label class="form-label fw-semibold">라지 가격</label>
+            <div class="col-md-4" th:if="${hasSize}" th:each="s : ${sizeList}">
+                <label class="form-label fw-semibold" th:text="${s.size + ' 가격'}"></label>
                 <div class="input-group input-group-sm w-auto">
-                    <input type="number" class="form-control" value="25000">
+                    <input type="number" class="form-control price-input"
+                           th:value="${s.menuPrice}" th:attr="data-size=${s.size}">
                     <span class="input-group-text">원</span>
                 </div>
             </div>
 
-            <div class="col-md-4 price-medium">
-                <label class="form-label fw-semibold">미디움 가격</label>
-                <div class="input-group input-group-sm w-auto">
-                    <input type="number" class="form-control" value="18000">
-                    <span class="input-group-text">원</span>
-                </div>
-            </div>
-
-            <div class="col-md-4 price-single" style="display:none;">
+            <div class="col-md-4" th:if="${!hasSize}">
                 <label class="form-label fw-semibold">판매 가격</label>
                 <div class="input-group input-group-sm w-auto">
-                    <input type="number" class="form-control">
+                    <input type="number" class="form-control" id="priceSingle" th:value="${menu.menuPrice}">
                     <span class="input-group-text">원</span>
                 </div>
             </div>
 
             <div class="col-12">
                 <label class="form-label fw-semibold">설명</label>
-                <textarea class="form-control" rows="3">짭짤한 맛이 일품인 페퍼로니 피자~</textarea>
+                <textarea class="form-control" rows="3" id="menuExplain"
+                          th:text="${menu.menuExplain}"></textarea>
             </div>
 
             <div class="col-md-4">
                 <label class="form-label fw-semibold">출시 상태</label>
-                <select class="form-select">
-                    <option>출시 예정</option>
-                    <option selected>출시 중</option>
-                    <option>출시 중지</option>
+                <select class="form-select" id="releaseStatus">
+                    <option th:selected="${menu.releaseStatus == '출시 예정'}">출시 예정</option>
+                    <option th:selected="${menu.releaseStatus == '출시 중'}">출시 중</option>
+                    <option th:selected="${menu.releaseStatus == '출시 중지'}">출시 중지</option>
                 </select>
             </div>
 
             <div class="col-md-4">
-                <label class="form-label fw-semibold">대표 이미지</label>
-                <input type="file" class="form-control">
+                <label class="form-label fw-semibold">대표 이미지 경로</label>
+                <input type="text" class="form-control" id="menuImage" th:value="${menu.menuImage}">
+                <div class="mt-2">
+                    <img th:src="${menu.menuImage}" alt="대표 이미지" class="img-thumbnail" style="max-width: 200px;">
+                </div>
             </div>
 
         </div>
     </div>
 
-    <!-- ===================== -->
-    <!-- 레시피 정보 section -->
-    <!-- ===================== -->
     <div class="section-inner">
 
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -204,21 +195,55 @@
             </tr>
             </thead>
 
-            <tbody id="recipeList"></tbody>
+            <tbody id="recipeList" th:if="${hasSize}">
+            <tr th:each="ing : ${ingredients}">
+                <td th:text="${ing.ingredientName}"></td>
+                <td th:text="${ing.stockUnit}"></td>
+                <td class="size-option">
+                    <input type="number" class="form-control recipe-input qty-large"
+                           th:value="${ing.quantityLarge}">
+                </td>
+                <td class="size-option">
+                    <input type="number" class="form-control recipe-input qty-medium"
+                           th:value="${ing.quantityMedium}">
+                </td>
+                <td class="qty-single-cell" style="display:none;"></td>
+                <td>
+                    <button class="btn btn-outline-danger btn-sm delete-row">삭제</button>
+                    <input type="hidden" class="item-no" th:value="${ing.itemNo}">
+                </td>
+            </tr>
+            </tbody>
+
+            <tbody id="recipeList" th:if="${!hasSize}">
+            <tr th:each="ing : ${ingredients}">
+                <td th:text="${ing.ingredientName}"></td>
+                <td th:text="${ing.stockUnit}"></td>
+                <td class="size-option" style="display:none;"></td>
+                <td class="size-option" style="display:none;"></td>
+                <td class="qty-single-cell">
+                    <input type="number" class="form-control recipe-input qty-single"
+                           th:value="${ing.quantity}">
+                </td>
+                <td>
+                    <button class="btn btn-outline-danger btn-sm delete-row">삭제</button>
+                    <input type="hidden" class="item-no" th:value="${ing.itemNo}">
+                </td>
+            </tr>
+            </tbody>
+
         </table>
 
     </div>
 
     <div class="text-center mt-3">
-        <button class="btn custom-btn">저장</button>
-        <button class="btn gray-btn">취소</button>
+        <button class="btn custom-btn" id="saveBtn">저장</button>
+        <button class="btn gray-btn" id="cancelBtn">취소</button>
     </div>
 
 </div>
 
-<!-- ============================= -->
-<!-- ⭐ 재료 불러오기 모달 ⭐ -->
-<!-- ============================= -->
+<!-- 모달 -->
 <div class="modal fade" id="ingredientModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
@@ -230,11 +255,10 @@
 
             <div class="modal-body">
 
-                <!-- 검색 -->
                 <div class="row g-3 mb-3">
                     <div class="col-md-3">
                         <label class="form-label fw-semibold">카테고리</label>
-                        <select class="form-select">
+                        <select class="form-select" id="modalCategory">
                             <option>전체</option>
                             <option>도우</option>
                             <option>치즈</option>
@@ -250,18 +274,22 @@
 
                     <div class="col-md-3">
                         <label class="form-label fw-semibold">검색조건</label>
-                        <select class="form-select">
+                        <select class="form-select" id="modalSearchType">
                             <option>품목코드</option>
                             <option>재료명</option>
                         </select>
                     </div>
 
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">검색어</label>
+                        <input type="text" class="form-control" id="modalKeyword">
+                    </div>
+
                     <div class="col-md-3 d-flex align-items-end">
-                        <button class="btn btn-outline-dark">조회</button>
+                        <button class="btn btn-outline-dark" id="modalSearchBtn">조회</button>
                     </div>
                 </div>
 
-                <!-- 테이블 -->
                 <div class="table-responsive">
                     <table class="table table-hover text-center align-middle">
                         <thead class="table-light">
@@ -274,33 +302,7 @@
                         </tr>
                         </thead>
 
-                        <tbody id="ingredientTableBody">
-
-                        <tr>
-                            <td><input type="checkbox" class="row-check"></td>
-                            <td>DOUGH-M</td>
-                            <td>피자 도우 M</td>
-                            <td>도우</td>
-                            <td>ea</td>
-                        </tr>
-
-                        <tr>
-                            <td><input type="checkbox" class="row-check"></td>
-                            <td>CHEESE-MOZZ</td>
-                            <td>모짜렐라 치즈</td>
-                            <td>치즈</td>
-                            <td>g</td>
-                        </tr>
-
-                        <tr>
-                            <td><input type="checkbox" class="row-check"></td>
-                            <td>SAUCE-TOMATO</td>
-                            <td>토마토 소스</td>
-                            <td>소스</td>
-                            <td>g</td>
-                        </tr>
-
-                        </tbody>
+                        <tbody id="ingredientTableBody"></tbody>
                     </table>
                 </div>
 
@@ -318,69 +320,151 @@
 
 <script>
 
-    // 사이즈 유무 표시
-    function updateSize() {
-        const isSize = $("input[name='sizeYn']:checked").val() === "Y";
+    // ✓ 모달 조회(fetchUtil 적용)
+    $("#modalSearchBtn").click(function () {
+        let category = $("#modalCategory").val();
+        let type = $("#modalSearchType").val();
+        let keyword = $("#modalKeyword").val();
 
-        $(".price-large").toggle(isSize);
-        $(".price-medium").toggle(isSize);
-        $(".price-single").toggle(!isSize);
+        let itemCategory = category === "전체" ? "" : category;
+        let ingredientName = type === "재료명" ? keyword : "";
+        let itemCode = type === "품목코드" ? keyword : "";
 
-        $("th.size-option, td.size-option").toggle(isSize);
-        $("th.qty-single-header, td.qty-single-cell").toggle(!isSize);
-    }
-    updateSize();
-
-    // 전체 선택
-    $("#checkAll").change(() => {
-        $(".row-check").prop("checked", $(this).is(":checked"));
+        fetchUtil(
+            `/menu/itemList?itemCategory=${itemCategory}&ingredientName=${ingredientName}&itemCode=${itemCode}`,
+            data => {
+                let html = "";
+                data.forEach(row => {
+                    html += `
+                <tr data-itemno="${row.itemNo}">
+                    <td><input type="checkbox" class="row-check"></td>
+                    <td>${row.itemCode}</td>
+                    <td>${row.ingredientName}</td>
+                    <td>${row.category}</td>
+                    <td>${row.stockUnit}</td>
+                </tr>`;
+                });
+                $("#ingredientTableBody").html(html);
+            }
+        );
     });
 
-    // 재료 추가
-    $("#modalAddSelected").click(() => {
-        const selectedRows = $(".row-check:checked");
-        const recipeBody = $("#recipeList");
-        const isSize = $("input[name='sizeYn']:checked").val() === "Y";
+    // 선택 재료 등록
+    $("#modalAddSelected").click(function () {
+        let hasSize = $("#hasSize").val() === "true";
+        let recipeBody = $("#recipeList");
+        let selectedRows = $(".row-check:checked");
 
         selectedRows.each(function () {
-            const row = $(this).closest("tr");
-            const cols = row.children();
-            const name = cols.eq(2).text();
-            const unit = cols.eq(4).text();
+            let row = $(this).closest("tr");
+            let itemNo = row.data("itemno");
+            let name = row.children().eq(2).text();
+            let unit = row.children().eq(4).text();
 
             let html = "";
-
-            if (isSize) {
-                html = `
-                <tr>
+            if (hasSize) {
+                html =
+                    `<tr>
                     <td>${name}</td>
                     <td>${unit}</td>
-                    <td class="size-option"><input type="number" class="form-control form-control-sm w-auto" placeholder="라지"></td>
-                    <td class="size-option"><input type="number" class="form-control form-control-sm w-auto" placeholder="미디움"></td>
+                    <td class="size-option">
+                        <input type="number" class="form-control recipe-input qty-large">
+                    </td>
+                    <td class="size-option">
+                        <input type="number" class="form-control recipe-input qty-medium">
+                    </td>
                     <td class="qty-single-cell" style="display:none;"></td>
-                    <td><button class="btn btn-outline-danger btn-sm delete-row">삭제</button></td>
+                    <td>
+                        <button class="btn btn-outline-danger btn-sm delete-row">삭제</button>
+                        <input type="hidden" class="item-no" value="${itemNo}">
+                    </td>
                 </tr>`;
             } else {
-                html = `
-                <tr>
+                html =
+                    `<tr>
                     <td>${name}</td>
                     <td>${unit}</td>
                     <td class="size-option" style="display:none;"></td>
                     <td class="size-option" style="display:none;"></td>
-                    <td class="qty-single-cell"><input type="number" class="form-control form-control-sm w-auto" placeholder="정량"></td>
-                    <td><button class="btn btn-outline-danger btn-sm delete-row">삭제</button></td>
+                    <td class="qty-single-cell">
+                        <input type="number" class="form-control recipe-input qty-single">
+                    </td>
+                    <td>
+                        <button class="btn btn-outline-danger btn-sm delete-row">삭제</button>
+                        <input type="hidden" class="item-no" value="${itemNo}">
+                    </td>
                 </tr>`;
             }
-
             recipeBody.append(html);
         });
 
         $("#ingredientModal").modal("hide");
     });
 
-    // 삭제
+    // 행 삭제
     $(document).on("click", ".delete-row", function () {
         $(this).closest("tr").remove();
+    });
+
+    // 저장(fetchUtil 적용)
+    $("#saveBtn").click(function () {
+        var hasSize = $("#hasSize").val() === "true";
+
+        var menuRequest = {};
+        menuRequest.menuNo = parseInt($("#baseMenuNo").val(), 10);
+        menuRequest.menuName = $("#menuName").val();
+        menuRequest.menuCode = $("#menuCode").val();
+        menuRequest.menuCategory = $("#menuCategory").val();
+        menuRequest.menuExplain = $("#menuExplain").val();
+        menuRequest.menuImage = $("#menuImage").val();
+        menuRequest.releaseStatus = $("#releaseStatus").val();
+        menuRequest.size = hasSize ? "Y" : "N";
+
+        if (hasSize) {
+            $(".price-input").each(function () {
+                let size = $(this).data("size");
+                let price = parseInt($(this).val(), 10) || 0;
+
+                if (size === "라지") menuRequest.menuPriceLarge = price;
+                if (size === "미디움") menuRequest.menuPriceMedium = price;
+            });
+        } else {
+            menuRequest.menuPrice = parseInt($("#priceSingle").val(), 10) || 0;
+        }
+
+        let ingredients = [];
+        $("#recipeList tr").each(function () {
+            let dto = {};
+            dto.itemNo = parseInt($(this).find(".item-no").val(), 10) || null;
+            dto.ingredientName = $(this).children("td").eq(0).text();
+            dto.stockUnit = $(this).children("td").eq(1).text();
+
+            if (hasSize) {
+                dto.quantityLarge = $(this).find(".qty-large").val() || null;
+                dto.quantityMedium = $(this).find(".qty-medium").val() || null;
+            } else {
+                dto.quantity = $(this).find(".qty-single").val() || null;
+            }
+            ingredients.push(dto);
+        });
+
+        menuRequest.ingredients = ingredients;
+
+        fetchUtil(
+            "/menu/setMenu",
+            () => {
+                alert("메뉴가 저장되었습니다.");
+                const menuNo = $("#baseMenuNo").val();
+                location.href = `/menu/menuDetailUI?menuNo=${menuNo}`;
+            },
+            "POST",
+            menuRequest
+        );
+    });
+
+    // 취소
+    $("#cancelBtn").click(function () {
+        history.back();
     });
 
 </script>

@@ -236,4 +236,138 @@ public class MenuService {
             storeMenuRepository.save(storeMenu);
         }
     }
+
+    @Transactional
+    public void updateMenu(MenuDTO menuRequest) {
+
+        List<MenuDTO> oldList = menuDAO.getMenuByMenuCode(menuRequest.getMenuCode());
+        if (oldList == null || oldList.isEmpty()) {
+            throw new RuntimeException("메뉴 정보를 찾을 수 없습니다.");
+        }
+
+        // 기존 상태
+        String oldStatus = oldList.get(0).getReleaseStatus();
+        // 새 상태
+        String newStatus = menuRequest.getReleaseStatus();
+
+        boolean hasSize = "Y".equals(menuRequest.getSize());
+
+        for (MenuDTO old : oldList) {
+
+            Integer menuPrice = null;
+
+            if (hasSize) {
+                if (old.getSize().equals("라지")) {
+                    menuPrice = menuRequest.getMenuPriceLarge();
+                } else if (old.getSize().equals("미디움")) {
+                    menuPrice = menuRequest.getMenuPriceMedium();
+                }
+            } else {
+                menuPrice = menuRequest.getMenuPrice();
+            }
+
+            MenuDTO updateDTO = MenuDTO.builder()
+                    .menuNo(old.getMenuNo())
+                    .menuCode(menuRequest.getMenuCode())
+                    .menuName(menuRequest.getMenuName())
+                    .menuCategory(old.getMenuCategory())
+                    .menuExplain(menuRequest.getMenuExplain())
+                    .menuImage(menuRequest.getMenuImage())
+                    .menuPrice(menuPrice)
+                    .releaseStatus(newStatus)
+                    .build();
+
+            menuDAO.setMenu(updateDTO);
+        }
+
+        for (MenuDTO old : oldList) {
+            menuIngredientRepository.deleteByMenu_MenuNo(old.getMenuNo());
+        }
+
+        for (MenuIngredientDTO ing : menuRequest.getIngredients()) {
+
+            if (!hasSize) {
+                Integer qty = ing.getQuantity();
+                if (qty == null) continue;
+
+                Long menuNo = oldList.get(0).getMenuNo();
+
+                MenuIngredient entity = MenuIngredient.builder()
+                        .menu(Menu.builder().menuNo(menuNo).build())
+                        .item(Item.builder().itemNo(ing.getItemNo()).build())
+                        .ingredientQuantity(qty)
+                        .build();
+
+                menuIngredientRepository.save(entity);
+                continue;
+            }
+
+            for (MenuDTO m : oldList) {
+
+                Integer qty = null;
+
+                if (m.getSize().equals("라지")) {
+                    qty = ing.getQuantityLarge();
+                } else if (m.getSize().equals("미디움")) {
+                    qty = ing.getQuantityMedium();
+                }
+
+                if (qty == null) continue;
+
+                MenuIngredient entity = MenuIngredient.builder()
+                        .menu(Menu.builder().menuNo(m.getMenuNo()).build())
+                        .item(Item.builder().itemNo(ing.getItemNo()).build())
+                        .ingredientQuantity(qty)
+                        .build();
+
+                menuIngredientRepository.save(entity);
+            }
+        }
+
+        if (!"출시 중".equals(oldStatus) && "출시 중".equals(newStatus)) {
+
+            List<StoreDTO> stores = storeDAO.getActiveStores();
+
+            for (StoreDTO store : stores) {
+
+                for (MenuDTO m : oldList) {
+
+                    boolean exists =
+                            storeMenuRepository.existsByStore_StoreNoAndMenu_MenuNo(
+                                    store.getStoreNo(),
+                                    m.getMenuNo()
+                            );
+
+                    if (!exists) {
+                        StoreMenu storeMenu = StoreMenu.builder()
+                                .store(Store.builder().storeNo(store.getStoreNo()).build())
+                                .menu(Menu.builder().menuNo(m.getMenuNo()).build())
+                                .salesStatus("판매중단")
+                                .build();
+
+                        storeMenuRepository.save(storeMenu);
+                    }
+                }
+            }
+        }
+    }
+
+
+    @Transactional
+    public void removeMenu(Long menuNo) {
+
+        MenuDTO menu = menuDAO.getMenuByMenuNo(menuNo);
+        if (menu == null) {
+            throw new NoMenuException("없는 메뉴입니다.");
+        }
+
+        List<MenuDTO> sameCodeMenus = menuDAO.getMenuByMenuCode(menu.getMenuCode());
+
+        for (MenuDTO m : sameCodeMenus) {
+            Long targetMenuNo = m.getMenuNo();
+            storeMenuRepository.deleteByMenu_MenuNo(targetMenuNo);
+            menuIngredientRepository.deleteByMenu_MenuNo(targetMenuNo);
+            menuDAO.removeMenu(targetMenuNo);
+        }
+    }
 }

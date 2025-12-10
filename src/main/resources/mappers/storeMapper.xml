@@ -2,6 +2,65 @@
 <!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.erp.dao.StoreDAO">
+    <select id="getStoresList" resultType="com.erp.dto.StoreDTO">
+        SELECT
+        s.store_no,
+        s.store_name,
+        s.address,
+        s.store_status,
+        m.manager_name,
+        s.latitude,
+        s.longitude
+        from store s
+        join manager m
+        on s.store_manager_id = m.manager_id
+        WHERE 1=1
+        <if test="storeNo != null">
+            AND s.store_no = #{storeNo}
+        </if>
+        <if test="address != null and address != ''">
+            AND s.address LIKE CONCAT('%', #{address}, '%')
+        </if>
+        <if test="storeName != null and storeName != ''">
+            AND s.store_name LIKE CONCAT('%', #{storeName}, '%')
+        </if>
+        <if test="managerName != null and managerName != ''">
+            AND m.manager_name LIKE CONCAT('%', #{managerName}, '%')
+        </if>
+        <if test="storeStatus != null and storeStatus != ''">
+            AND s.store_status = #{storeStatus}
+        </if>
+        ORDER BY s.store_no DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countStoreList" resultType="long">
+        SELECT COUNT(*)
+        from store s
+        join manager m
+        on s.store_manager_id = m.manager_id
+        WHERE 1=1
+        <if test="storeNo != null">
+            AND s.store_no = #{storeNo}
+        </if>
+
+        <if test="address != null and address != ''">
+            AND s.address LIKE CONCAT('%', #{address}, '%')
+        </if>
+
+        <if test="storeName != null and storeName != ''">
+            AND s.store_name LIKE CONCAT('%', #{storeName}, '%')
+        </if>
+
+        <if test="managerName != null and managerName != ''">
+            AND m.manager_name LIKE CONCAT('%', #{managerName}, '%')
+        </if>
+
+        <if test="storeStatus != null and storeStatus != ''">
+            AND s.store_status = #{storeStatus}
+        </if>
+    </select>
+
     <select id="getActiveStores" resultType="com.erp.dto.StoreDTO">
         select store_no
         from store

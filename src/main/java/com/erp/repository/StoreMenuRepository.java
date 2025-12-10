@@ -14,6 +14,9 @@ import java.util.List;
 
 public interface StoreMenuRepository extends JpaRepository<StoreMenu, Long> {
 
+        void deleteByMenu_MenuNo(Long menuNo);
+        boolean existsByStore_StoreNoAndMenu_MenuNo(Long storeNo, Long menuNo);
+
         @Modifying
         @Transactional
         @Query("""

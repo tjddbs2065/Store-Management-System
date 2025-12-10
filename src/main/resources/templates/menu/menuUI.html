@@ -104,7 +104,8 @@
             <h2 class="fw-bold">메뉴 조회</h2>
             <div>
                 <button class="btn btn-warning me-2 custom-btn" id="menuAddBtn" sec:authorize="hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')">메뉴 등록</button>
-                <button class="btn custom-btn" id="storeMenuBtn">판매 메뉴 보기</button>
+                <button class="btn custom-btn" sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')" id="storeMenuBtn">판매 메뉴 보기(본사)</button>
+                <button class="btn custom-btn" sec:authorize="hasRole('ROLE_STORE')" id="storeMenuBtnStore">판매 메뉴 보기(직영점)</button>
             </div>
         </div>
 
@@ -307,9 +308,13 @@
     }
 
     $("#storeMenuBtn").click(() => {
-        //지금은 본사 기준. 직영점 로그인 시, storeMenuUI.html로 이동하게 해야 함
-        location.href = "storeMenuManagerUI.html"
+        location.href = "/manager/storeMenu";
     });
+    $("#storeMenuBtnStore").click(() => {
+        location.href = '/store/storeMenu';
+    });
+
+
     $(document).on("click", ".detailBtn", function () {
         const menuNo = $(this).data("menuNo");
         location.href = `/menu/menuDetailUI?menuNo=${menuNo}`;

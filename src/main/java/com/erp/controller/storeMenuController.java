@@ -16,6 +16,8 @@ public class storeMenuController {
             Model model,
             @AuthenticationPrincipal PrincipalDetails principal){
         String storeName = principal.getStore().getStoreName();
+        Long storeNo = principal.getStore().getStoreNo();
+        model.addAttribute("storeNo", storeNo);
         model.addAttribute("storeName", storeName);
         return "menu/storeMenuUI";
     }

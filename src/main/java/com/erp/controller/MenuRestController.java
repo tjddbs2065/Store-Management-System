@@ -18,6 +18,18 @@ public class MenuRestController {
     private final MenuService menuService;
     private final ItemService itemService;
 
+    @DeleteMapping("/delMenu")
+    public ResponseEntity<Map<String, String>> removeMenu(@RequestParam Long menuNo) {
+        menuService.removeMenu(menuNo);
+        return ResponseEntity.ok(Map.of("message","delete Menu success"));
+    }
+
+    @PostMapping("/setMenu")
+    public ResponseEntity<Map<String, String>> setMenu(@RequestBody MenuDTO menuDTO) {
+        menuService.updateMenu(menuDTO);
+        return ResponseEntity.ok(Map.of("message", "set Menu success"));
+    }
+
     @GetMapping("/menuList")
     public ResponseEntity<List<MenuDTO>> getMenuList(
             @RequestParam(required = false) String menuCategory,

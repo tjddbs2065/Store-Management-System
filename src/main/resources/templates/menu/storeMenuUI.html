@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>직영점 판매 메뉴</title>
@@ -37,7 +37,7 @@
 <div class="container py-4">
     <div class="bg-white border rounded p-4">
 
-        <h2 class="fw-bold mb-4">직영점 판매 메뉴 - [[${storeName}]]</h2>
+        <h2 class="fw-bold mb-4">[[${storeName}]] 판매 메뉴 </h2>
 
         <div class="border rounded p-3 mb-4">
             <div class="row g-3 align-items-end">
@@ -92,6 +92,7 @@
 </div>
 
 
+<!-- 단건/일괄 변경 모달 -->
 <div class="modal fade" id="statusSetModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -128,7 +129,7 @@
     </div>
 </div>
 
-
+<!-- 알림 모달 -->
 <div class="modal fade" id="alertModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-center border border-primary">
@@ -142,19 +143,53 @@
     </div>
 </div>
 
+<!-- 로그인한 점주의 매장 menu_stop_role → hidden 으로 내려보내기 -->
+<input type="hidden"
+       id="menuStopRoleValue"
+       th:value="${#authentication?.principal?.store?.menuStopRole ?: 'N'}"/>
 
 <script src="/js/util.js"></script>
 
 <script>
+    // menu_stop_role 값을 JS 전역으로 노출
+    (function () {
+        const el   = document.getElementById('menuStopRoleValue');
+        const role = el ? (el.value || 'N') : 'N';   // DB 는 NOT NULL 이지만, 방어적으로 'N' 기본값
+
+        window.MENU_STOP_ROLE    = role;          // 'Y' / 'N'
+        window.CAN_USE_MENU_STOP = (role === 'Y'); // Y 일 때만 "판매중단" 옵션 노출
+    })();
+
     function showAlert(msg){
         $("#alertMessage").text(msg);
         $("#alertModal").modal("show");
+    }
+
+    /**
+     * 점주 화면에서 사용할 판매 상태 옵션 생성
+     */
+    function buildStoreStatusOptions(currentStatus) {
+        let html = '';
+
+        // 판매중
+        html += '<option ' + (currentStatus === '판매중' ? 'selected' : '') + '>판매중</option>';
+
+        // 판매중단 (점주 권한이 있을 때만 노출)
+        if (window.CAN_USE_MENU_STOP) {
+            html += '<option ' + (currentStatus === '판매중단' ? 'selected' : '') + '>판매중단</option>';
+        }
+
+        // 품절
+        html += '<option ' + (currentStatus === '품절' ? 'selected' : '') + '>품절</option>';
+
+        return html;
     }
 
     function collectUpdates(){
         const updates = [];
         const bulkSelect = $("#bulkStatusSelect");
 
+        // 일괄 변경인 경우
         if(bulkSelect && bulkSelect.length > 0){
             const status = bulkSelect.val();
 
@@ -168,6 +203,7 @@
             return updates;
         }
 
+        // 단건 변경인 경우
         $("#modalSizeArea select").each(function(){
             updates.push({
                 storeMenuNo: $(this).data("storemenu"),
@@ -194,6 +230,9 @@
         );
     });
 
+    // ==========================
+    // 테이블 렌더링
+    // ==========================
     function renderMenuTable(data){
 
         const tbody = $("#menuTableBody");
@@ -207,7 +246,6 @@
         data.forEach(function(group){
 
             const items = group.items;
-
             const sorted = items.slice().sort(function(a, b){
                 const order = { "라지":1, "미디움":2, "단일":3 };
                 return order[a.size] - order[b.size];
@@ -220,32 +258,29 @@
                 let html = "<tr>";
 
                 if(i === 0){
-                    html += '\
-                        <td rowspan="' + rowSpan + '">' + group.menuCode + '</td>\
-                        <td rowspan="' + rowSpan + '">' + item.menuCategory + '</td>\
-                        <td rowspan="' + rowSpan + '">' + group.menuName + '</td>\
-                    ';
+                    html += ''
+                        + '<td rowspan="' + rowSpan + '">' + group.menuCode + '</td>'
+                        + '<td rowspan="' + rowSpan + '">' + item.menuCategory + '</td>'
+                        + '<td rowspan="' + rowSpan + '">' + group.menuName + '</td>';
                 }
 
-                html += '\
-                    <td>' + item.size + '</td>\
-                    <td>' + item.menuPrice.toLocaleString() + '</td>\
-                    <td>' + item.salesStatus + '</td>\
-                ';
+                html += ''
+                    + '<td>' + item.size + '</td>'
+                    + '<td>' + item.menuPrice.toLocaleString() + '</td>'
+                    + '<td>' + item.salesStatus + '</td>';
 
                 if(i === 0){
-                    html += '\
-                        <td rowspan="' + rowSpan + '">\
-                            <button class="btn btn-outline-secondary btn-sm statusSetBtn"\
-                                data-menu="' + group.menuName + '"\
-                                data-items="' + btoa(encodeURIComponent(JSON.stringify(sorted))) + '">\
-                                변경\
-                            </button>\
-                        </td>\
-                        <td rowspan="' + rowSpan + '">\
-                            <input type="checkbox" class="row-check">\
-                        </td>\
-                    ';
+                    html += ''
+                        + '<td rowspan="' + rowSpan + '">'
+                        + '  <button class="btn btn-outline-secondary btn-sm statusSetBtn"'
+                        + '      data-menu="' + group.menuName + '"'
+                        + '      data-items="' + btoa(encodeURIComponent(JSON.stringify(sorted))) + '">'
+                        + '      변경'
+                        + '  </button>'
+                        + '</td>'
+                        + '<td rowspan="' + rowSpan + '">'
+                        + '  <input type="checkbox" class="row-check">'
+                        + '</td>';
                 }
 
                 html += "</tr>";
@@ -254,20 +289,24 @@
         });
     }
 
+    // ==========================
+    // 데이터 로딩
+    // ==========================
     function loadMenuTable() {
 
         const salesStatus  = $("#searchStatus").val();
         const menuCategory = $("#searchCategory").val();
 
-        fetchUtil(
-            "/storeMenu/getMenu?salesStatus=" + salesStatus + "&menuCategory=" + menuCategory,
-            function(data){
-                renderMenuTable(data);
-            }
-        );
+        const url = "/storeMenu/getMenu?salesStatus=" + salesStatus + "&menuCategory=" + menuCategory;
+
+        fetchUtil(url, function(data){
+            renderMenuTable(data);
+        });
     }
 
-
+    // ==========================
+    // 이벤트 바인딩
+    // ==========================
     $(document).ready(function(){
         loadMenuTable();
     });
@@ -284,6 +323,7 @@
         $(".row-check").prop("checked", this.checked);
     });
 
+    // 단건 변경 버튼 클릭
     $(document).on("click", ".statusSetBtn", function(){
 
         const menuName = $(this).data("menu");
@@ -293,23 +333,24 @@
         const area = $("#modalSizeArea").empty();
 
         items.forEach(function(item){
-            area.append('\
-                <div class="row mb-2">\
-                    <label class="col-3 fw-semibold">' + item.size + '</label>\
-                    <div class="col">\
-                        <select class="form-select" data-storemenu="' + item.storeMenuNo + '">\
-                            <option ' + (item.salesStatus === '판매중' ? "selected" : "") + '>판매중</option>\
-                            <option ' + (item.salesStatus === '판매중단' ? "selected" : "") + '>판매중단</option>\
-                            <option ' + (item.salesStatus === '품절' ? "selected" : "") + '>품절</option>\
-                        </select>\
-                    </div>\
-                </div>\
-            ');
+            const optionsHtml = buildStoreStatusOptions(item.salesStatus);
+
+            area.append(''
+                + '<div class="row mb-2">'
+                + '  <label class="col-3 fw-semibold">' + item.size + '</label>'
+                + '  <div class="col">'
+                + '      <select class="form-select" data-storemenu="' + item.storeMenuNo + '">'
+                +            optionsHtml
+                + '      </select>'
+                + '  </div>'
+                + '</div>'
+            );
         });
 
         $("#statusSetModal").modal("show");
     });
 
+    // 선택 일괄 변경
     $(document).on("click", "#statusSetAllBtn", function(){
 
         const checkedRows = $(".row-check:checked");
@@ -334,20 +375,21 @@
             if(!firstName) firstName = items[0].menuName;
         });
 
+        // 일괄 변경용 select → 여기서도 메뉴중단 옵션은 CAN_USE_MENU_STOP 에 따라 제거
+        const optionsHtml = buildStoreStatusOptions('판매중');
+
         $("#modalMenuName").text(firstName + " 외 " + (totalItems - 1) + "건");
 
-        $("#modalSizeArea").html('\
-            <div class="row mb-2">\
-                <label class="col-3 fw-semibold">전체</label>\
-                <div class="col">\
-                    <select class="form-select" id="bulkStatusSelect">\
-                        <option>판매중</option>\
-                        <option>판매중단</option>\
-                        <option>품절</option>\
-                    </select>\
-                </div>\
-            </div>\
-        ');
+        $("#modalSizeArea").html(''
+            + '<div class="row mb-2">'
+            + '  <label class="col-3 fw-semibold">전체</label>'
+            + '  <div class="col">'
+            + '      <select class="form-select" id="bulkStatusSelect">'
+            +            optionsHtml
+            + '      </select>'
+            + '  </div>'
+            + '</div>'
+        );
 
         $("#statusSetModal").modal("show");
     });

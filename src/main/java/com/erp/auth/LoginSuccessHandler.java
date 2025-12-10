@@ -22,15 +22,11 @@ public class    LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         String role = authentication.getAuthorities().iterator().next().getAuthority();
 
-        if(role.equals("ROLE_ADMIN")) {
-            response.sendRedirect("/admin/home");
-
-        } else if(role.equals("ROLE_MANAGER")) {
+        if ("ROLE_ADMIN".equals(role) || "ROLE_MANAGER".equals(role)) {
             response.sendRedirect("/manager/salesMain");
 
-        } else if(role.equals("ROLE_STORE")) {
+        } else if ("ROLE_STORE".equals(role)) {
             response.sendRedirect("/store/storeSalesMain");
-
         }
 
     }

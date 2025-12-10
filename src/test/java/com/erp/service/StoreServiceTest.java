@@ -1,11 +1,13 @@
 package com.erp.service;
 
+import com.erp.dto.StoreDTO;
 import com.erp.dto.ManagerDTO;
 import com.erp.dto.StoreDTO;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +23,14 @@ public class StoreServiceTest {
 
     @Test
     void getStoresTest(){
-        System.out.println(storeService.getStores());
+        Page<StoreDTO> result =  storeService.getStoresList(0, null, null, null, null);
+        result.forEach(System.out::println);
+    }
+
+    @Test
+    void getStoresByNameTest(){
+        Page<StoreDTO> result =  storeService.getStoresList(0, null, null, "표", null);
+        result.forEach(System.out::println);
     }
 
     @Test

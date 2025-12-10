@@ -8,24 +8,23 @@ import com.erp.dao.StoreDAO;
 import com.erp.dto.ManagerDTO;
 import com.erp.dto.MenuDTO;
 import com.erp.dto.StoreDTO;
-import com.erp.repository.MenuRepository;
-import com.erp.repository.StoreItemRepository;
 import com.erp.repository.StoreMenuRepository;
 import com.erp.repository.entity.Menu;
 import com.erp.repository.entity.Store;
 import com.erp.repository.entity.StoreMenu;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-@Log4j2
 public class StoreService {
     private final BCryptPasswordEncoder encoder;
     private final StoreDAO storeDAO;
@@ -33,8 +32,23 @@ public class StoreService {
     private final MenuDAO menuDAO;
     private final StoreMenuRepository storeMenuRepository;
 
-    public List<StoreDTO> getStores() {
-        return storeDAO.getStores();
+
+    public Page<StoreDTO> getStoresList(Integer pageNo, String address, String storeName, String managerName, String storeStatus) {
+        int pageSize = 10;
+        int offset = pageNo * pageSize;
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("address", address);
+        params.put("storeName", storeName);
+        params.put("managerName", managerName);
+        params.put("storeStatus", storeStatus);
+        params.put("offset", offset);
+        params.put("limit", pageSize);
+
+        List<StoreDTO> content = storeDAO.getStoresList(params);
+        long total = storeDAO.countStoreList(params);
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return new PageImpl<>(content, pageable, total);
     }
 
     @Transactional

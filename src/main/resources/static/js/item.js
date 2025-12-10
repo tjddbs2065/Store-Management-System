@@ -4,28 +4,35 @@
     // ===== 공통 상수 =====
     const API_LIST_BASE  = '/api/items/list/';
     const API_ITEM_BASE  = '/api/items';
+    const API_UPLOAD_IMG = '/api/items/upload-image';
     const PAGE_SIZE      = 10;
 
-    // ===== 상태 (목록용) =====
-    let currentPage = 1;
+    // ===== 상태 =====
+    let currentPage = 1;          // 목록용
+    let selectedImageFile = null; // 이미지 업로드용(저장/수정 버튼 때만 S3 업로드)
 
     // ===== 공통 Toast =====
     function toast(message, type) {
-        let box = document.getElementById('toastBox');
-        if (!box) {
-            box = document.createElement('div');
-            box.id = 'toastBox';
-            box.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:9999';
-            document.body.appendChild(box);
+        let $box = $('#toastBox');
+        if ($box.length === 0) {
+            $box = $('<div>', {
+                id: 'toastBox',
+                css: {
+                    position: 'fixed',
+                    right: '16px',
+                    bottom: '16px',
+                    zIndex: 9999
+                }
+            }).appendTo('body');
         }
-        const el = document.createElement('div');
-        el.className = 'alert alert-' + (type || 'success') + ' shadow-sm py-2 px-3 mb-2';
-        el.textContent = message;
-        box.appendChild(el);
+        const $el = $('<div>', {
+            'class': 'alert alert-' + (type || 'success') + ' shadow-sm py-2 px-3 mb-2',
+            text: message
+        }).appendTo($box);
+
         setTimeout(() => {
-            el.style.transition = 'opacity .2s';
-            el.style.opacity = '0';
-            setTimeout(() => el.remove(), 200);
+            $el.css('transition', 'opacity .2s').css('opacity', '0');
+            setTimeout(() => $el.remove(), 200);
         }, 1800);
     }
 
@@ -70,8 +77,17 @@
         const end = Math.min(start + VISIBLE - 1, total);
 
         function add(label, target, disabled, active) {
-            const liClass = 'page-item' + (disabled ? ' disabled' : '') + (active ? ' active' : '');
-            $p.append(`<li class="${liClass}"><a class="page-link" href="#" data-page="${target}">${label}</a></li>`);
+            const liClass = 'page-item' +
+                (disabled ? ' disabled' : '') +
+                (active ? ' active' : '');
+            const $li = $('<li>', { 'class': liClass });
+            $('<a>', {
+                'class': 'page-link',
+                href: '#',
+                'data-page': target,
+                text: label
+            }).appendTo($li);
+            $p.append($li);
         }
 
         add('«', 1, current === 1, false);
@@ -102,7 +118,10 @@
     function loadPage(page) {
         const qs = collectQuery();
         fetch(API_LIST_BASE + page + (qs ? ('?' + qs) : ''))
-            .then(res => { if (!res.ok) throw new Error('목록 조회 실패'); return res.json(); })
+            .then(res => {
+                if (!res.ok) throw new Error('목록 조회 실패');
+                return res.json();
+            })
             .then(data => {
                 const list = data.content || data.list || [];
                 const totalPages = data.totalPages || 1;
@@ -204,16 +223,17 @@
         const itemNo = $body.data('itemNo');
         if (!itemNo || !$('#d-itemCode').length) return;
 
-        // 데이터 로딩
         fetch(API_ITEM_BASE + '/' + itemNo)
-            .then(res => { if (!res.ok) throw new Error('상세 조회 실패'); return res.json(); })
+            .then(res => {
+                if (!res.ok) throw new Error('상세 조회 실패');
+                return res.json();
+            })
             .then(dto => fillDetail(dto))
             .catch(err => {
                 console.error(err);
                 toast('품목 상세 조회 중 오류가 발생했습니다.', 'danger');
             });
 
-        // 버튼 동작
         $('#btnEdit').on('click', function () {
             window.location.href = '/item/set?itemNo=' + itemNo;
         });
@@ -236,7 +256,7 @@
     }
 
     // =========================
-    // 3) 등록/수정 공통 - 폼
+    // 3) 등록/수정 공통 - 폼 + 이미지
     // =========================
     function bindExpirationBox() {
         const $type = $('#expirationType');
@@ -256,69 +276,158 @@
         toggleBox();
     }
 
-    function bindImageDrop(dropId) {
-        const $drop = $(dropId);
-        const $file = $('#itemImage');
-        if (!$drop.length || !$file.length) return;
+    // 미리보기 + 선택 파일 기억 (여기서는 S3 업로드 안 함)
+    function setupImageUploader(dropSelector) {
+        const $drop   = $(dropSelector);
+        const $file   = $('#itemImage');
+        const $hidden = $('#itemImageUrl');
 
+        if (!$drop.length || !$file.length || !$hidden.length) return;
+
+        function applyPreview(dataUrl) {
+            $drop.css({
+                backgroundImage: 'url(' + dataUrl + ')',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center center',
+                color: 'transparent'
+            }).text('');
+        }
+
+        function handleFileSelect(file) {
+            if (!file) {
+                selectedImageFile = null;
+                return;
+            }
+
+            selectedImageFile = file;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                applyPreview(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 클릭 → 파일 선택
         $drop.on('click', function () {
             $file.trigger('click');
         });
 
+        // drag & drop
         $drop.on('dragover', function (e) {
             e.preventDefault();
             $(this).css('border-color', '#999');
-        }).on('dragleave', function () {
+        }).on('dragleave', function (e) {
+            e.preventDefault();
             $(this).css('border-color', '#ccc');
         }).on('drop', function (e) {
             e.preventDefault();
-            const dt = e.originalEvent.dataTransfer;
-            if (dt && dt.files) {
-                $file[0].files = dt.files;
-            }
             $(this).css('border-color', '#ccc');
+            const dt = e.originalEvent.dataTransfer;
+            if (dt && dt.files && dt.files[0]) {
+                $file[0].files = dt.files;
+                handleFileSelect(dt.files[0]);
+            }
+        });
+
+        // input[type=file] 변경
+        $file.on('change', function () {
+            const file = this.files && this.files[0];
+            handleFileSelect(file);
         });
     }
 
+// 실제 S3 업로드는 저장/수정 버튼 누를 때만 (fetch 버전)
+    function uploadImageIfNeeded() {
+        const $hidden = $('#itemImageUrl');
+
+        // 새로 선택한 파일이 없으면 hidden 값 그대로 사용
+        if (!selectedImageFile) {
+            return Promise.resolve($hidden.val() || null);
+        }
+
+        const formData = new FormData();
+        formData.append('file', selectedImageFile);
+
+        return fetch(API_UPLOAD_IMG, {
+            method: 'POST',
+            body: formData
+            // FormData 쓸 때는 content-type 직접 설정 X
+        })
+            .then(res => {
+                if (res.status === 403) {
+                    throw new Error('권한이 없습니다.');
+                }
+                if (!res.ok) {
+                    throw new Error('이미지 업로드 실패');
+                }
+                // 서버에서 URL 문자열을 그대로 내려준다고 가정
+                return res.text(); // JSON이면 res.json() 으로 변경
+            })
+            .then(url => {
+                $hidden.val(url);
+                selectedImageFile = null; // 한 번 업로드했으니 초기화
+                toast('이미지 업로드 완료', 'success');
+                return url;
+            })
+            .catch(err => {
+                console.error(err);
+                toast(err.message || '이미지 업로드 실패', 'danger');
+                // 상위 .catch 에서도 처리할 수 있도록 다시 throw
+                throw err;
+            });
+    }
+
     function collectFormData() {
-        const dto = {};
+        const $itemPrice    = $('#itemPrice');
+        const $convertStock = $('#convertStock');
+        const $expiration   = $('#expiration');
 
-        dto.itemCategory   = ($('#itemCategory').val() || '').trim();
-        dto.itemCode       = ($('#itemCode').val() || '').trim();
-        dto.itemName       = ($('#itemName').val() || '').trim();
-        dto.ingredientName = ($('#ingredientName').val() || '').trim();
+        const priceVal   = $itemPrice.val();
+        const convertVal = $convertStock.val();
+        const expVal     = $expiration.val();
 
-        dto.stockUnit    = ($('#stockUnit').val() || '').trim();
-        dto.supplyUnit   = ($('#supplyUnit').val() || '').trim();
-        dto.convertStock = $('#convertStock').val() ? parseInt($('#convertStock').val(), 10) : null;
-        dto.itemPrice    = $('#itemPrice').val() ? parseInt($('#itemPrice').val(), 10) : null;
-        dto.supplier     = ($('#supplier').val() || '').trim();
+        return {
+            itemCategory:   ($('#itemCategory').val() || '').trim(),
+            itemCode:       ($('#itemCode').val() || '').trim(),
+            itemName:       ($('#itemName').val() || '').trim(),
+            ingredientName: ($('#ingredientName').val() || '').trim(),
 
-        dto.storageType    = $('input[name="storageType"]:checked').val() || null;
-        dto.expirationType = $('#expirationType').val() || null;
-        dto.expiration     = $('#expiration').val() ? parseInt($('#expiration').val(), 10) : null;
+            stockUnit:    ($('#stockUnit').val() || '').trim(),
+            supplyUnit:   ($('#supplyUnit').val() || '').trim(),
+            convertStock: convertVal ? Number(convertVal) : null,
+            itemPrice:    priceVal ? Number(priceVal) : null,
+            supplier:     ($('#supplier').val() || '').trim(),
 
-        dto.note        = ($('#note').val() || '').trim();
-        // 이미지 업로드는 지금은 경로 문자열만 사용 (필요시 추가 구현)
-        // dto.itemImage = ...;
+            storageType:    $('input[name="storageType"]:checked').val() || null,
+            expirationType: $('#expirationType').val() || null,
+            expiration:     expVal ? Number(expVal) : null,
 
-        return dto;
+            note:      ($('#note').val() || '').trim(),
+            itemImage: ($('#itemImageUrl').val() || null)
+        };
     }
 
     function validateForm(dto) {
-        if (!dto.itemCategory) { toast('카테고리를 선택해 주세요.', 'warning'); return false; }
-        if (!dto.itemCode)     { toast('품목 코드를 입력해 주세요.', 'warning'); return false; }
-        if (!dto.itemName)     { toast('품목 명을 입력해 주세요.', 'warning'); return false; }
-        if (!dto.ingredientName){ toast('재료 명을 입력해 주세요.', 'warning'); return false; }
-        if (!dto.stockUnit)    { toast('기준 단위를 선택해 주세요.', 'warning'); return false; }
-        if (!dto.supplyUnit)   { toast('공급 단위를 선택해 주세요.', 'warning'); return false; }
+        if (!dto.itemCategory)   return toast('카테고리를 선택해 주세요.', 'warning'), false;
+        if (!dto.itemCode)       return toast('품목 코드를 입력해 주세요.', 'warning'), false;
+        if (!dto.itemName)       return toast('품목 명을 입력해 주세요.', 'warning'), false;
+        if (!dto.ingredientName) return toast('재료 명을 입력해 주세요.', 'warning'), false;
+        if (!dto.stockUnit)      return toast('기준 단위를 선택해 주세요.', 'warning'), false;
+        if (!dto.supplyUnit)     return toast('공급 단위를 선택해 주세요.', 'warning'), false;
+
         if (dto.itemPrice == null || isNaN(dto.itemPrice) || dto.itemPrice <= 0) {
-            toast('공급 가격을 1 이상으로 입력해 주세요.', 'warning'); return false;
+            toast('공급 가격을 1 이상으로 입력해 주세요.', 'warning');
+            return false;
         }
-        if (!dto.supplier)     { toast('공급사를 입력해 주세요.', 'warning'); return false; }
+        if (!dto.supplier) {
+            toast('공급사를 입력해 주세요.', 'warning');
+            return false;
+        }
 
         if (dto.expirationType === '입고 후 n일' && (dto.expiration == null || dto.expiration <= 0)) {
-            toast('보관기한 일수를 입력해 주세요.', 'warning'); return false;
+            toast('보관기한 일수를 입력해 주세요.', 'warning');
+            return false;
         }
         return true;
     }
@@ -327,17 +436,24 @@
         if (!$('#itemFormAdd').length) return;
 
         bindExpirationBox();
-        bindImageDrop('#imgDropAdd');
+        setupImageUploader('#imgDropAdd');
+        $('#itemImageUrl').val('');
+        selectedImageFile = null;
 
         $('#btnItemSave').on('click', function () {
             const dto = collectFormData();
             if (!validateForm(dto)) return;
 
-            fetch(API_ITEM_BASE, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-                body: JSON.stringify(dto)
-            })
+            uploadImageIfNeeded()
+                .then(function (url) {
+                    if (url) dto.itemImage = url;
+
+                    return fetch(API_ITEM_BASE, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+                        body: JSON.stringify(dto)
+                    });
+                })
                 .then(res => {
                     if (res.status === 403) throw new Error('권한이 없습니다.');
                     if (!res.ok) return res.text().then(t => { throw new Error(t || '등록 실패'); });
@@ -349,7 +465,9 @@
                 })
                 .catch(err => {
                     console.error(err);
-                    toast(err.message || '등록 중 오류가 발생했습니다.', 'danger');
+                    if (err && err.message) {
+                        toast(err.message || '등록 중 오류가 발생했습니다.', 'danger');
+                    }
                 });
         });
     }
@@ -374,6 +492,16 @@
         if (dto.expiration != null) $('#expiration').val(dto.expiration);
 
         $('#note').val(dto.note || '');
+
+        if (dto.itemImage) {
+            $('#itemImageUrl').val(dto.itemImage);
+            $('#imgDropEdit').css({
+                backgroundImage: 'url(' + dto.itemImage + ')',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center center',
+                color: 'transparent'
+            }).text('');
+        }
     }
 
     function initEditPage() {
@@ -383,14 +511,17 @@
         if (!itemNo) return;
 
         bindExpirationBox();
-        bindImageDrop('#imgDropEdit');
+        setupImageUploader('#imgDropEdit');
+        selectedImageFile = null;
 
         // 기존 데이터 불러오기
         fetch(API_ITEM_BASE + '/' + itemNo)
-            .then(res => { if (!res.ok) throw new Error('상세 조회 실패'); return res.json(); })
+            .then(res => {
+                if (!res.ok) throw new Error('상세 조회 실패');
+                return res.json();
+            })
             .then(dto => {
                 fillForm(dto);
-                // 보관기한 박스 표시 상태 맞추기
                 $('#expirationType').trigger('change');
             })
             .catch(err => {
@@ -402,11 +533,16 @@
             const dto = collectFormData();
             if (!validateForm(dto)) return;
 
-            fetch(API_ITEM_BASE + '/' + itemNo, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-                body: JSON.stringify(dto)
-            })
+            uploadImageIfNeeded()
+                .then(function (url) {
+                    if (url) dto.itemImage = url;
+
+                    return fetch(API_ITEM_BASE + '/' + itemNo, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+                        body: JSON.stringify(dto)
+                    });
+                })
                 .then(res => {
                     if (res.status === 403) throw new Error('권한이 없습니다.');
                     if (!res.ok) return res.text().then(t => { throw new Error(t || '수정 실패'); });
@@ -414,11 +550,15 @@
                 })
                 .then(() => {
                     toast('수정이 완료되었습니다.', 'success');
-                    setTimeout(() => { window.location.href = '/item/detail?itemNo=' + itemNo; }, 800);
+                    setTimeout(() => {
+                        window.location.href = '/item/detail?itemNo=' + itemNo;
+                    }, 800);
                 })
                 .catch(err => {
                     console.error(err);
-                    toast(err.message || '수정 중 오류가 발생했습니다.', 'danger');
+                    if (err && err.message) {
+                        toast(err.message || '수정 중 오류가 발생했습니다.', 'danger');
+                    }
                 });
         });
     }
