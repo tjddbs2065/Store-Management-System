@@ -56,6 +56,7 @@
         }
 
         list.forEach(function (s) {
+            const storeNo = s.storeNo || '';
             const storeName = s.storeName || '';
             const storeManagerId = s.storeManagerId || '';
             const email = s.email || '';
@@ -72,14 +73,17 @@
                     <td>${storePhoneNumber}</td>
                     <td>
                         <div class="form-check form-switch d-flex justify-content-center">
-                            <!-- 기능 미구현: 토글만 보여주고 disabled -->
-                            <input class="form-check-input" type="checkbox" ${checkedAttr} disabled>
+                            <!-- 메뉴 판매 중지 권한 토글 -->
+                            <input class="form-check-input store-menu-toggle"
+                                   type="checkbox"
+                                   ${checkedAttr}
+                                   data-store-no="${storeNo}">
                         </div>
                     </td>
                     <td>
-                        <!-- 상세보기 버튼: 모양만, 기능 없음 -->
+                        <!-- 상세보기 버튼: 아이콘만, 테두리/배경 없음 (기능 미구현) -->
                         <button type="button"
-                                class="btn btn-sm detailStoreBtn"
+                                class="btn p-0 border-0 bg-transparent detailStoreBtn"
                                 disabled>
                             <i class="bi bi-file-earmark-text" style="font-size: 1.6rem;"></i>
                         </button>
@@ -91,7 +95,7 @@
     }
 
     // -----------------------------
-    // 서버 호출
+    // 서버 호출 (목록)
     // -----------------------------
     function fetchManagerPage(page) {
         const zeroBased = page - 1;
@@ -176,6 +180,27 @@
         // 계정 등록 버튼: 안내만
         $('#addMemberBtn').on('click', function () {
             alert('계정 등록 기능은 추후 구현 예정입니다.');
+        });
+
+        // 직영점 - 메뉴 판매 중지 권한 토글 이벤트
+        $('#storeTbody').on('change', '.store-menu-toggle', function () {
+            const $cb = $(this);
+            const storeNo = $cb.data('store-no');
+            if (!storeNo) return;
+
+            const isChecked = $cb.is(':checked');
+            const newRole = isChecked ? 'Y' : 'N';
+
+            const payload = {
+                storeNo: storeNo,
+                menuStopRole: newRole
+            };
+
+            // /admin/member/store/menuStopRole 로 PATCH
+            fetchUtil('/admin/member/store/menuStopRole', function (res) {
+                console.log('menuStopRole updated:', res);
+                // 필요하면 여기서 toast 띄우기
+            }, 'PATCH', payload);
         });
 
         // 첫 로딩: 본사 직원 1페이지

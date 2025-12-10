@@ -43,6 +43,21 @@ public class MemberService {
         return toPage(all, safePage);
     }
 
+    /**
+     * 직영점 메뉴 판매 중지 권한 변경
+     */
+    public void updateStoreMenuStopRole(long storeNo, String menuStopRole) {
+        // Y / N 이외 값 들어와도 기본은 N 으로 처리
+        String safeRole = "Y".equalsIgnoreCase(menuStopRole) ? "Y" : "N";
+
+        StoreDTO dto = new StoreDTO();
+        dto.setStoreNo(storeNo);
+        dto.setMenuStopRole(safeRole);
+
+        storeDAO.setStoreRole(dto);  // MyBatis update
+    }
+
+    // 공통 페이지 변환
     private <T> Page<T> toPage(List<T> all, int pageNo) {
         Pageable pageable = PageRequest.of(pageNo, PAGE_SIZE);
 
