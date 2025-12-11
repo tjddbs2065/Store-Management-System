@@ -404,6 +404,12 @@
         location.href = `/manager/storeMenu?storeNo=${storeNo}&storeName=${encodeURIComponent(storeName)}`;
     })
 
+    $("#salesBtn").on("click", function () {
+        const storeNo = currentStore.storeNo;
+        const storeName = currentStore.storeName;
+        location.href = `/manager/salesMain?storeNo=${storeNo}&storeName=${encodeURIComponent(storeName)}`;
+    })
+
 </script>
 
 </body>
