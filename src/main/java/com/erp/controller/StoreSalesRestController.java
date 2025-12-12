@@ -72,11 +72,11 @@ public class StoreSalesRestController {
     ) {
         Long storeNo = principal.getStore().getStoreNo();
 
-        return salesKPIService.getStoreKPI(
-                storeNo,
+        return salesKPIService.getKPIByDate(
                 type,
                 startDate,
-                endDate
+                endDate,
+                storeNo
         );
     }
 

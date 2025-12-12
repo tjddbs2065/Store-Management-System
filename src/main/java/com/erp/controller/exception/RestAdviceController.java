@@ -35,4 +35,9 @@ public class RestAdviceController {
     public ResponseEntity<Map<String, String>> StoreNotFoundException(StoreNotFoundException e) {
         return ResponseEntity.status(400).body(Map.of("message", e.getMessage()));
     }
+
+    @ExceptionHandler(InvalidDateRangeException.class)
+    public ResponseEntity<Map<String, String>> InvalidDateRangeException(InvalidDateRangeException e) {
+        return ResponseEntity.status(400).body(Map.of("message", e.getMessage()));
+    }
 }

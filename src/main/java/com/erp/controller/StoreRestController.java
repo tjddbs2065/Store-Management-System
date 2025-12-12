@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/store")
+@RequestMapping("/admin")
 @RequiredArgsConstructor
 public class StoreRestController {
 
