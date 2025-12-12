@@ -43,9 +43,10 @@
                         <!-- MANAGER만 수정/삭제 버튼 -->
                         <button id="btnEdit" class="btn custom-btn" th:if="${role=='MANAGER'}">수정</button>
                         <button id="btnDelete" class="btn btn-outline-danger" th:if="${role=='MANAGER'}">품목 삭제</button>
-                        <button class="btn btn-outline-secondary" id="btnBackList"
-                                th:onclick="|location.href='@{/item/get}'|">
-                            전체 품목 목록으로
+
+                        <!-- 🔹 뒤로가기 버튼 (재고조회 또는 품목목록으로, 히스토리 기반) -->
+                        <button class="btn btn-outline-secondary" id="btnBack">
+                            뒤로가기
                         </button>
                     </div>
                 </div>

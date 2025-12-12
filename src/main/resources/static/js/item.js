@@ -6,6 +6,7 @@
     const API_ITEM_BASE  = '/api/items';
     const API_UPLOAD_IMG = '/api/items/upload-image';
     const PAGE_SIZE      = 10;
+    const LIST_STATE_KEY = 'ITEM_LIST_STATE';
 
     // ===== 상태 =====
     let currentPage = 1;          // 목록용
@@ -34,6 +35,48 @@
             $el.css('transition', 'opacity .2s').css('opacity', '0');
             setTimeout(() => $el.remove(), 200);
         }, 1800);
+    }
+
+    // =========================
+    // 목록 화면 상태 저장/복원
+    // =========================
+    function saveListState(page) {
+        if (!window.sessionStorage) return;
+        try {
+            const state = {
+                page: page,
+                category: $('#categorySelect').val() || '',
+                searchType: $('#searchTypeSelect').val() || 'ITEM_NAME',
+                keyword: ($('#searchKeyword').val() || '').trim()
+            };
+            sessionStorage.setItem(LIST_STATE_KEY, JSON.stringify(state));
+        } catch (e) {
+            console.error('ITEM_LIST_STATE 저장 실패', e);
+        }
+    }
+
+    function restoreListState() {
+        if (!window.sessionStorage) return null;
+        const raw = sessionStorage.getItem(LIST_STATE_KEY);
+        if (!raw) return null;
+
+        try {
+            const state = JSON.parse(raw);
+
+            if (state.category !== undefined) {
+                $('#categorySelect').val(state.category);
+            }
+            if (state.searchType) {
+                $('#searchTypeSelect').val(state.searchType);
+            }
+            if (state.keyword !== undefined) {
+                $('#searchKeyword').val(state.keyword);
+            }
+            return state;
+        } catch (e) {
+            console.error('ITEM_LIST_STATE 파싱 실패', e);
+            return null;
+        }
     }
 
     // =========================
@@ -133,6 +176,8 @@
 
                 renderTable(list);
                 renderPager(currentPage, totalPages);
+                // 마지막 조회 상태 저장 (페이지 + 검색조건)
+                saveListState(currentPage);
 
                 if (currentPage > totalPages && totalPages > 0) {
                     loadPage(totalPages);
@@ -162,17 +207,27 @@
             $('#categorySelect').val('');
             $('#searchTypeSelect').val('ITEM_NAME');
             $('#searchKeyword').val('');
+            // 상태 초기화
+            if (window.sessionStorage) {
+                sessionStorage.removeItem(LIST_STATE_KEY);
+            }
             loadPage(1);
         });
 
         // 상세 이동
         $(document).on('click', '.detail-btn', function () {
             const itemNo = $(this).data('itemno');
-            if (itemNo) window.location.href = '/item/detail?itemNo=' + itemNo;
-            else window.location.href = '/item/detail';
+            if (itemNo) {
+                window.location.href = '/item/detail?itemNo=' + itemNo;
+            } else {
+                window.location.href = '/item/detail';
+            }
         });
 
-        loadPage(1);
+        // 기존 검색/페이지 상태 복원 후 첫 페이지 로드
+        const restored = restoreListState();
+        const initialPage = (restored && restored.page && restored.page > 0) ? restored.page : 1;
+        loadPage(initialPage);
     }
 
     // =========================
@@ -253,6 +308,25 @@
                     toast(err.message || '삭제 중 오류가 발생했습니다.', 'danger');
                 });
         });
+
+        // ===== 뒤로가기 버튼 처리 =====
+        const $backBtn = $('#btnBack');
+        if ($backBtn.length) {
+            const ref = document.referrer || '';
+            const sameOrigin = ref && ref.startsWith(window.location.origin);
+
+            if (!sameOrigin) {
+                // 직접 URL로 진입한 경우 등 → 버튼 숨김
+                $backBtn.hide();
+            } else {
+                // 이전 화면으로 돌아가기 (재고조회/품목목록 둘 다 브라우저 히스토리 기준)
+                $backBtn.text('뒤로가기');
+                $backBtn.on('click', function (e) {
+                    e.preventDefault();
+                    window.history.back();
+                });
+            }
+        }
     }
 
     // =========================
@@ -337,7 +411,7 @@
         });
     }
 
-// 실제 S3 업로드는 저장/수정 버튼 누를 때만 (fetch 버전)
+    // 실제 S3 업로드는 저장/수정 버튼 누를 때만 (fetch 버전)
     function uploadImageIfNeeded() {
         const $hidden = $('#itemImageUrl');
 
