@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+                xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>직영점 목록 조회</title>
@@ -12,7 +13,13 @@
     <script src="/js/util.js"></script>
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=55b8e6a9e27878899b29b23d80c19d82&libraries=services,clusterer,drawing"></script>
     <style>
-
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 2000;
+        }
         body {
             background-color: #e5e5e5;
         }
@@ -22,25 +29,6 @@
             border: 1px solid #ddd;
             border-radius: 10px;
             padding: 20px;
-        }
-
-        .pill-box {
-            border: 1px solid #000;
-            border-radius: 12px;
-            padding: 6px 12px;
-            background: #fff;
-            min-width: 150px;
-            text-align: center;
-        }
-
-        .detail-btn {
-            width: 22px;
-            cursor: pointer;
-        }
-
-        .modal-label {
-            font-weight: 600;
-            margin-bottom: 4px;
         }
 
         /* 버튼 색 FFEEAA */
@@ -66,7 +54,7 @@
 </head>
 
 <body class="p-3">
-
+<header th:replace="fragments/toolBar :: toolBar"></header>
 <div class="border border-secondary" style="max-width:1500px; margin:0 auto; background:#fff;">
 
     <!-- 제목 -->
@@ -160,104 +148,103 @@
 <!-- 상세 모달 -->
 <div class="modal fade" id="storeDetailModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content">
+        <div class="modal-content shadow-lg">
 
-            <div class="modal-header">
-                <h5 class="fw-bold">직영점 상세 보기</h5>
+            <!-- HEADER -->
+            <div class="modal-header bg-light">
+                <h5 class="fw-bold mb-0">직영점 상세 정보</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
+            <!-- BODY -->
             <div class="modal-body">
 
+                <!-- 버튼 영역 -->
                 <div class="d-flex gap-2 justify-content-end mb-3" id="managerButtons">
-                    <button id="stockSearchBtn" class="btn btn-custom-yellow btn-sm">재고 조회</button>
-                    <button id="menuSearchBtn" class="btn btn-custom-yellow btn-sm">판매 메뉴 조회</button>
-                    <button id="salesSearchBtn" class="btn btn-custom-yellow btn-sm">매출 조회</button>
+                    <button id="storeStockBtn" class="btn btn-custom-yellow btn-sm" sec:authorize="hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')">재고 조회</button>
+                    <button id="storeMenuBtn" class="btn btn-custom-yellow btn-sm" sec:authorize="hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')">판매 메뉴 조회</button>
+                    <button id="salesBtn" class="btn btn-custom-yellow btn-sm" sec:authorize="hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')">매출 조회</button>
                 </div>
 
-                <div class="d-flex justify-content-between gap-4">
+                <div class="row">
+                    <!-- LEFT INFORMATION AREA -->
+                    <div class="col-md-8">
 
-                    <!-- 좌측 -->
-                    <div style="flex: 1; min-width: 470px;">
+                        <div class="row g-3">
 
-                        <div class="row mb-2">
-                            <div class="col-4 modal-label">직영점</div>
-                            <div class="col-4 modal-label">상태</div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-4">
-                                <div id="mdStoreName" class="pill-box"></div>
+                            <!-- 매장명 -->
+                            <div class="col-md-6">
+                                <label class="fw-semibold">직영점</label>
+                                <div id="mdStoreName" class="p-2 border rounded bg-light w-75"></div>
                             </div>
-                            <div class="col-4">
-                                <div id="mdStatus" class="pill-box"></div>
-                            </div>
-                        </div>
 
-                        <div class="row mb-2">
-                            <div class="col-4 modal-label">점장명</div>
-                            <div class="col-4 modal-label">점장 연락처</div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-4">
-                                <div id="mdManagerName" class="pill-box"></div>
+                            <!-- 상태 -->
+                            <div class="col-md-6">
+                                <label class="fw-semibold">매장 상태</label>
+                                <div id="mdStatus" class="p-2 border rounded bg-light w-75"></div>
                             </div>
-                            <div class="col-4">
-                                <div id="mdManagerPhone" class="pill-box"></div>
-                            </div>
-                        </div>
 
-                        <div class="modal-label mb-1">주소</div>
-                        <div class="mb-3">
-                            <div id="mdAddress" class="pill-box" style="width: 97%;"></div>
-                        </div>
-
-                        <div class="row mb-2">
-                            <div class="col-4 modal-label">직영점 전화</div>
-                            <div class="col-4 modal-label">개점일</div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-4">
-                                <div id="mdStorePhone" class="pill-box"></div>
+                            <!-- 점장명 -->
+                            <div class="col-md-6">
+                                <label class="fw-semibold">점장명</label>
+                                <div id="mdManagerName" class="p-2 border rounded bg-light w-75"></div>
                             </div>
-                            <div class="col-4">
-                                <div id="mdOpenDate" class="pill-box"></div>
-                            </div>
-                        </div>
 
-                        <div class="row mb-2">
-                            <div class="col-4 modal-label">영업시간</div>
-                            <div class="col-4 modal-label">폐점일</div>
-                        </div>
+                            <!-- 점장 연락처 -->
+                            <div class="col-md-6">
+                                <label class="fw-semibold">점장 연락처</label>
+                                <div id="mdManagerPhoneNumber" class="p-2 border rounded bg-light w-75"></div>
+                            </div>
 
-                        <div class="row">
-                            <div class="col-4">
-                                <div id="mdBizTime" class="pill-box"></div>
+                            <!-- 주소 -->
+                            <div class="col-md-10">
+                                <label class="fw-semibold">직영점 주소</label>
+                                <div id="mdAddress" class="p-2 border rounded bg-light"></div>
                             </div>
-                            <div class="col-4">
-                                <div id="mdCloseDate" class="pill-box"></div>
+
+                            <!-- 매장 연락처 -->
+                            <div class="col-md-6">
+                                <label class="fw-semibold">직영점 연락처</label>
+                                <div id="mdStorePhone" class="p-2 border rounded bg-light w-75"></div>
                             </div>
+
+                            <!-- 개점일 -->
+                            <div class="col-md-6">
+                                <label class="fw-semibold">개점일</label>
+                                <div id="mdOpenDate" class="p-2 border rounded bg-light w-75"></div>
+                            </div>
+
+                            <!-- 영업시간 -->
+                            <div class="col-md-6">
+                                <label class="fw-semibold">영업시간</label>
+                                <div id="mdTime" class="p-2 border rounded bg-light w-75"></div>
+                            </div>
+
+                            <!-- 폐점일 -->
+                            <div class="col-md-6">
+                                <label class="fw-semibold">폐점일</label>
+                                <div id="mdCloseDate" class="p-2 border rounded bg-light w-75"></div>
+                            </div>
+
                         </div>
 
                     </div>
 
-                    <!-- 우측 이미지 -->
-                    <div style="width: 430px; max-width: 100%;">
-                        <div class="image-wrapper"
-                             style="width:100%; height:350px; overflow:hidden; border-radius:10px;">
-                            <img id="mdStoreImg" src="https://picsum.photos/450/350"
-                                 style="width:100%; height:100%; object-fit:cover;">
+                    <!-- RIGHT IMAGE AREA -->
+                    <div class="col-md-4">
+                        <div class="image-wrapper rounded shadow-sm">
+                            <img id="mdStoreImg"
+                                 src="https://picsum.photos/500/350"
+                                 class="img-fluid rounded"
+                                 style="object-fit: cover; width:100%; height:350px;">
                         </div>
                     </div>
-
                 </div>
-
             </div>
 
+            <!-- FOOTER -->
             <div class="modal-footer justify-content-center">
-                <button id="closeDetailBtn" type="button" class="btn btn-custom-yellow px-4" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-custom-yellow px-4" data-bs-dismiss="modal">
                     닫기
                 </button>
             </div>
@@ -265,6 +252,7 @@
         </div>
     </div>
 </div>
+
 <script>
     const storeTable = $("#storeList")
 
@@ -373,28 +361,54 @@
     $("#searchBtn").on("click", function () {
         loadPage(1);
     });
-    function openStoreDetail(no) {
-        var s = stores.find(x => x.no === no);
-        if (!s) return;
-
-        $("#mdStoreName").text(s.name);
-        $("#mdStatus").text(s.status);
-        $("#mdManagerName").text(s.manager);
-        $("#mdManagerPhone").text(s.managerPhone);
-        $("#mdAddress").text(s.region);
-        $("#mdStorePhone").text(s.storePhone);
-        $("#mdOpenDate").text(s.openDate);
-        $("#mdBizTime").text(s.bizTime);
-        $("#mdCloseDate").text(s.closeDate);
-
-        new bootstrap.Modal(document.getElementById("storeDetailModal")).show();
-    };
 
     $(document).on("click", "#pagination .page-link", function (e) {
         e.preventDefault();      // a 태그 기본 동작 막기
         const page = $(this).data("page");
         loadPage(page);          // 원하는 페이지 로드
     });
+
+
+    $(document).on("click", ".detailBtn", function () {
+        const storeNo = $(this).data("storeno");
+        fetchUtil(`getStoreDetail/${storeNo}`, data => {
+            openStoreDetail(data);
+        })
+    });
+
+    let currentStore = null;
+    function openStoreDetail(store) {
+        currentStore = store;
+        $("#mdStoreName").text(store.storeName?? "-");
+        $("#mdStatus").text(store.storeStatus?? "-");
+        $("#mdManagerName").text(store.managerName?? "-");
+        $("#mdManagerPhoneNumber").text(store.phoneNumber?? "-");
+        $("#mdAddress").text(store.address?? "-");
+        $("#mdStorePhone").text(store.storePhoneNumber?? "-");
+        $("#mdOpenDate").text(store.openedDate?? "-");
+        $("#mdTime").text(store.openTime + " ~ " + store.closeTime?? "-");
+        $("#mdCloseDate").text(store.closedDate?? "-");
+
+        new bootstrap.Modal(document.getElementById("storeDetailModal")).show();
+    }
+
+    $("#storeStockBtn").on("click", function () {
+        const storeNo = currentStore.storeNo;
+        const storeName = currentStore.storeName;
+        location.href = `/manager/stock/storeItem?storeNo=${storeNo}&storeName=${encodeURIComponent(storeName)}`;
+    })
+
+    $("#storeMenuBtn").on("click", function () {
+        const storeNo = currentStore.storeNo;
+        const storeName = currentStore.storeName;
+        location.href = `/manager/storeMenu?storeNo=${storeNo}&storeName=${encodeURIComponent(storeName)}`;
+    })
+
+    $("#salesBtn").on("click", function () {
+        const storeNo = currentStore.storeNo;
+        const storeName = currentStore.storeName;
+        location.href = `/manager/salesMain?storeNo=${storeNo}&storeName=${encodeURIComponent(storeName)}`;
+    })
 
 </script>
 

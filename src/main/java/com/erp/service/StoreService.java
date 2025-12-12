@@ -32,7 +32,6 @@ public class StoreService {
     private final MenuDAO menuDAO;
     private final StoreMenuRepository storeMenuRepository;
 
-
     public Page<StoreDTO> getStoresList(Integer pageNo, String address, String storeName, String managerName, String storeStatus) {
         int pageSize = 10;
         int offset = pageNo * pageSize;
@@ -46,10 +45,14 @@ public class StoreService {
         params.put("limit", pageSize);
 
         List<StoreDTO> content = storeDAO.getStoresList(params);
-        long total = storeDAO.countStoreList(params);
+        Long total = storeDAO.countStoreList(params);
         Pageable pageable = PageRequest.of(pageNo, pageSize);
         return new PageImpl<>(content, pageable, total);
     }
+
+    public StoreDTO getStoreDetail(Long storeNo) {
+        return storeDAO.getStoreDetail(storeNo);
+    };
 
     @Transactional
     public void addStore(ManagerDTO manager, StoreDTO store) {

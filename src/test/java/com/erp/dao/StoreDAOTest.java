@@ -40,7 +40,7 @@ public class StoreDAOTest {
     }
     @Test
     void getStoreDetailTest() {
-        System.out.println(storeDAO.getStoreDetail(1));
+        System.out.println(storeDAO.getStoreDetail(1L));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class StoreDAOTest {
         store.setAddress("서울특별시 금천구 가산디지털1로 128");
         store.setLatitude("37.47984");
         store.setLongitude("126.88279");
-        store.setOpenedDate("2023-03-01");
+        store.setOpenedDate(null);
         store.setClosedDate(null);
         store.setStorePhoneNumber("02-567-8888");
         store.setStoreImage("default_store_image.png");   // 필요 없으면 null

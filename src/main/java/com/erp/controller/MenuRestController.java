@@ -5,8 +5,10 @@ import com.erp.dto.MenuDTO;
 import com.erp.service.ItemService;
 import com.erp.service.MenuService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -39,12 +41,13 @@ public class MenuRestController {
         return ResponseEntity.ok(menuList);
     }
 
-    @PostMapping("/addMenu")
+    @PostMapping(value = "/addMenu", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> addMenu(
-            @RequestBody MenuDTO menuDTO
+            @RequestPart MenuDTO menuDTO,
+            @RequestPart(value = "image", required = false) MultipartFile image
     ){
-        menuService.addMenu(menuDTO);
-        return ResponseEntity.ok().body(Map.of("message", "Request addSalesOrder success"));
+        menuService.addMenu(menuDTO, image);
+        return ResponseEntity.ok().body(Map.of("message", "add Menu success"));
     }
 
     @GetMapping("/itemList")

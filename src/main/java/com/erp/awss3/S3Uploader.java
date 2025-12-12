@@ -52,4 +52,35 @@ public class S3Uploader {
         // 퍼블릭 접근을 허용하는 버킷 정책이 있다고 가정
         return String.format("https://%s.s3.%s.amazonaws.com/%s", bucket, REGION, key);
     }
+
+    public String uploadMenuImage(MultipartFile image, String menuCode) {
+        if (image == null || image.isEmpty()) {
+            throw new IllegalArgumentException("파일이 비어 있습니다.");
+        }
+
+        String originalName = image.getOriginalFilename();
+        String extension = "";
+        if (originalName != null && originalName.contains(".")) {
+            extension = originalName.substring(originalName.lastIndexOf("."));
+        }
+
+        String key = "menu/" + menuCode + "_" + UUID.randomUUID() + extension; // S3 오브젝트 키
+
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .contentType(image.getContentType())
+                // ★ 여기서 ACL 절대 넣지 않기 (The bucket does not allow ACLs 에러 방지)
+                .build();
+
+        try {
+            s3Client.putObject(putObjectRequest,
+                    RequestBody.fromInputStream(image.getInputStream(), image.getSize()));
+        } catch (IOException e) {
+            throw new RuntimeException("S3 업로드 중 오류 발생", e);
+        }
+
+        // 퍼블릭 접근을 허용하는 버킷 정책이 있다고 가정
+        return String.format("https://%s.s3.%s.amazonaws.com/%s", bucket, REGION, key);
+    }
 }

@@ -318,6 +318,24 @@
         $(".row-check").prop("checked", this.checked);
     });
 
+    $(function () {
+        const params = new URLSearchParams(location.search);
+
+        const storeNo = params.get("storeNo");
+        const storeName = params.get("storeName");
+
+        if (storeNo && storeName) {
+
+            $("#searchType").val("");
+            $("#storeInput")
+                .val(storeName)
+                .data("storeno", storeNo)
+                .prop("readonly", true);
+
+            loadMenuTable();
+        }
+    });
+
     $(document).on("click", ".statusSetBtn", function(){
 
         const menuName = $(this).data("menu");

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -31,8 +32,8 @@ public class Store {
     private String latitude;
     @Column(nullable = false)
     private String longitude;
-    private Date openedDate;
-    private Date closedDate;
+    private LocalDate openedDate;
+    private LocalDate closedDate;
     @Column(nullable = false)
     private String storePhoneNumber;
     private String storeImage;

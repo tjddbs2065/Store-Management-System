@@ -294,6 +294,48 @@
         loadMenuRatio(start, end, storeNo);   // ★ 메뉴비중 함께 업데이트
     });
 
+    $(function () {
+
+        const params = new URLSearchParams(location.search);
+        const storeNo = params.get("storeNo");
+        const storeName = params.get("storeName");
+
+        $("#day").prop("checked", true);
+        updatePeriodInputs("day");
+
+        const today = new Date();
+        const startObj = new Date(today);
+        startObj.setDate(startObj.getDate() - 30);
+
+        const toDate = (d) =>
+            `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
+        const start = toDate(startObj);
+        const end   = toDate(today);
+
+        $("#startInput").val(start);
+        $("#endInput").val(end);
+
+        if (storeNo && storeName) {
+            $("#storeInput").val(storeName);
+            $("#storeInput").data("storeno", storeNo);
+
+            loadTrend("day", start, end, storeNo);
+            loadKPI("day", start, end, storeNo);
+            loadMenuRatio(start, end, storeNo);  // 메뉴비중
+        } else {
+            loadTrend("day", start, end, null);
+            loadKPI("day", start, end, null);
+            loadMenuRatio(start, end, null);
+        }
+
+        loadTop5();
+
+        $("#list-start").val(start);
+        $("#list-end").val(end);
+        loadList(1);
+    });
+
 
     let top5Chart;
 

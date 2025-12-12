@@ -1,5 +1,6 @@
 package com.erp.service;
 
+import com.erp.awss3.S3Uploader;
 import com.erp.controller.exception.NoMenuException;
 import com.erp.dao.ItemDAO;
 import com.erp.dao.MenuDAO;
@@ -14,6 +15,7 @@ import com.erp.repository.entity.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +30,7 @@ public class MenuService {
     private final ItemDAO itemDAO;
     private final MenuIngredientRepository menuIngredientRepository;
     private final StoreMenuRepository storeMenuRepository;
+    private final S3Uploader s3Uploader;
 
     //전체 메뉴 조회
     public List<MenuDTO> getMenuList(String menuCategory, String releaseStatus) {
@@ -107,7 +110,12 @@ public class MenuService {
         return new ArrayList<>(merged.values());
     }
 
-    public void addMenu(MenuDTO menuRequest) {
+    public void addMenu(MenuDTO menuRequest, MultipartFile image) {
+        if (image != null && !image.isEmpty()) {
+            String imageUrl = s3Uploader.uploadMenuImage(image, menuRequest.getMenuCode());
+            menuRequest.setMenuImage(imageUrl);
+        }
+
         if ("Y".equals(menuRequest.getSize())) {
             MenuDTO largeDTO = MenuDTO.builder()
                     .menuName(menuRequest.getMenuName())

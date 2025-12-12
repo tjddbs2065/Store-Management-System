@@ -2,6 +2,7 @@ package com.erp.dto;
 
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 @NoArgsConstructor
@@ -19,9 +20,10 @@ public class StoreDTO {
     private String managerName;
     private String email;
     private String address;
+    private String phoneNumber;
     private String storePhoneNumber;
-    private String openedDate;
-    private String closedDate;
+    private LocalDate openedDate;
+    private LocalDate closedDate;
     private String openTime;
     private String closeTime;
     private String latitude;
@@ -37,7 +39,7 @@ public class StoreDTO {
                 .longitude(data.get("longitude"))
                 .latitude(data.get("latitude"))
                 .storePhoneNumber(data.get("storePhoneNumber"))
-                .openedDate(data.get("openedDate"))
+                .openedDate(LocalDate.parse(data.get("openedDate")))
                 .openTime(data.get("openTime"))
                 .closeTime(data.get("closeTime"))
                 .storeImage(data.get("image"))
