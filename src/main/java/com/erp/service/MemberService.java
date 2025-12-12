@@ -1,6 +1,7 @@
 package com.erp.service;
 
 import com.erp.controller.exception.StoreNotFoundException;
+import com.erp.controller.exception.ManagerException;
 import com.erp.dao.ManagerDAO;
 import com.erp.dao.StoreDAO;
 import com.erp.dto.ManagerDTO;
@@ -23,6 +24,22 @@ public class MemberService {
 
     private final ManagerDAO managerDAO;
     private final StoreDAO storeDAO;
+
+    public void addManager(ManagerDTO managerDTO) {
+        managerDTO.setRole("ROLE_MANAGER");
+        try {
+            managerDAO.addManager(managerDTO);
+        }
+        catch (Exception e) {
+            throw new ManagerException("직원 등록 실패");
+        }
+    }
+
+    public void checkManager(String managerId) {
+        if(managerDAO.getManagerForLogin(managerId) == null) {
+            throw new ManagerException("직원을 찾을 수 없습니다.");
+        }
+    }
 
     /**
      * 본사 직원 목록 (ROLE_MANAGER 만 조회)
