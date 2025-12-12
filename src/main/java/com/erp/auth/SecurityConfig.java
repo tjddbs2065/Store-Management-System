@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .requestMatchers("/loginView").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/manager/**").hasAnyRole("ADMIN", "MANAGER")
-                .requestMatchers("/store/**").hasRole("STORE")
+                .requestMatchers("/store/**").hasRole("STORE"   )
                 .anyRequest().authenticated());
 
 

@@ -1,5 +1,6 @@
 package com.erp.service;
 
+import com.erp.controller.exception.InvalidDateRangeException;
 import com.erp.dao.StoreDAO;
 import com.erp.dto.KPIDTO;
 import com.erp.repository.SalesOrderRepository;
@@ -24,16 +25,20 @@ public class SalesKPIService {
 
     public KPIDTO getKPIByDate(String type, String start, String end, Long storeNo) {
 
-        if (storeNo != null) {
-            return getStoreKPI(storeNo, type, start, end);
-        }
-        return getOfficeKPI(type, start, end);
-    }
-
-    public KPIDTO getStoreKPI(Long storeNo, String type, String start, String end) {
-
         LocalDate startDate = convert(type, start, false);
         LocalDate endDate   = convert(type, end, true);
+        if (startDate.isAfter(endDate)) {
+            throw new InvalidDateRangeException();
+        }
+        if (storeNo != null) {
+            return getStoreKPI(storeNo, type, startDate, endDate);
+        }
+
+        return getOfficeKPI(type, startDate, endDate);
+    }
+
+    public KPIDTO getStoreKPI(Long storeNo, String type, LocalDate startDate, LocalDate endDate) {
+
 
         long  totalSales = sumStoreSales(storeNo, startDate, endDate);
 
@@ -54,12 +59,6 @@ public class SalesKPIService {
                 .build();
     }
 
-
-    private KPIDTO getOfficeKPI(String type, String start, String end) {
-        LocalDate startDate = convert(type, start, false);
-        LocalDate endDate   = convert(type, end, true);
-        return getOfficeKPI(type, startDate, endDate);
-    }
 
     private KPIDTO getOfficeKPI(String type, LocalDate startDate, LocalDate endDate) {
 
