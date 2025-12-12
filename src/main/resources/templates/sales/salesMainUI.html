@@ -294,49 +294,6 @@
         loadMenuRatio(start, end, storeNo);   // ★ 메뉴비중 함께 업데이트
     });
 
-    $(function () {
-
-        const params = new URLSearchParams(location.search);
-        const storeNo = params.get("storeNo");
-        const storeName = params.get("storeName");
-
-        $("#day").prop("checked", true);
-        updatePeriodInputs("day");
-
-        const today = new Date();
-        const startObj = new Date(today);
-        startObj.setDate(startObj.getDate() - 30);
-
-        const toDate = (d) =>
-            `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-
-        const start = toDate(startObj);
-        const end   = toDate(today);
-
-        $("#startInput").val(start);
-        $("#endInput").val(end);
-
-        if (storeNo && storeName) {
-            $("#storeInput").val(storeName);
-            $("#storeInput").data("storeno", storeNo);
-
-            loadTrend("day", start, end, storeNo);
-            loadKPI("day", start, end, storeNo);
-            loadMenuRatio(start, end, storeNo);  // 메뉴비중
-        } else {
-            loadTrend("day", start, end, null);
-            loadKPI("day", start, end, null);
-            loadMenuRatio(start, end, null);
-        }
-
-        loadTop5();
-
-        $("#list-start").val(start);
-        $("#list-end").val(end);
-        loadList(1);
-    });
-
-
     let top5Chart;
 
     function loadTop5(){
@@ -523,9 +480,11 @@
 
 
     /* --------------------- 초기 로딩 --------------------- */
-    $(document).ready(function(){
+    $(function () {
 
-        updateModeButtons("chart");
+        const params = new URLSearchParams(location.search);
+        const storeNo = params.get("storeNo");
+        const storeName = params.get("storeName");
 
         $("#day").prop("checked", true);
         updatePeriodInputs("day");
@@ -533,38 +492,47 @@
         const today = new Date();
         let startObj, endObj;
 
-        if (today.getDate() === 1) {
-            const prevLast  = new Date(today.getFullYear(), today.getMonth(), 0);
-            const prevStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-            startObj = prevStart;
-            endObj   = prevLast;
+        if (storeNo && storeName) {
+            startObj = new Date(today);
+            startObj.setDate(startObj.getDate() - 30);
+            endObj = today;
         } else {
-            const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-            const yesterday  = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-            startObj = monthStart;
-            endObj   = yesterday;
+            if (today.getDate() === 1) {
+                endObj   = new Date(today.getFullYear(), today.getMonth(), 0);
+                startObj = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+            } else {
+                startObj = new Date(today.getFullYear(), today.getMonth(), 1);
+                endObj   = new Date(today);
+                endObj.setDate(endObj.getDate() - 1);
+            }
         }
 
         const toDate = d =>
             `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 
-        const s = toDate(startObj);
-        const e = toDate(endObj);
+        const start = toDate(startObj);
+        const end   = toDate(endObj);
 
-        $("#startInput").val(s);
-        $("#endInput").val(e);
+        $("#startInput").val(start);
+        $("#endInput").val(end);
 
-        loadTrend("day", s, e);
-        loadKPI("day", s, e);
+        if (storeNo && storeName) {
+            $("#storeInput").val(storeName).data("storeno", storeNo);
+            loadTrend("day", start, end, storeNo);
+            loadKPI("day", start, end, storeNo);
+            loadMenuRatio(start, end, storeNo);
+        } else {
+            loadTrend("day", start, end, null);
+            loadKPI("day", start, end, null);
+            loadMenuRatio(start, end, null);
+        }
+
         loadTop5();
-        loadMenuRatio(s, e, null);   // ★ 기본 조회는 전체 기준
-
-        $("#list-start").val(s);
-        $("#list-end").val(e);
-
+        $("#list-start").val(start);
+        $("#list-end").val(end);
         loadList(1);
     });
+
 
 
     $("#resetBtn").on("click",function(){
