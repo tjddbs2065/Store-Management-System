@@ -1,4 +1,4 @@
-function fetchUtil(url, action, method="GET", json=null){
+function fetchUtil(url, action, method="GET", data=null){
     const options = {
         method: method
     };
@@ -13,10 +13,10 @@ function fetchUtil(url, action, method="GET", json=null){
     }
 
     fetch(url, options)
-    .then(async data => {
-        const json = await data.json();
-        json.status = data.status;
-        json.ok = data.ok;
+    .then(async dat => {
+        const json = await dat.json();
+        json.status = dat.status;
+        json.ok = dat.ok;
         return json;
     })
     .then(action)

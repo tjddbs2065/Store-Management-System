@@ -1,5 +1,6 @@
 package com.erp.service;
 
+import com.erp.awss3.S3Uploader;
 import com.erp.controller.exception.ManagerException;
 import com.erp.controller.exception.StoreNotFoundException;
 import com.erp.dao.ManagerDAO;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -31,6 +33,7 @@ public class StoreService {
     private final ManagerDAO managerDAO;
     private final MenuDAO menuDAO;
     private final StoreMenuRepository storeMenuRepository;
+    private final S3Uploader s3Uploader;
 
     public Page<StoreDTO> getStoresList(Integer pageNo, String address, String storeName, String managerName, String storeStatus) {
         int pageSize = 10;
@@ -55,7 +58,12 @@ public class StoreService {
     };
 
     @Transactional
-    public void addStore(ManagerDTO manager, StoreDTO store) {
+    public void addStore(ManagerDTO manager, StoreDTO store, MultipartFile storeImage) {
+        if (storeImage != null && !storeImage.isEmpty()) {
+            String imageUrl = s3Uploader.uploadMenuImage(storeImage, store.getStoreName());
+            store.setStoreImage(imageUrl);
+        }
+
         manager.setRole("ROLE_STORE");
         manager.setPw(encoder.encode(manager.getPw()));
         store.setStoreManagerId(manager.getManagerId());

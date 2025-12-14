@@ -214,7 +214,9 @@
                     <div class="col-2"><input type="time" class="form-control" id="closeTime"></div>
 
                     <label class="col-2 fw-bold ms-5">직영점 이미지</label>
-                    <div class="col-4"><input type="file" class="form-control" id="storeImage"></div>
+                    <div class="col-4">
+                        <input type="file" class="form-control" id="storeImage">
+                    </div>
                 </div>
             </div>
         </div>
@@ -313,7 +315,7 @@
                 return;
             }
 
-            return {
+            const data = {
                 "manager":{
                     "managerId" : managerId,
                     "password" : password,
@@ -322,6 +324,7 @@
                     "phone" : phone
                 }
             };
+            return data;
         }
 
         function getStoreData() {
@@ -359,7 +362,7 @@
                 return;
             }
 
-            return {
+            const data = {
                 "manager": {
                     "managerId": storeId,
                     "password": password,
@@ -381,6 +384,18 @@
                 }
             };
 
+            const formData = new FormData();
+            formData.append(
+                "request",
+                new Blob([JSON.stringify(data)], {type: "application/json"})
+            );
+
+            const storeImage = $("#storeImage")[0].files[0];
+            if(storeImage){
+                formData.append("storeImage", storeImage);
+            }
+
+            return formData;
         }
 
         function fetchMemberData(){
@@ -401,16 +416,22 @@
                 // 직영점일 경우
                 if(tabStore.hasClass("active")){
                     fetchUtil("/admin/member/store", (data)=>{
-                            location.href = "memberListUI";
+                            if(data.message === "직영점 추가 성공") {
+                                location.href = "memberListUI";
+                            }
                         },
-                        "POST", JSON.stringify(jsonData)
+                        "POST", jsonData
                     );
                 }
                 // 직원일 경우
                 else if(tabManager.hasClass("active")){
                     fetchUtil("/admin/member/manager", (data)=>{
-                        location.href = "memberListUI";
-                    }, "POST", JSON.stringify(jsonData));
+                            if(data.message === "직원 추가 성공") {
+                                location.href = "memberListUI";
+                            }
+                        },
+                        "POST", jsonData
+                    );
                 }
             });
         }

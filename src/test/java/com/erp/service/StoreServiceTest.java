@@ -61,6 +61,6 @@ public class StoreServiceTest {
                 .menuStopRole("N")
                 .build();
 
-        storeService.addStore(managerStore, store);
+        storeService.addStore(managerStore, store, null);
     }
 }

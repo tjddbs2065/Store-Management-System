@@ -3,15 +3,18 @@ package com.erp.controller;
 import com.erp.controller.exception.ManagerException;
 import com.erp.dto.AddStoreRequestDTO;
 import com.erp.dto.ManagerDTO;
+import com.erp.dto.MenuDTO;
 import com.erp.dto.StoreDTO;
 import com.erp.service.MemberService;
 import com.erp.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -27,17 +30,20 @@ public class MemberRestController {
     public ResponseEntity<Map<String, String>> manager(@RequestBody AddStoreRequestDTO request, Model model) {
         ManagerDTO manager = ManagerDTO.toDTO(request.getManager());
 
+        System.out.println(manager);
         memberService.addManager(manager);
 
         return ResponseEntity.ok().body(Map.of("message", "직원 추가 성공"));
     }
 
-    @PostMapping("/store")
-    public ResponseEntity<Map<String, String>> store(@RequestBody AddStoreRequestDTO request, Model model) {
+    @PostMapping(value = "/store", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String, String>> store(
+            @RequestPart AddStoreRequestDTO request,
+            @RequestPart(value="storeImage", required = false) MultipartFile storeImage) {
         ManagerDTO manager = ManagerDTO.toDTO(request.getManager());
         StoreDTO store = StoreDTO.toDTO(request.getStore());
 
-        storeService.addStore(manager, store);
+        storeService.addStore(manager, store, storeImage);
         return ResponseEntity.ok().body(Map.of("message", "직영점 추가 성공"));
     }
 
