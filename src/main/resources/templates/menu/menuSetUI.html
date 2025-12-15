@@ -60,7 +60,9 @@
             border-color: #FFEEAA !important;
             color: #000;
         }
-
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 2000;
+        }
         .custom-btn:hover {
             background-color: #f2da84 !important;
             border-color: #f2da84 !important;
@@ -95,7 +97,7 @@
 </head>
 
 <body class="py-5">
-
+<header th:insert="fragments/toolBar :: toolBar"></header>
 <div class="wrapper-box">
 
     <input type="hidden" id="menuNos" th:value="${menuNos}">
@@ -469,6 +471,8 @@
         });
 
         menuRequest.ingredients = ingredients;
+        menuRequest.originImage = $("#originImage").val();
+        menuRequest.removeImage = $("#removeImage").val() === "true";
 
         const formData = new FormData();
         formData.append(
@@ -477,13 +481,10 @@
         );
 
         const menuImage = $("#menuImage")[0].files[0];
-        const originImage = $("#originImage").val();
-        const removeImage = $("#removeImage").val();
+
         if(menuImage){
             formData.append("menuImage", menuImage);
         }
-        formData.append("originImage", originImage);
-        formData.append("removeImage", removeImage);
 
         fetchUtil(
             "/menu/setMenu",
