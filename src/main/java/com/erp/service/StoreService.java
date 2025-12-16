@@ -56,6 +56,11 @@ public class StoreService {
     public StoreDTO getStoreDetail(Long storeNo) {
         return storeDAO.getStoreDetail(storeNo);
     };
+    public StoreDTO getStore(String managerId){
+        Long storeId = storeDAO.getStoreNoByManager(managerId);
+
+        return storeDAO.getStoreDetail(storeId);
+    }
 
     @Transactional
     public void addStore(ManagerDTO manager, StoreDTO store, MultipartFile storeImage) {

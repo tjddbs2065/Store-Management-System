@@ -6,6 +6,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/js/util.js"></script>
 
     <style>
         body {
@@ -55,14 +56,14 @@
 
             <div class="row mb-3">
                 <label class="col-2 fw-bold">아이디</label>
-                <div class="col-6"><input type="text" class="form-control" disabled value="bumgye"></div>
+                <div class="col-6"><input type="text" class="form-control" disabled value="" id="managerId"></div>
             </div>
 
             <div class="row mb-3">
                 <label class="col-2 fw-bold">비밀번호</label>
                 <div class="col-5 d-flex">
-                    <input type="password" class="form-control me-1" value="passwd">
-                    <input type="password" class="form-control" value="passwd">
+                    <input type="password" class="form-control me-1" value="" id="pw">
+                    <input type="password" class="form-control" value="" id="pwEqual">
                 </div>
                 <div class="col-2">
                     <button class="btn btn-outline-secondary">비밀번호 확인</button>
@@ -71,23 +72,23 @@
 
             <div class="row mb-3">
                 <label class="col-2 fw-bold">점장명</label>
-                <div class="col-4"><input type="text" class="form-control" value="표수정"></div>
+                <div class="col-4"><input type="text" class="form-control" value="" id="managerName"></div>
 
                 <label class="col-2 fw-bold ms-4">이메일</label>
-                <div class="col-3"><input type="email" class="form-control" value="bumgye@naver.com"></div>
+                <div class="col-3"><input type="email" class="form-control" value="" id="managerEmail"></div>
             </div>
 
             <div class="row mb-3">
                 <label class="col-2 fw-bold">점장 연락처</label>
-                <div class="col-4"><input type="text" class="form-control" value="010-1234-5678"></div>
+                <div class="col-4"><input type="text" class="form-control" value="" id="managerPhone"></div>
 
                 <label class="col-2 fw-bold ms-4">직영점 주소</label>
-                <div class="col-3"><input type="text" class="form-control" value="서울특별시 금천구 가산디지털1로 128"></div>
+                <div class="col-3"><input type="text" class="form-control" value="" id="storeAddress" readonly></div>
             </div>
 
             <div class="row mb-3">
                 <label class="col-2 fw-bold">직영점명</label>
-                <div class="col-4"><input type="text" class="form-control" value="가산1호점"></div>
+                <div class="col-4"><input type="text" class="form-control" value="" id="storeName"></div>
 
                 <label class="col-2 fw-bold ms-4">영업상태</label>
                 <div class="col-2">
@@ -100,35 +101,80 @@
             </div>
             <div class="row mb-3">
                 <label class="col-2 fw-bold">개점날짜</label>
-                <div class="col-2"><input type="date" class="form-control" value="2023-06-01"></div>
+                <div class="col-2"><input type="date" class="form-control" value="" id="openDate"></div>
             </div>
             <div class="row mb-3" id="closeDateRow" style="display: none;">
                 <label class="col-2 fw-bold" >폐점날짜</label>
-                <div class="col-2"><input type="date" class="form-control"></div>
+                <div class="col-2"><input type="date" class="form-control" id="closeDate"></div>
             </div>
             <div class="row mb-3">
                 <label class="col-2 fw-bold">영업 시작</label>
-                <div class="col-2"><input type="time" class="form-control" value="10:00"></div>
+                <div class="col-2"><input type="time" class="form-control" value="" id="openTime"></div>
 
                 <label class="col-2 fw-bold ms-5">직영점 연락처</label>
-                <div class="col-3"><input type="text" class="form-control" value="02-855-9274"></div>
+                <div class="col-3"><input type="text" class="form-control" value="" id="storePhone"></div>
             </div>
 
             <div class="row mb-3">
                 <label class="col-2 fw-bold">영업 마감</label>
-                <div class="col-2"><input type="time" class="form-control" value="22:00"></div>
+                <div class="col-2"><input type="time" class="form-control" value="" id="closeTime"></div>
 
                 <label class="col-2 fw-bold ms-5">직영점 이미지</label>
-                <div class="col-4"><input type="file" class="form-control" value="store1.png"></div>
+                <div class="col-4"><input type="file" class="form-control" value=""></div>
             </div>
         </div>
     </div>
     <div class="text-center mt-4">
-        <button class="btn btn-success custom-btn px-4">저장</button>
+        <button class="btn btn-success custom-btn px-4" id="saveBtn">저장</button>
         <button class="btn btn-light px-4 gray-btn" id="cancelBtn">취소</button>
     </div>
 </div>
 <script>
+    const managerId = location.pathname.split('/').pop();
+    $(document).ready(function(){
+        fetchUtil("/admin/member/store/"+managerId, function(data){
+            loadInfo(data);
+        });
+    });
+
+    function loadInfo(data){
+        $("#managerId").val(data.manager.managerId);
+        $("#managerName").val(data.manager.managerName);
+        $("#managerEmail").val(data.manager.email);
+        $("#managerPhone").val(data.manager.phoneNumber);
+        $("#storeAddress").val(data.store.address);
+        $("#storeName").val(data.store.storeName);
+        $("#storeStatus").val(data.store.storeStatus);
+        $("#openDate").val(data.store.openedDate);
+        $("#openTime").val(data.store.openTime);
+        $("#closeTime").val(data.store.closeTime);
+        $("#storePhone").val(data.store.storePhoneNumber);
+
+    }
+
+
+
+    $(document).on("click", "#storeAddress", function(){
+        goPopup();
+    });
+
+    let addr = {};
+    function jusoCallback(data) {
+        addr = data;
+        $("#storeAddress").val(data.roadFullAddr);
+
+
+    }
+
+    function goPopup() {
+        window.open(
+            "/jusoPopup",
+            "jusoPopup",
+            "width=570,height=420,scrollbars=yes"
+        );
+    }
+
+
     $("#cancelBtn").click(() => {
         history.back()
     });

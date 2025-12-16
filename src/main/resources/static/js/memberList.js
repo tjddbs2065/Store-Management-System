@@ -27,7 +27,7 @@
             const rowHtml = `
                 <tr>
                     <td>${managerName}</td>
-                    <td>${managerId}</td>
+                    <td class="managerId">${managerId}</td>
                     <td>${email}</td>
                     <td>${phoneNumber}</td>
                     <td>
@@ -181,12 +181,16 @@
 
         // 계정 등록 버튼: 추후 구현 → alert
         $('#addMemberBtn').on('click', function () {
-            alert('계정 등록 기능은 추후 구현 예정입니다.');
+            location.href = "memberAddUI";
         });
 
         // 본사 직원 수정 버튼: 추후 구현 → alert
         $('#managerTbody').on('click', '.managerSetbtn', function () {
-            alert('본사 직원 정보 수정 기능은 추후 구현 예정입니다.');
+            const managerId = $(this).closest("tr").find(".managerId").text();
+            // console.log(managerId);
+            location.href = "managerSetUI/"+managerId;
+
+            // alert('본사 직원 정보 수정 기능은 추후 구현 예정입니다.');
         });
 
         // 직영점 - 메뉴 판매 중지 권한 토글

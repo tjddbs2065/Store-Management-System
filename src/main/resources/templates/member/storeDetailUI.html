@@ -200,7 +200,8 @@
                             <input type="text" class="form-control-plaintext"
                                    readonly
                                    th:value="${store.storeManagerId}"
-                                   value="kosta123">
+                                   value="kosta123"
+                                   id="managerId">
                         </div>
                     </div>
 
@@ -303,7 +304,9 @@
 
         // 수정 기능: 추후 구현 → 일단 alert만
         $('#storeSetBtn').on('click', function () {
-            alert('직영점 정보 수정 기능은 추후 구현 예정입니다.');
+            const managerId = $("#managerId").val();
+
+            location.href = "/admin/storeSetUI/"+managerId;
         });
 
     });

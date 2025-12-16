@@ -27,6 +27,26 @@ public class MemberService {
     private final StoreDAO storeDAO;
     private final BCryptPasswordEncoder encoder;
 
+    public void setManager(ManagerDTO managerDTO) {
+        managerDTO.setPw(encoder.encode(managerDTO.getPw()));
+        try {
+            managerDAO.setManager(managerDTO);
+        }
+        catch (Exception e) {
+            throw new ManagerException("직원을 정보를 변경할 수 없습니다.");
+        }
+    }
+
+    public ManagerDTO getManager(String managerId) {
+        ManagerDTO managerDTO = null;
+        managerDTO = managerDAO.getManagerForLogin(managerId);
+        if(managerDTO == null) {
+            throw new ManagerException("직원을 찾을 수 없습니다.");
+        }
+
+        return managerDTO;
+    }
+
     public void addManager(ManagerDTO managerDTO) {
         managerDTO.setPw(encoder.encode(managerDTO.getPw()));
         managerDTO.setRole("ROLE_MANAGER");

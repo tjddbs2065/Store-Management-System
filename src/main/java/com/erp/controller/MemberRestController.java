@@ -5,6 +5,7 @@ import com.erp.dto.AddStoreRequestDTO;
 import com.erp.dto.ManagerDTO;
 import com.erp.dto.MenuDTO;
 import com.erp.dto.StoreDTO;
+import com.erp.repository.entity.Manager;
 import com.erp.service.MemberService;
 import com.erp.service.StoreService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -26,11 +28,34 @@ public class MemberRestController {
     private final MemberService memberService;
     private final StoreService storeService;
 
+    @PutMapping("/manager")
+    public ResponseEntity<Map<String, String>> updateManager(@RequestBody ManagerDTO requestBody) {
+        memberService.setManager(requestBody);
+        return ResponseEntity.ok().body(Map.of("message", "success"));
+    }
+    @GetMapping("/manager/{managerId}")
+    public ResponseEntity<Map<String, Object>> getManager(@PathVariable String managerId) {
+        ManagerDTO managerDTO = memberService.getManager(managerId);
+
+        return ResponseEntity.ok().body(Map.of("manager", managerDTO));
+    }
+
+    @GetMapping("/store/{managerId}")
+    public ResponseEntity<Map<String, Object>> getStore(@PathVariable String managerId) {
+        ManagerDTO managerDTO = memberService.getManager(managerId);
+        StoreDTO storeDTO =  storeService.getStore(managerId);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("manager", managerDTO);
+        data.put("store", storeDTO);
+
+        return ResponseEntity.ok().body(data);
+    }
+
     @PostMapping("/manager")
     public ResponseEntity<Map<String, String>> manager(@RequestBody AddStoreRequestDTO request, Model model) {
         ManagerDTO manager = ManagerDTO.toDTO(request.getManager());
 
-        System.out.println(manager);
         memberService.addManager(manager);
 
         return ResponseEntity.ok().body(Map.of("message", "직원 추가 성공"));
