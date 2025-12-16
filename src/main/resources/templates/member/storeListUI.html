@@ -327,9 +327,17 @@
                 kakao.maps.event.addListener(marker, 'mouseout', () => {
                     infowindow.close();
                 });
+
+                kakao.maps.event.addListener(marker, 'click', function() {
+                    fetchUtil(`getStoreDetail/${store.storeNo}`, data => {
+                        openStoreDetail(data);
+                    })
+                });
             });
         });
     }
+
+
 
     function renderStoreList(data) {
         const tbody = storeTable.find("tbody");
@@ -381,6 +389,7 @@
         })
     });
 
+
     let currentStore = null;
     function openStoreDetail(store) {
         currentStore = store;
@@ -393,6 +402,7 @@
         $("#mdOpenDate").text(store.openedDate?? "-");
         $("#mdTime").text(store.openTime + " ~ " + store.closeTime?? "-");
         $("#mdCloseDate").text(store.closedDate?? "-");
+        $("#mdStoreImg").attr("src", store.storeImage);
 
         new bootstrap.Modal(document.getElementById("storeDetailModal")).show();
     }
