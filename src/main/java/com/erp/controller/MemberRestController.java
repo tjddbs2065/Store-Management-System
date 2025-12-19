@@ -1,11 +1,9 @@
 package com.erp.controller;
 
-import com.erp.controller.exception.ManagerException;
+import com.erp.exception.ManagerException;
 import com.erp.dto.AddStoreRequestDTO;
 import com.erp.dto.ManagerDTO;
-import com.erp.dto.MenuDTO;
 import com.erp.dto.StoreDTO;
-import com.erp.repository.entity.Manager;
 import com.erp.service.MemberService;
 import com.erp.service.StoreService;
 import lombok.RequiredArgsConstructor;

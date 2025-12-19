@@ -1,7 +1,7 @@
 package com.erp.service;
 
-import com.erp.controller.exception.StoreItemLimitConflictException;
-import com.erp.controller.exception.StoreItemNotFoundException;
+import com.erp.exception.StoreItemLimitConflictException;
+import com.erp.exception.StoreItemNotFoundException;
 import com.erp.controller.request.SearchRequestDTO;
 import com.erp.dto.PageResponseDTO;
 import com.erp.dto.StoreItemDTO;

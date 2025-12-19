@@ -1,6 +1,6 @@
 package com.erp.service;
 
-import com.erp.controller.exception.InvalidDateRangeException;
+import com.erp.exception.InvalidDateRangeException;
 import com.erp.dao.StoreDAO;
 import com.erp.dto.KPIDTO;
 import com.erp.repository.SalesOrderRepository;

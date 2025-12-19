@@ -2,7 +2,7 @@ package com.erp.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
-import com.erp.controller.exception.StoreNotFoundException;
+import com.erp.exception.StoreNotFoundException;
 import com.erp.dto.StoreDTO;
 import com.erp.service.MemberService;
 import lombok.RequiredArgsConstructor;

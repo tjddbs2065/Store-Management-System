@@ -1,4 +1,4 @@
-package com.erp.controller.exception;
+package com.erp.exception;
 
 public class ItemNotFoundException extends RuntimeException {
     public ItemNotFoundException(String message) {

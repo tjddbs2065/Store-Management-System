@@ -1,4 +1,4 @@
-package com.erp.controller.exception;
+package com.erp.exception;
 
 public class NoIngredientException extends RuntimeException {
     public NoIngredientException(String message) {

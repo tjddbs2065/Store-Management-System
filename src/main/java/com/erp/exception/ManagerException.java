@@ -1,4 +1,4 @@
-package com.erp.controller.exception;
+package com.erp.exception;
 
 public class ManagerException extends RuntimeException {
     public ManagerException(String message) {
