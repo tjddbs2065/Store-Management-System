@@ -3,6 +3,10 @@ package com.erp.auth.Filter;
 
 import com.erp.auth.PrincipalDetails;
 import com.erp.dto.ManagerDTO;
+import com.erp.response.ApiResponse;
+import com.erp.response.ErrorCode;
+import com.erp.response.ErrorResponse;
+import com.erp.response.ResponseUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSHeader;
@@ -46,8 +50,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
             return auth;
         }
-        catch (IOException e){
-            log.error("사용자 인증 중 예외 발생", e);
+        catch(IOException e){
+            log.error("사용자 인증 실패: {}", e.getMessage());
         }
 
         return null;
@@ -89,6 +93,22 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // 응답 헤더에 JWT 값을 추가(Authorization : ....)
         response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + token);
         // 응답으로 전달할 데이터
-        response.getWriter().println(Map.of("message", "loginOK"));
+        ResponseUtil.writeJson(
+                response,
+                HttpServletResponse.SC_OK,
+                ApiResponse.success(Map.of("message", "loginOK"))
+        );
+    }
+
+    // 인증 실패 메서드 재정의
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+        log.error("인증 실패: {}", failed.getMessage());
+
+        ResponseUtil.writeJson(
+                response,
+                HttpServletResponse.SC_UNAUTHORIZED,
+                ApiResponse.error(ErrorResponse.of(ErrorCode.AUTH_FAILED))
+        );
     }
 }

@@ -2,6 +2,7 @@ package com.erp.controller;
 
 import com.erp.dto.ItemDTO;
 import com.erp.dto.PageResponseDTO;
+import com.erp.response.ApiResponse;
 import com.erp.service.ItemService;
 import com.erp.awss3.S3Uploader;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,7 @@ public class ItemRestController {
        2) 목록 + 검색 + 페이징
      ----------------------------------------- */
     @GetMapping("/list/{page}")
-    public PageResponseDTO<ItemDTO> listPaged(
+    public ApiResponse<PageResponseDTO<ItemDTO>> listPaged(
             @PathVariable int page,
             @RequestParam(required = false) String itemCategory,
             @RequestParam(required = false) String itemName,
@@ -92,7 +93,7 @@ public class ItemRestController {
         int startPage = blockIdx * blockSize + 1;
         int endPage = Math.min(totalPages, startPage + blockSize - 1);
 
-        return PageResponseDTO.<ItemDTO>builder()
+        return ApiResponse.success(PageResponseDTO.<ItemDTO>builder()
                 .content(pageContent)
                 .page(currentPage - 1)
                 .size(pageSize)
@@ -102,7 +103,7 @@ public class ItemRestController {
                 .endPage(endPage)
                 .hasPrevBlock(startPage > 1)
                 .hasNextBlock(endPage < totalPages)
-                .build();
+                .build());
     }
 
 
