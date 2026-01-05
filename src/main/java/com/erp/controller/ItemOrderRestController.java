@@ -5,6 +5,7 @@ import com.erp.exception.ItemOrderNotFoundException;
 import com.erp.exception.StoreItemNotFoundException;
 import com.erp.dao.StoreDAO;
 import com.erp.dto.*;
+import com.erp.response.ApiResponse;
 import com.erp.service.ItemOrderService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@RequestMapping("/api")
 @RestController
 public class ItemOrderRestController {
     @Autowired
@@ -127,8 +129,11 @@ public class ItemOrderRestController {
     }
 
     @GetMapping("/itemOrder/itemList")
-    public List<ItemStoreQuantityDTO> itemList(@AuthenticationPrincipal PrincipalDetails dp) {
-        return itemOrderService.itemList(dp.getStore().getStoreNo());
+    public ApiResponse<List<ItemStoreQuantityDTO>> itemList(@AuthenticationPrincipal PrincipalDetails dp) {
+        Long storeNo = storeDAO.getStoreNoByManager(dp.getManager().getManagerId());
+
+
+        return ApiResponse.success(itemOrderService.itemList(storeNo));
     }
     @GetMapping("/itemOrder/itemList/{storeNo}")
     public List<ItemStoreQuantityDTO> itemList(@PathVariable Long storeNo) {

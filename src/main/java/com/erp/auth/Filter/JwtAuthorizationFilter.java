@@ -88,6 +88,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
                 // 한 요청에 대한 Security 임시 저장소에 인증상태 등록
                 SecurityContextHolder.getContext().setAuthentication(auth);
+
                 // 나머지 필터 이어서 처리
                 chain.doFilter(request, response);
             }
