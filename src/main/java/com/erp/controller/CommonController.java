@@ -23,7 +23,7 @@ public class CommonController implements ErrorController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(ErrorResponse.of(ErrorCode.REQ_NOT_FOUND)));
         }
         if(status == HttpStatus.FORBIDDEN.value()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error(ErrorResponse.of(ErrorCode.FORBIDDEN)));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error(ErrorResponse.of(ErrorCode.FORBIDDEN)));
         }
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR)));

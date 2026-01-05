@@ -5,6 +5,7 @@ import com.erp.dao.ManagerDAO;
 import com.erp.response.ApiResponse;
 import com.erp.response.ErrorCode;
 import com.erp.response.ErrorResponse;
+import com.erp.response.ResponseUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -93,15 +94,27 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         }
         catch (JOSEException e){
             log.error("JWT 토큰 검증 중 문제 발생: {}", e.getMessage());
-            new ObjectMapper().writeValue(response.getOutputStream(), ApiResponse.error(ErrorResponse.of(ErrorCode.AUTH_NOT_VERIFY)));
+            ResponseUtil.writeJson(
+                    response,
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    ApiResponse.error(ErrorResponse.of(ErrorCode.AUTH_NOT_VERIFY))
+            );
         }
         catch (ParseException e){
             log.error("JWT 토큰 변환 중 문제 발생: {}", e.getMessage());
-            new ObjectMapper().writeValue(response.getOutputStream(), ApiResponse.error(ErrorResponse.of(ErrorCode.AUTH_NOT_CONVERTABLE)));
+            ResponseUtil.writeJson(
+                    response,
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    ApiResponse.error(ErrorResponse.of(ErrorCode.AUTH_NOT_CONVERTABLE))
+            );
         }
         catch (BadJWTException e){
             log.error("JWT 정보 검증 중 문제 발생: {}", e.getMessage());
-            new ObjectMapper().writeValue(response.getOutputStream(), ApiResponse.error(ErrorResponse.of(ErrorCode.AUTH_EXPIRED)));
+            ResponseUtil.writeJson(
+                    response,
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    ApiResponse.error(ErrorResponse.of(ErrorCode.AUTH_EXPIRED))
+            );
         }
     }
 

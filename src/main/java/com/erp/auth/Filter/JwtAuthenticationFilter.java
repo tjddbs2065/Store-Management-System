@@ -92,6 +92,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         log.info("로그인 성공 - JWT: {}", token);
         // 응답 헤더에 JWT 값을 추가(Authorization : ....)
         response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + token);
+
         // 응답으로 전달할 데이터
         ResponseUtil.writeJson(
                 response,
@@ -107,7 +108,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         ResponseUtil.writeJson(
                 response,
-                HttpServletResponse.SC_UNAUTHORIZED,
+                400,
                 ApiResponse.error(ErrorResponse.of(ErrorCode.AUTH_FAILED))
         );
     }

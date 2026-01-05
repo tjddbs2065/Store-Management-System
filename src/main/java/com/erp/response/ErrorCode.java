@@ -21,11 +21,11 @@ public enum ErrorCode {
 
     
     private final HttpStatus status;
-    private final String errorCode;
-    private final String errorMessage;
+    private final String code;
+    private final String message;
     ErrorCode(HttpStatus status, String errorCode, String errorMessage){
         this.status = status;
-        this.errorCode = errorCode;
-        this.errorMessage = errorMessage;
+        this.code = errorCode;
+        this.message = errorMessage;
     }
 }

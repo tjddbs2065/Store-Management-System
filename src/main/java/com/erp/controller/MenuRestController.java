@@ -2,6 +2,7 @@ package com.erp.controller;
 
 import com.erp.dto.ItemDTO;
 import com.erp.dto.MenuDTO;
+import com.erp.response.ApiResponse;
 import com.erp.service.ItemService;
 import com.erp.service.MenuService;
 import lombok.RequiredArgsConstructor;
@@ -28,12 +29,13 @@ public class MenuRestController {
 
 
     @GetMapping("/menuList")
-    public ResponseEntity<List<MenuDTO>> getMenuList(
+    public ApiResponse<List<MenuDTO>> getMenuList(
             @RequestParam(required = false) String menuCategory,
             @RequestParam(required = false) String releaseStatus
     ) {
         List<MenuDTO> menuList = menuService.getMenuList(menuCategory, releaseStatus);
-        return ResponseEntity.ok(menuList);
+
+        return ApiResponse.success(menuList);
     }
     @PutMapping(value = "/setMenu", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, String>> setMenu(@RequestPart MenuDTO menuDTO,
