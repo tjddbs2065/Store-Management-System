@@ -108,16 +108,18 @@ public class ItemOrderRestController {
     }
 
     @GetMapping("/itemOrder/itemProposal")
-    public List<ItemProposalDTO> proposalItemOrder(@AuthenticationPrincipal PrincipalDetails dp) {
-        return itemOrderService.getItemProposalByStoreNo(dp.getStore().getStoreNo());
+    public ApiResponse<List<ItemProposalDTO>> proposalItemOrder(@AuthenticationPrincipal PrincipalDetails dp) {
+        long storeNo = storeDAO.getStoreNoByManager(dp.getManager().getManagerId());
+
+        return ApiResponse.success(itemOrderService.getItemProposalByStoreNo(storeNo));
     }
     @GetMapping("/itemOrder/itemProposal/{storeNo}")
     public List<ItemProposalDTO> proposalItemOrder(@PathVariable Long storeNo) {
         return itemOrderService.getItemProposalByStoreNo(storeNo);
     }
 
-    @PutMapping("/itemOrder/respondItemProposal/{proposalNo}")
-    public ResponseEntity<Map<String, String>> responseProposal(@PathVariable Long proposalNo) {
+    @PutMapping("/itemOrder/respondItemProposal")
+    public ResponseEntity<Map<String, String>> responseProposal(@RequestBody Long proposalNo) {
         try {
             itemOrderService.responseProposal(proposalNo);
         }

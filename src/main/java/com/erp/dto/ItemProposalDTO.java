@@ -22,6 +22,7 @@ public class ItemProposalDTO {
 
     private Long itemNo;
     private String itemName;
+    private Integer itemPrice;
 
     private Integer quantity;
     private String supplyUnit;
@@ -42,6 +43,7 @@ public class ItemProposalDTO {
                 .reason(prop.getProposalReason())
                 .proposalDate(prop.getProposalDate())
                 .responseDate(prop.getResponseDate())
+                .itemPrice(prop.getItemNo().getItemPrice())
                 .build();
     }
 }
