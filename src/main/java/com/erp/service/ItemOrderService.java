@@ -18,6 +18,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -170,21 +172,43 @@ public class ItemOrderService {
         return repoOrder.save(newOrder);
     }
 
+    @Transactional
     public void requestItemOrder(ItemOrderRequestDTO request, Long storeNo) {
-
+        System.out.println(request);
         ItemOrder itemOrder = makeOrder(request, storeNo);
 
-        request.getOrderList().forEach((item)->{
+        List<Long> itemNos = request.getOrderList().stream().map(OrderItemDTO::getItemNo).toList();
+        List<Item> items = itemRepo.findAllById(itemNos);
+        Map<Long, Item> itemMap = items.stream().collect(Collectors.toMap(Item::getItemNo, item -> item));
+
+        List<ItemOrderDetail> details = new ArrayList<>();
+
+        int totalAmount = 0;
+        for(OrderItemDTO reqItem: request.getOrderList()){
+            Item item = itemMap.get(reqItem.getItemNo());
+            if(item == null){
+                throw new EntityNotFoundException("상품 없음");
+            }
+
+            int price = item.getItemPrice();
+            int quantity = reqItem.getItemQuantity();
+            int totalPrice = price * quantity;
+            totalAmount += totalPrice;
+
             ItemOrderDetail orderDetail = ItemOrderDetail
                     .builder()
-                    .itemNo(Item.builder().itemNo(item.getItemNo()).build())
+                    .itemNo(item)
                     .itemOrderNo(itemOrder)
-                    .orderDetailQuantity(item.getItemQuantity())
-                    .orderDetailPrice(item.getItemOrderPrice())
+                    .orderDetailQuantity(quantity)
+                    .orderDetailPrice(totalPrice)
                     .build();
+            details.add(orderDetail);
+        }
 
-            orderDetailRepo.save(orderDetail);
-        });
+        itemOrder.setTotalAmount(totalAmount);
+        repoOrder.save(itemOrder);
+
+        orderDetailRepo.saveAll(details);
     }
 
     // 발주 제안

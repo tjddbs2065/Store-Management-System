@@ -12,8 +12,6 @@ import java.util.List;
 @Data
 @Builder
 public class ItemOrderRequestDTO {
-
-    private Long storeNo;
     private int totalItem;
     private int totalAmount;
 

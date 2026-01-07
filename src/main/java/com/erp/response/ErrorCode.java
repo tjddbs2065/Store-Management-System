@@ -15,6 +15,7 @@ public enum ErrorCode {
 
     // 요청 관련 오류
     REQ_NOT_FOUND(HttpStatus.NOT_FOUND, "REQ_001", "찾을 수 없는 페이지 입니다."),
+    REQ_FAILED(HttpStatus.NOT_ACCEPTABLE, "REQ_002", "요청이 실패했습니다."),
 
     // 서버 관련 오류
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "RES_001", "서버 에러입니다.");

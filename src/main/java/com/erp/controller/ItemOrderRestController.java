@@ -6,6 +6,8 @@ import com.erp.exception.StoreItemNotFoundException;
 import com.erp.dao.StoreDAO;
 import com.erp.dto.*;
 import com.erp.response.ApiResponse;
+import com.erp.response.ErrorCode;
+import com.erp.response.ErrorResponse;
 import com.erp.service.ItemOrderService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,16 +120,15 @@ public class ItemOrderRestController {
         return itemOrderService.getItemProposalByStoreNo(storeNo);
     }
 
-    @PutMapping("/itemOrder/respondItemProposal")
-    public ResponseEntity<Map<String, String>> responseProposal(@RequestBody Long proposalNo) {
+    @PutMapping("/itemOrder/respondItemProposal/{proposalNo}")
+    public ResponseEntity<?> responseProposal(@PathVariable Long proposalNo) {
         try {
             itemOrderService.responseProposal(proposalNo);
         }
         catch (EntityNotFoundException e) {
-            System.err.println(e.getMessage());
-            return ResponseEntity.status(400).build();
+            return ResponseEntity.status(402).body(ApiResponse.error(ErrorResponse.of(ErrorCode.REQ_FAILED)));
         }
-        return ResponseEntity.ok().body(Map.of("message", "Response Proposal Success"));
+        return ResponseEntity.ok(ApiResponse.success(Map.of("message", "success")));
     }
 
     @GetMapping("/itemOrder/itemList")
@@ -143,15 +144,16 @@ public class ItemOrderRestController {
     }
 
     @PostMapping("/itemOrder/itemOrder")
-    public ResponseEntity<Map<String, String>> requestItemOrder(@RequestBody ItemOrderRequestDTO request, @AuthenticationPrincipal PrincipalDetails dp) {
+    public ResponseEntity<?> requestItemOrder(@RequestBody ItemOrderRequestDTO request, @AuthenticationPrincipal PrincipalDetails dp) {
+        long storeNo = storeDAO.getStoreNoByManager(dp.getManager().getManagerId());
         try {
-            itemOrderService.requestItemOrder(request, dp.getStore().getStoreNo());
+            itemOrderService.requestItemOrder(request, storeNo);
         }
         catch (Exception e) {
             System.err.println(e.getMessage());
-            return ResponseEntity.status(400).build();
+            return ResponseEntity.status(403).body(ApiResponse.error(ErrorResponse.of(ErrorCode.REQ_FAILED)));
         }
-        return ResponseEntity.ok().body(Map.of("message", "Request ItemOrder Success"));
+        return ResponseEntity.ok(ApiResponse.success(Map.of("message", "success")));
     }
 
     @PutMapping("/itemOrder/approveItemOrder/{itemOrderNo}")

@@ -26,6 +26,8 @@ public class ItemProposalDTO {
 
     private Integer quantity;
     private String supplyUnit;
+    private Integer convertStock;
+    private String stockUnit ;
     private String reason;
     private Timestamp proposalDate;
     private Timestamp responseDate;
@@ -40,6 +42,8 @@ public class ItemProposalDTO {
                 .itemName(prop.getItemNo().getItemName())
                 .quantity(prop.getProposalQuantity())
                 .supplyUnit(prop.getItemNo().getSupplyUnit())
+                .stockUnit(prop.getItemNo().getStockUnit())
+                .convertStock(prop.getItemNo().getConvertStock())
                 .reason(prop.getProposalReason())
                 .proposalDate(prop.getProposalDate())
                 .responseDate(prop.getResponseDate())
