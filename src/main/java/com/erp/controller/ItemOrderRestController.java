@@ -37,22 +37,22 @@ public class ItemOrderRestController {
                 "totalElement", page.getTotalElements()
         );
     }
-    @GetMapping("/itemOrder/itemOrderListFilter")
-    public Map<String, Object> itemOrderListFilter(@RequestParam int pageNo,
-                                                 @RequestParam String startDate,
-                                                 @RequestParam String endDate,
-                                                 @RequestParam String orderStatus,
-                                                 @AuthenticationPrincipal PrincipalDetails dp) {
-        String managerId = dp.getManager().getManagerId();
-        Long storeNo = storeDAO.getStoreNoByManager(managerId);
-        if(storeNo == null) storeNo = 0L;
+    @GetMapping("/itemOrder/itemOrderList/{pageNo}")
+    public ApiResponse<?> itemOrderListFilter(@PathVariable int pageNo,
+                                               @RequestParam String orderStatus,
+                                               @RequestParam String startDate,
+                                               @RequestParam String endDate,
+                                               @AuthenticationPrincipal PrincipalDetails dp) {
+        Long storeNo = storeDAO.getStoreNoByManager(dp.getManager().getManagerId());
+        Page<ItemOrderDTO> page = itemOrderService.getItemOrderList(pageNo-1, storeNo, orderStatus, startDate, endDate);
 
-        Page<ItemOrderDTO> page = itemOrderService.getItemOrderList(pageNo, storeNo, orderStatus, startDate, endDate);
-        return Map.of(
-                "list", page.getContent(),
+        return ApiResponse.success(
+            Map.of(
+                "content", page.getContent(),
                 "totalPages", page.getTotalPages(),
-                "pageNo", page.getNumber() + 1,
-                "totalElement", page.getTotalElements()
+                "pageNo", page.getNumber(),
+                "totalElements", page.getTotalElements()
+            )
         );
     }
     @GetMapping("/itemOrder/itemOrderListFilter/{storeNo}")

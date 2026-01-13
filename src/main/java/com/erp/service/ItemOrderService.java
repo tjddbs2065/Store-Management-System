@@ -46,8 +46,8 @@ public class ItemOrderService {
     public Page<ItemOrderDTO> getItemOrderList(Integer pageNo, Long storeNo, String orderStatus, String startDate, String endDate) {
         LocalDateTime startDateTime = startDate.isEmpty() ? null : LocalDate.parse(startDate).atStartOfDay();
         LocalDateTime endDateTime = endDate.isEmpty() ? null : (endDate.equals(startDate) ? LocalDate.parse(endDate).plusDays(1).atStartOfDay() : LocalDate.parse(endDate).atStartOfDay());
-        String status = orderStatus.equals("전체") ? null : orderStatus;
-        storeNo = storeNo == 0 ? null : storeNo;
+        String status = orderStatus.isEmpty() ? null : orderStatus;
+
         return repoOrder.findAllItemOrderList(PageRequest.of(pageNo, 10, Sort.by("itemOrderNo").descending()), storeNo, status, startDateTime, endDateTime);
     }
 
